@@ -95,7 +95,7 @@ public class User implements Serializable {
      */
     //逻辑删除标记: @TableLogic 是 MyBatis-Plus 框架提供的注解，用于实现逻辑删除功能
     @TableLogic
-    private Integer isDelete;
+    private Byte isDelete;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
