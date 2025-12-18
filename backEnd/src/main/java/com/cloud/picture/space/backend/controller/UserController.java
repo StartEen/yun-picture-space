@@ -6,8 +6,8 @@ import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
-import com.cloud.picture.space.backend.model.dto.UserLoginRequest;
-import com.cloud.picture.space.backend.model.dto.UserRegisterRequest;
+import com.cloud.picture.space.backend.model.dto.user.UserLoginRequest;
+import com.cloud.picture.space.backend.model.dto.user.UserRegisterRequest;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.LoginUserVo;
 import com.cloud.picture.space.backend.service.UserService;
@@ -64,6 +64,15 @@ public class UserController {
     public BaseResponse<LoginUserVo> getLoginUser(HttpServletRequest request) {
         User user = userService.getLoginUser(request);
         return ResultUtils.success(userService.getLoginUserVO(user));
+    }
+
+    /**
+     * 用户注销
+     */
+    @PostMapping("/logout")
+    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(request), ErrorCode.PARAMS_ERROR, "传来的参数为空");
+        return ResultUtils.success(userService.userLogout(request));
     }
 
 

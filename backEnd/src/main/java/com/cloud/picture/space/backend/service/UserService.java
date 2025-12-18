@@ -58,5 +58,12 @@ public interface UserService extends IService<User> {
      */
     LoginUserVo getLoginUserVO(User user);
 
+    /**
+     * 用户注销
+     *
+     * @param request 请求
+     * @return 是否注销成功
+     */
+    boolean userLogout(HttpServletRequest request);
 
 }

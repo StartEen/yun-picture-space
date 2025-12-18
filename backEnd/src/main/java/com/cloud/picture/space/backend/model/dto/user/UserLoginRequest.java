@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.model.dto;
+package com.cloud.picture.space.backend.model.dto.user;
 
 
 import lombok.Data;

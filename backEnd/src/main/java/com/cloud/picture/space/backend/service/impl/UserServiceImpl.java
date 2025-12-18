@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
+import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.UserRoleEnum;
 import com.cloud.picture.space.backend.model.vo.LoginUserVo;
@@ -128,9 +129,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 先判断当前是否已经登录
         Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
         User currentUser = (User) userObj;
-        if (ObjectUtil.isEmpty(currentUser)) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "当前账号未登录");
-        }
+        // if (ObjectUtil.isEmpty(currentUser)) {
+        //     throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "当前账号未登录");
+        // }
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(currentUser), ErrorCode.NOT_LOGIN_ERROR, "当前账号未登录");
         // 从数据库查询（追求性能的话可以注释）
         long userId = currentUser.getId();
         currentUser = this.baseMapper.selectById(userId);
@@ -151,6 +153,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         LoginUserVo loginUserVO = new LoginUserVo();
         BeanUtils.copyProperties(user, loginUserVO);
         return loginUserVO;
+    }
+
+    /**
+     * 用户注销
+     */
+    @Override
+    public boolean userLogout(HttpServletRequest request) {
+        // 先判断当前账户是否已经登录
+        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(currentUser), ErrorCode.OPERATION_ERROR, "当前用户未登录");
+
+        // 移除当前用户登录态
+        request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
+        return true;
     }
 
 }
