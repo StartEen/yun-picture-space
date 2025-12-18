@@ -2,6 +2,9 @@ package com.cloud.picture.space.backend.service;
 
 import com.cloud.picture.space.backend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cloud.picture.space.backend.model.vo.LoginUserVo;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author yz2025120101
@@ -27,6 +30,16 @@ public interface UserService extends IService<User> {
      * @return 加密后的密码
      */
     String getEncryptPassword(String userPassword);
+
+    /**
+     * 用户登录
+     *
+     * @param userAccount  用户账户
+     * @param userPassword 用户密码
+     * @param request      请求
+     * @return 脱敏后的用户信息
+     */
+    LoginUserVo userLogin(String userAccount, String userPassword, HttpServletRequest request);
 
 
 }

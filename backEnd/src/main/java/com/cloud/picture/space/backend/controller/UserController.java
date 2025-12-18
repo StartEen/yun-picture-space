@@ -1,11 +1,14 @@
 package com.cloud.picture.space.backend.controller;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
+import com.cloud.picture.space.backend.model.dto.UserLoginRequest;
 import com.cloud.picture.space.backend.model.dto.UserRegisterRequest;
+import com.cloud.picture.space.backend.model.vo.LoginUserVo;
 import com.cloud.picture.space.backend.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @Author: LT
@@ -26,18 +30,33 @@ public class UserController {
     @Resource
     private UserService userService;
 
-
+    /**
+     * 用户注册
+     */
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
 
         // 校验前端传来的信息是否完整
-        ThrowUtils.throwIf(userRegisterRequest == null, ErrorCode.PARAMS_ERROR, "传来的参数为空");
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(userRegisterRequest), ErrorCode.PARAMS_ERROR, "传来的参数为空");
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
         long result = userService.userRegister(userAccount, userPassword, checkPassword);
         return ResultUtils.success(result);
 
+    }
+
+    /**
+     * 用户登录
+     */
+    @PostMapping("/login")
+    public BaseResponse<LoginUserVo> userLogin(@RequestBody UserLoginRequest userloginRequest, HttpServletRequest request) {
+        // 校验前端传来的信息是否完整
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(userloginRequest), ErrorCode.PARAMS_ERROR, "传来的参数为空");
+        String userAccount = userloginRequest.getUserAccount();
+        String userPassword = userloginRequest.getUserPassword();
+        LoginUserVo loginUserVo = userService.userLogin(userAccount, userPassword, request);
+        return ResultUtils.success(loginUserVo);
     }
 
 
