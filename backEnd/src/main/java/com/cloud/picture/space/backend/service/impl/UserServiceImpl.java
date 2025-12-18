@@ -1,5 +1,6 @@
 package com.cloud.picture.space.backend.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -7,9 +8,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
+import com.cloud.picture.space.backend.model.dto.user.UserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.UserRoleEnum;
 import com.cloud.picture.space.backend.model.vo.LoginUserVo;
+import com.cloud.picture.space.backend.model.vo.UserVo;
 import com.cloud.picture.space.backend.service.UserConstant;
 import com.cloud.picture.space.backend.service.UserService;
 import com.cloud.picture.space.backend.mapper.UserMapper;
@@ -19,6 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author yz2025120101
@@ -168,6 +175,57 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 移除当前用户登录态
         request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
         return true;
+    }
+
+    /**
+     * 单个用户信息脱敏
+     */
+    @Override
+    public UserVo getUserVo(User user) {
+        if (ObjectUtil.isEmpty(user)) {
+            return null;
+        }
+        UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(user, userVo);
+        return userVo;
+    }
+
+    /**
+     * 用户列表信息脱敏
+     */
+    @Override
+    public List<UserVo> getUserVoList(List<User> users) {
+        if (CollUtil.isEmpty(users)) {
+            return new ArrayList<>();
+        }
+        // 这行代码使用Stream API
+        // 将users列表中的每个User对象对象通过getUserVo方法
+        // 转换为脱敏的UserVo对象，并收集为新的列表
+        return users.stream().map(this::getUserVo).collect(Collectors.toList());
+    }
+
+    /**
+     * 用户信息分页查询
+     **/
+    @Override
+    public QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest) {
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(userQueryRequest), ErrorCode.PARAMS_ERROR);
+        Long id = userQueryRequest.getId();
+        String userName = userQueryRequest.getUserName();
+        String userAccount = userQueryRequest.getUserAccount();
+        String userProfile = userQueryRequest.getUserProfile();
+        String userRole = userQueryRequest.getUserRole();
+        String sortField = userQueryRequest.getSortField();
+        String sortOrder = userQueryRequest.getSortOrder();
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ObjectUtil.isNotNull(id), "id", id);
+        queryWrapper.eq(StrUtil.isNotBlank(userRole), "userRole", userRole);
+        queryWrapper.like(StrUtil.isNotBlank(userProfile), "userProfile", userProfile);
+        queryWrapper.like(StrUtil.isNotBlank(userAccount), "userAccount", userAccount);
+        queryWrapper.like(StrUtil.isNotBlank(userName), "userName", userName);
+        queryWrapper.orderBy(StrUtil.isNotEmpty(sortField), sortOrder.equals("ascend"), sortField);
+        return queryWrapper;
     }
 
 }

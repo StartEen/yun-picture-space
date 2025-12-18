@@ -1,10 +1,14 @@
 package com.cloud.picture.space.backend.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cloud.picture.space.backend.model.dto.user.UserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cloud.picture.space.backend.model.vo.LoginUserVo;
+import com.cloud.picture.space.backend.model.vo.UserVo;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author yz2025120101
@@ -65,5 +69,32 @@ public interface UserService extends IService<User> {
      * @return 是否注销成功
      */
     boolean userLogout(HttpServletRequest request);
+
+    /**
+     * 单个用户信息脱敏
+     *
+     * @param user 用户信息
+     * @return 脱敏用户信息
+     */
+    public UserVo getUserVo(User user);
+
+
+    /**
+     * 用户列表信息脱敏
+     *
+     * @param users 用户列表
+     * @return 脱敏用户列表
+     */
+    public List<UserVo> getUserVoList(List<User> users);
+
+
+    /**
+     * 用户信息分页查询
+     *
+     * @param userQueryRequest 用户查询条件
+     * @return 查询条件
+     */
+    public QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
+
 
 }
