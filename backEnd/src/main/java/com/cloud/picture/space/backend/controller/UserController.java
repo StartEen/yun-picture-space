@@ -8,12 +8,10 @@ import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.UserLoginRequest;
 import com.cloud.picture.space.backend.model.dto.UserRegisterRequest;
+import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.LoginUserVo;
 import com.cloud.picture.space.backend.service.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +55,15 @@ public class UserController {
         String userPassword = userloginRequest.getUserPassword();
         LoginUserVo loginUserVo = userService.userLogin(userAccount, userPassword, request);
         return ResultUtils.success(loginUserVo);
+    }
+
+    /**
+     * 获取当前登录用户(信息已脱敏)
+     */
+    @GetMapping("/get/login")
+    public BaseResponse<LoginUserVo> getLoginUser(HttpServletRequest request) {
+        User user = userService.getLoginUser(request);
+        return ResultUtils.success(userService.getLoginUserVO(user));
     }
 
 

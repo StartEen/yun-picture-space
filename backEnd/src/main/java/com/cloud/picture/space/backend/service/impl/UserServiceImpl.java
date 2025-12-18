@@ -13,6 +13,7 @@ import com.cloud.picture.space.backend.service.UserConstant;
 import com.cloud.picture.space.backend.service.UserService;
 import com.cloud.picture.space.backend.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -117,6 +118,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
 
         return null;
+    }
+
+    /**
+     * 获取当前登录用户（未脱敏信息）
+     */
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        // 先判断当前是否已经登录
+        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (ObjectUtil.isEmpty(currentUser)) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "当前账号未登录");
+        }
+        // 从数据库查询（追求性能的话可以注释）
+        long userId = currentUser.getId();
+        currentUser = this.baseMapper.selectById(userId);
+        if (ObjectUtil.isEmpty(currentUser)) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "当前账号未找到");
+        }
+        return currentUser;
+    }
+
+    /**
+     * 获取当前登录用户（脱敏信息）
+     */
+    @Override
+    public LoginUserVo getLoginUserVO(User user) {
+        if (ObjectUtil.isEmpty(user)) {
+            return null;
+        }
+        LoginUserVo loginUserVO = new LoginUserVo();
+        BeanUtils.copyProperties(user, loginUserVO);
+        return loginUserVO;
     }
 
 }
