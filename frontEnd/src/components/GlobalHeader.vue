@@ -11,7 +11,7 @@
       </a-col>
 
       <a-col flex="auto">
-        <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items" />
+        <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items" @click="doMenuClick" />
       </a-col>
       <a-col flex="120px">
         <div class="user-login-status">
@@ -27,7 +27,7 @@
 import { h, ref } from 'vue';
 import { HomeOutlined,SearchOutlined } from '@ant-design/icons-vue';
 import { MenuProps } from 'ant-design-vue';
-const current = ref<string[]>(['home']);
+import { useRouter } from 'vue-router'
 const items = ref<MenuProps['items']>([
   {
     key:'/',
@@ -47,6 +47,25 @@ const items = ref<MenuProps['items']>([
     title:'网站直达'
   }
 ]);
+
+//路由跳转事件
+const router = useRouter();
+
+// 当前要高亮的菜单项
+const current = ref<string[]>([])
+// 监听路由变化，更新高亮菜单项
+router.afterEach((to, from, next) => {
+  current.value = [to.path]
+})
+
+
+const doMenuClick = (({key}:{key:string})=>{
+  router.push({
+    path:key
+  })
+});
+
+
 </script>
 <style scoped>
 .title-bar {
@@ -71,17 +90,4 @@ const items = ref<MenuProps['items']>([
   object-fit: contain; /* 保持图片比例并完整显示 */
 }
 
-/*
-.title-bar{
-  display: flex;
-  align-items: center;
-}
-.title{
-  color: black;
-  font-size: 18px;
-  margin-left: 16px;
-}
-.logo{
-  height: 48px;
-}*/
 </style>
