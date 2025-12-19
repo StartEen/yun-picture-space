@@ -47,3 +47,5 @@ myAxios.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
+export default myAxios
