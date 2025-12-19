@@ -4,52 +4,55 @@
       <a-col flex="250px">
         <router-link to="/">
           <div class="title-bar">
-            <img class="logo" src="../assets/icon.png" alt="logo" />
+            <img class="logo" src="../assets/img.png" alt="logo" />
             <div class="title">Cloud Picture Space</div>
           </div>
         </router-link>
       </a-col>
 
       <a-col flex="auto">
-        <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items" @click="doMenuClick" />
+        <a-menu
+          v-model:selectedKeys="current"
+          mode="horizontal"
+          :items="items"
+          @click="doMenuClick"
+        />
       </a-col>
       <a-col flex="120px">
         <div class="user-login-status">
           <a-button type="primary" href="/user/login">Login</a-button>
         </div>
-
       </a-col>
     </a-row>
   </div>
-
 </template>
 <script lang="ts" setup>
-import { h, ref } from 'vue';
-import { HomeOutlined,SearchOutlined } from '@ant-design/icons-vue';
-import { MenuProps } from 'ant-design-vue';
+import { h, ref } from 'vue'
+import { HomeOutlined, SearchOutlined } from '@ant-design/icons-vue'
+import { MenuProps } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 const items = ref<MenuProps['items']>([
   {
-    key:'/',
-    icon:()=>h(HomeOutlined),
-    label:'主页',
-    title:'主页'
+    key: '/',
+    icon: () => h(HomeOutlined),
+    label: '主页',
+    title: '主页',
   },
   {
-    key:'/about',
-    label:'关于',
-    title:'关于'
+    key: '/about',
+    label: '关于',
+    title: '关于',
   },
   {
-    key:'/others',
-    icon:()=>h(SearchOutlined),
-    label:h('a',{href:'https://www.biying.com',target:"_blank"},'网站直达'),
-    title:'网站直达'
-  }
-]);
+    key: '/others',
+    icon: () => h(SearchOutlined),
+    label: h('a', { href: 'https://www.biying.com', target: '_blank' }, '网站直达'),
+    title: '网站直达',
+  },
+])
 
 //路由跳转事件
-const router = useRouter();
+const router = useRouter()
 
 // 当前要高亮的菜单项
 const current = ref<string[]>([])
@@ -58,14 +61,11 @@ router.afterEach((to, from, next) => {
   current.value = [to.path]
 })
 
-
-const doMenuClick = (({key}:{key:string})=>{
+const doMenuClick = ({ key }: { key: string }) => {
   router.push({
-    path:key
+    path: key,
   })
-});
-
-
+}
 </script>
 <style scoped>
 .title-bar {
@@ -89,5 +89,4 @@ const doMenuClick = (({key}:{key:string})=>{
   width: 48px; /* 明确设置宽度 */
   object-fit: contain; /* 保持图片比例并完整显示 */
 }
-
 </style>
