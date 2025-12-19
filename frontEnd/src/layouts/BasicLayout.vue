@@ -2,35 +2,31 @@
   <div id="basicLayout">
     <a-layout style="min-height: 100vh">
       <a-layout-header class="header">
-        <GlobalHeader/>
+        <GlobalHeader />
       </a-layout-header>
       <a-layout-content class="content">
-        <router-view/>
+        <router-view />
       </a-layout-content>
-      <a-layout-footer class="footer">
-        自己做的页面
-      </a-layout-footer>
+      <a-layout-footer class="footer"> 自己做的页面 </a-layout-footer>
     </a-layout>
   </div>
 </template>
 
 <script setup lang="ts">
-import GlobalHeader from "@/components/GlobalHeader.vue";
+import GlobalHeader from '@/components/GlobalHeader.vue'
 </script>
 <style scoped>
-#basicLayout{
-
+#basicLayout {
 }
 
-#basicLayout .header{
+#basicLayout .header {
   padding-inline: 20px;
   margin-bottom: 16px;
   color: unset;
   background: white;
 }
 
-
-#basicLayout .footer{
+#basicLayout .footer {
   background: #efefef;
   padding: 16px;
   position: fixed;
@@ -40,11 +36,10 @@ import GlobalHeader from "@/components/GlobalHeader.vue";
   text-align: center;
 }
 
-#basicLayout .content{
+#basicLayout .content {
   /*渐变*/
-  background: linear-gradient(to right,#fefefe,#fff);
+  background: linear-gradient(to right, #fefefe, #fff);
   margin-bottom: 28px;
   padding: 20px;
 }
-
 </style>
