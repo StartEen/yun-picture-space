@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { getLoginUserUsingGet } from '@/api/userController.ts'
 
 /**
  * 定义一个用于管理登录用户状态的store
@@ -10,7 +11,7 @@ export const useLoginUserStore = defineStore('loginUser', () => {
    * 存储当前登录用户信息的响应式变量
    * 默认值为未登录状态
    */
-  const loginUser = ref<any>({
+  const loginUser = ref<API.LoginUserVo>({
     userName: '未登录',
   })
 
@@ -18,7 +19,12 @@ export const useLoginUserStore = defineStore('loginUser', () => {
    * 异步获取登录用户信息
    * @returns Promise<void>
    */
-  async function getLoginUser() {}
+  async function fetchLoginUser() {
+    const res = await getLoginUserUsingGet()
+    if (res.data.code === 0 && res.data.data) {
+      loginUser.value = res.data.data
+    }
+  }
 
   /**
    * 设置登录用户信息
@@ -28,5 +34,5 @@ export const useLoginUserStore = defineStore('loginUser', () => {
     loginUser.value = newLoginUser
   }
 
-  return { loginUser, getLoginUser, setLoginUser }
+  return { loginUser, fetchLoginUser, setLoginUser }
 })
