@@ -125,7 +125,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 3.记录当前用户的登录态
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
 
-        return null;
+        return getLoginUserVO(user);
     }
 
     /**
