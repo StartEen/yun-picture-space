@@ -11,6 +11,10 @@ spring:
   application:
     name: yun-picture-space-service
 
+  # 激活配置文件
+  profiles:
+    active: local
+
   # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -49,12 +53,15 @@ knife4j:
 # cos配置一般会在application-local.yml文件中配置而且不会同步到仓库中，
 #如果仓库不是私有就不要同步进去，防止信息泄露
 #这里仓库是私有，会同步
-cos:
-  client:
-    host:
-    secret-id:
-    secret-key:
-    region:
-    bucket: yun-picture-1369372725
+# 对象存储配置
+#cos:
+#  client:
+#    host: xxxxxxx
+#    secretId: xxxxxxx
+#    secretKey: xxxxxxx
+#    region: xxxxxxx
+#    bucket: xxxxxxx
+
+
 
 
