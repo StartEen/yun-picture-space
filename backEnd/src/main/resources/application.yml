@@ -2,6 +2,10 @@ server:
   port: 8123
   servlet:
     context-path: /api
+  # cookie 30 天过期
+  session:
+    cookie:
+      max-age: 2592000
 
 spring:
   application:
@@ -42,6 +46,15 @@ knife4j:
 
 
 
-
+# cos配置一般会在application-local.yml文件中配置而且不会同步到仓库中，
+#如果仓库不是私有就不要同步进去，防止信息泄露
+#这里仓库是私有，会同步
+cos:
+  client:
+    host:
+    secret-id:
+    secret-key:
+    region:
+    bucket: yun-picture-1369372725
 
 
