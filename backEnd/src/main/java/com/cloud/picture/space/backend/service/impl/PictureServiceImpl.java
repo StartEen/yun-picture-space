@@ -161,7 +161,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
      * 获取分页查询包装类
      */
     @Override
-    public Page<PictureVo> getPictureVoPAge(Page<Picture> picturePage, HttpServletRequest httpServletRequest) {
+    public Page<PictureVo> getPictureVoPage(Page<Picture> picturePage, HttpServletRequest httpServletRequest) {
         List<Picture> pictureList = picturePage.getRecords();
         Page<PictureVo> pictureVoPage = new Page<>(picturePage.getCurrent(), picturePage.getSize(), picturePage.getTotal());
         if (CollUtil.isEmpty(pictureList)) {
