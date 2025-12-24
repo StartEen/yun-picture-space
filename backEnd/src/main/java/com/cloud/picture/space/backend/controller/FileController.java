@@ -8,14 +8,16 @@ import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.manager.CosManager;
 import com.cloud.picture.space.backend.service.UserConstant;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.COSObjectInputStream;
+import com.qcloud.cos.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 
@@ -68,7 +70,38 @@ public class FileController {
     }
 
 
-
-
+    /**
+     * 文件下载测试
+     *
+     * @param filePath 文件路径
+     * @param response 响应
+     */
+    @GetMapping("/test/download")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public void testDownloadFile(String filePath, HttpServletResponse response) throws IOException {
+        // COSObjectInputStream 是腾讯云COS
+        // （Cloud Object Storage）SDK提供的输入流类，
+        // 用于读取存储在COS上的文件内容
+        COSObjectInputStream stream = null;
+        try {
+            COSObject cosObject = cosManager.getObject(filePath);
+            // 处理下载下来的流
+            stream = cosObject.getObjectContent();
+            byte[] byteArray = IOUtils.toByteArray(stream);
+            // 设置响应头
+            response.setContentType("application/octet-stream;charset=UTF-8");
+            response.setHeader("Content-Disposition", "attachment;filename=" + filePath);
+            // 写入响应
+            response.getOutputStream().write(byteArray);
+            response.getOutputStream().flush();
+        } catch (IOException e) {
+            log.error("文件下载失败，filePath = " + filePath, e);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "下载文件失败");
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+        }
+    }
 
 }
