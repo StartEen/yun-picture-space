@@ -5,6 +5,7 @@ import com.cloud.picture.space.backend.config.CosClientConfig;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.demo.PutObjectDemo;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -35,6 +36,25 @@ public class CosManager {
      */
     @Resource
     private COSClient cosClient;
+
+
+    /**
+     * 上传图片对象(附带图片信息)
+     *
+     * @param key  对象的键（key）
+     * @param file 要上传的文件
+     * @return 返回一个PutObjectRequest对象，用于描述上传操作的详细信息
+     */
+    public PutObjectResult putPictureObject(String key, File file) {
+        // 创建一个PutObjectRequest对象，用于描述上传操作的详细信息
+        PutObjectRequest putObjectRequest = new PutObjectRequest(clientConfig.getBucket(), key, file);
+        // 对图片进行处理（获取基本信息）
+        PicOperations picOperations = new PicOperations();
+        picOperations.setIsPicInfo(1);
+        putObjectRequest.setPicOperations(picOperations);
+        return cosClient.putObject(putObjectRequest);
+    }
+
 
     /**
      * 上传对象

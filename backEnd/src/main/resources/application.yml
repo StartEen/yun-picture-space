@@ -11,6 +11,11 @@ spring:
   application:
     name: yun-picture-space-service
 
+  #开放更大的文件上传体积
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
   # 激活配置文件
   profiles:
     active: local
