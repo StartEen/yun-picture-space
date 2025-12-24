@@ -16,19 +16,21 @@ import com.cloud.picture.space.backend.model.dto.picture.PictureUpdateRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.User;
+import com.cloud.picture.space.backend.model.vo.PictureTagCategory;
 import com.cloud.picture.space.backend.model.vo.PictureVo;
 import com.cloud.picture.space.backend.service.PictureService;
 import com.cloud.picture.space.backend.service.UserConstant;
 import com.cloud.picture.space.backend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: StartEnd
@@ -189,13 +191,24 @@ public class PictureController {
         Picture oldPicture = pictureService.getById(id);
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
 
-        //设置权限
+        // 设置权限
         if (!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"您没有修改权限！");
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "您没有修改权限！");
         }
         boolean result = pictureService.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(result);
+    }
+
+
+    @GetMapping("/tag_category")
+    public BaseResponse<PictureTagCategory> listPictureTagCategory() {
+        PictureTagCategory pictureTagCategory = new PictureTagCategory();
+        List<String> tagList = Arrays.asList("热门", "搞笑", "生活", "高清", "艺术", "校园", "背景", "游戏", "创意");
+        List<String> categoryList = Arrays.asList("模版", "电商", "UI", "UX", "平面", "摄影", "插画");
+        pictureTagCategory.setTagList(tagList);
+        pictureTagCategory.setCategoryList(categoryList);
+        return ResultUtils.success(pictureTagCategory);
     }
 
 
