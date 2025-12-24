@@ -1,0 +1,84 @@
+package com.cloud.picture.space.backend.model.dto.picture;
+
+
+import com.cloud.picture.space.backend.common.PageRequest;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * @Author: StartEnd
+ * @CreateTime: 2025-12-24  14:07
+ * @Description: TODO 图片分页查询请求体
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class PictureQueryRequest extends PageRequest implements Serializable {
+
+    /**
+     * id
+     */
+    private Long id;
+    /**
+     * 图片名称
+     */
+    private String name;
+
+    /**
+     * 图片简介
+     */
+    private String introduction;
+
+    /**
+     * 图片分类
+     */
+    private String category;
+
+    /**
+     * 图片标签
+     */
+    private List<String> tags;
+
+
+    /**
+     * 图片体积
+     */
+    private Long picSize;
+
+    /**
+     * 图片宽度
+     */
+    private Integer picWidth;
+
+
+    /**
+     * 图片高度
+     */
+    private Integer picHeight;
+
+    /**
+     * 图片宽高比例
+     */
+    private Double picScale;
+
+    /**
+     * 图片格式
+     */
+    private String picFormat;
+
+    /**
+     * 搜索词（同时搜索名称、简介等）
+     */
+    private String searchText;
+
+    /**
+     * 用户id
+     */
+    private String userId;
+
+    private static final long serialVersionUID = 1L;
+
+
+}

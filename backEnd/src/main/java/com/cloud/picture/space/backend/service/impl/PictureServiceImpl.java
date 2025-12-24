@@ -1,20 +1,34 @@
 package com.cloud.picture.space.backend.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.manager.FileManager;
 import com.cloud.picture.space.backend.model.dto.file.UploadPictureResult;
+import com.cloud.picture.space.backend.model.dto.picture.PictureQueryRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.PictureVo;
+import com.cloud.picture.space.backend.model.vo.UserVo;
 import com.cloud.picture.space.backend.service.PictureService;
 import com.cloud.picture.space.backend.mapper.PictureMapper;
+import com.cloud.picture.space.backend.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author yz2025120101
@@ -26,9 +40,11 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         implements PictureService {
 
     private final FileManager fileManager;
+    private final UserService userService;
 
-    public PictureServiceImpl(FileManager fileManager) {
+    public PictureServiceImpl(FileManager fileManager, UserService userService) {
         this.fileManager = fileManager;
+        this.userService = userService;
     }
 
     /**
@@ -70,6 +86,122 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         boolean result = this.saveOrUpdate(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "图片上传失败");
         return PictureVo.objToVo(picture);
+    }
+
+    /**
+     * 获取图片信息,并关联用户信息
+     */
+    @Override
+    public PictureVo getPictureVo(Picture picture, HttpServletRequest httpServletRequest) {
+        // 对象转封装类
+        PictureVo pictureVo = PictureVo.objToVo(picture);
+        // 管理查询用户信息
+        Long userId = picture.getUserId();
+        if (userId != null && userId > 0) {
+            User user = userService.getById(userId);
+            UserVo userVo = userService.getUserVo(user);
+            pictureVo.setUser(userVo);
+        }
+        return pictureVo;
+    }
+
+    /**
+     * 获取查询包装类
+     */
+    @Override
+    public QueryWrapper<Picture> getQueryWrapper(PictureQueryRequest pictureQueryRequest) {
+        QueryWrapper<Picture> queryWrapper = new QueryWrapper<>();
+
+        if (pictureQueryRequest == null) {
+            return queryWrapper;
+        }
+        Long id = pictureQueryRequest.getId();
+        String name = pictureQueryRequest.getName();
+        String introduction = pictureQueryRequest.getIntroduction();
+        String category = pictureQueryRequest.getCategory();
+        List<String> tags = pictureQueryRequest.getTags();
+        Long picSize = pictureQueryRequest.getPicSize();
+        Integer picWidth = pictureQueryRequest.getPicWidth();
+        Integer picHeight = pictureQueryRequest.getPicHeight();
+        Double picScale = pictureQueryRequest.getPicScale();
+        String picFormat = pictureQueryRequest.getPicFormat();
+        String searchText = pictureQueryRequest.getSearchText();
+        String userId = pictureQueryRequest.getUserId();
+        String sortField = pictureQueryRequest.getSortField();
+        String sortOrder = pictureQueryRequest.getSortOrder();
+
+        // 如果是多字段搜索要拼接查询条件
+        if (StrUtil.isNotBlank(searchText)) {
+            queryWrapper.and(qw -> qw.like("name", searchText)
+                    .or()
+                    .like("introduction", searchText));
+        }
+        queryWrapper.eq(ObjectUtil.isNotEmpty(id), "id", id);
+        queryWrapper.eq(ObjectUtil.isNotEmpty(userId), "userId", userId);
+        queryWrapper.like(StrUtil.isNotBlank(name), "name", name);
+        queryWrapper.like(StrUtil.isNotBlank(introduction), "introduction", introduction);
+        queryWrapper.like(StrUtil.isNotBlank(picFormat), "picFormat", picFormat);
+        queryWrapper.eq(StrUtil.isNotBlank(category), "category", category);
+        queryWrapper.eq(ObjectUtil.isNotEmpty(picSize), "picSize", picSize);
+        queryWrapper.eq(ObjectUtil.isNotEmpty(picWidth), "picWidth", picWidth);
+        queryWrapper.eq(ObjectUtil.isNotEmpty(picHeight), "picHeight", picHeight);
+        queryWrapper.eq(ObjectUtil.isNotEmpty(picScale), "picScale", picScale);
+        // JSON数组查询
+        if (CollUtil.isNotEmpty(tags)) {
+            for (String tag : tags) {
+                queryWrapper.like("tag", "\"" + tag + "\"");
+            }
+        }
+        // 排序
+        queryWrapper.orderBy(StrUtil.isNotBlank(sortField), sortOrder.equals("ascend"), sortField);
+        return queryWrapper;
+    }
+
+    /**
+     * 获取分页查询包装类
+     */
+    @Override
+    public Page<PictureVo> getPictureVoPAge(Page<Picture> picturePage, HttpServletRequest httpServletRequest) {
+        List<Picture> pictureList = picturePage.getRecords();
+        Page<PictureVo> pictureVoPage = new Page<>(picturePage.getCurrent(), picturePage.getSize(), picturePage.getTotal());
+        if (CollUtil.isEmpty(pictureList)) {
+            return pictureVoPage;
+        }
+        // 对像列表 =》封装对象列表
+        List<PictureVo> pictureVoList = pictureList.stream().map(PictureVo::objToVo).collect(Collectors.toList());
+        Set<Long> userIdSet = pictureList.stream().map(Picture::getUserId).collect(Collectors.toSet());
+        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
+                .collect(Collectors.groupingBy(User::getId));
+        pictureVoList.forEach(pictureVo -> {
+            Long userId = pictureVo.getUserId();
+            User user = null;
+            if (userIdUserListMap.containsKey(userId)) {
+                user = userIdUserListMap.get(userId).get(0);
+            }
+            pictureVo.setUser(userService.getUserVo(user));
+        });
+        pictureVoPage.setRecords(pictureVoList);
+        return pictureVoPage;
+    }
+
+    /**
+     * 验证图片数据
+     */
+    @Override
+    public void validPicture(Picture picture) {
+        ThrowUtils.throwIf(picture == null, ErrorCode.PARAMS_ERROR);
+        // 从对象中取值
+        Long id = picture.getId();
+        String url = picture.getUrl();
+        String introduction = picture.getIntroduction();
+        // 修改数据是，id不能为空，有参数则校验
+        ThrowUtils.throwIf(ObjectUtil.isNull(id), ErrorCode.PARAMS_ERROR, "id不能为空");
+        if (StrUtil.isNotBlank(url)) {
+            ThrowUtils.throwIf(url.length() > 1024, ErrorCode.PARAMS_ERROR, "url过长");
+        }
+        if (StrUtil.isNotBlank(introduction)) {
+            ThrowUtils.throwIf(introduction.length() > 800, ErrorCode.PARAMS_ERROR, "简介过长");
+        }
     }
 
 
