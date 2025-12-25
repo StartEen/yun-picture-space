@@ -1,5 +1,6 @@
 package com.cloud.picture.space.backend.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -11,6 +12,7 @@ import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.manager.FileManager;
 import com.cloud.picture.space.backend.model.dto.file.UploadPictureResult;
 import com.cloud.picture.space.backend.model.dto.picture.PictureQueryRequest;
+import com.cloud.picture.space.backend.model.dto.picture.PictureReviewRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.User;
@@ -204,6 +206,32 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         }
     }
 
+
+    /**
+     * 图片审核
+     */
+    @Override
+    public void doPictureReview(PictureReviewRequest pictureReviewRequest, User loginUser) {
+        // 获取校验信息，并验证
+        Long id = pictureReviewRequest.getId();
+        Integer reviewStatus = pictureReviewRequest.getReviewStatus();
+        // 参数校验
+        ThrowUtils.throwIf(ObjectUtil.isNull(id), ErrorCode.PARAMS_ERROR, "id不能为空");
+        ThrowUtils.throwIf(ObjectUtil.isNull(reviewStatus), ErrorCode.PARAMS_ERROR, "审核状态不能为空");
+        // 判断图片是否存在
+        Picture oldPicture = this.getById(id);
+        ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR, "图片不存在");
+        // 判断是否是重复操作
+        ThrowUtils.throwIf(oldPicture.getReviewStatus().equals(reviewStatus), ErrorCode.OPERATION_ERROR, "请勿重复操作");
+
+        // 更新审核状态
+        Picture updatePicture = new Picture();
+        BeanUtil.copyProperties(pictureReviewRequest, updatePicture);
+        updatePicture.setReviewerId(loginUser.getId());
+        updatePicture.setReviewTime(new Date());
+        boolean result = this.updateById(updatePicture);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "操作失败");
+    }
 
 }
 

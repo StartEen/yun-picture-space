@@ -10,10 +10,7 @@ import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
-import com.cloud.picture.space.backend.model.dto.picture.PictureEditRequest;
-import com.cloud.picture.space.backend.model.dto.picture.PictureQueryRequest;
-import com.cloud.picture.space.backend.model.dto.picture.PictureUpdateRequest;
-import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
+import com.cloud.picture.space.backend.model.dto.picture.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.PictureTagCategory;
@@ -211,5 +208,14 @@ public class PictureController {
         return ResultUtils.success(pictureTagCategory);
     }
 
+
+    @PostMapping("/review")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> doPictureReview(@RequestBody PictureReviewRequest pictureReviewRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(pictureReviewRequest == null || pictureReviewRequest.getId() <= 0, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        pictureService.doPictureReview(pictureReviewRequest, loginUser);
+        return ResultUtils.success(true);
+    }
 
 }

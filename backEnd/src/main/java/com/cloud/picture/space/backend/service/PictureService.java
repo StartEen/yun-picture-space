@@ -3,6 +3,7 @@ package com.cloud.picture.space.backend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.model.dto.picture.PictureQueryRequest;
+import com.cloud.picture.space.backend.model.dto.picture.PictureReviewRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -52,8 +53,8 @@ public interface PictureService extends IService<Picture> {
     /**
      * 获取分页图片信息
      *
-     * @param picturePage         分页信息
-     * @param httpServletRequest  请求
+     * @param picturePage        分页信息
+     * @param httpServletRequest 请求
      * @return 分页图片信息
      */
     Page<PictureVo> getPictureVoPage(Page<Picture> picturePage, HttpServletRequest httpServletRequest);
@@ -66,7 +67,13 @@ public interface PictureService extends IService<Picture> {
      */
     void validPicture(Picture picture);
 
-
+    /**
+     * 图片审核
+     *
+     * @param pictureReviewRequest 图片审核请求体
+     * @param loginUser            登录用户
+     */
+    void doPictureReview(PictureReviewRequest pictureReviewRequest, User loginUser);
 
 
 }
