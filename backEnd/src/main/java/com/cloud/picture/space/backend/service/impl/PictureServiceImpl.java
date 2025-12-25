@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.manager.FileManager;
@@ -16,6 +17,7 @@ import com.cloud.picture.space.backend.model.dto.picture.PictureReviewRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.User;
+import com.cloud.picture.space.backend.model.enums.PictureReviewStatusEnum;
 import com.cloud.picture.space.backend.model.vo.PictureVo;
 import com.cloud.picture.space.backend.model.vo.UserVo;
 import com.cloud.picture.space.backend.service.PictureService;
@@ -62,10 +64,20 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             pictureId = pictureUploadRequest.getId();
         }
         // 2.1如果是新增校验图片是否存在（如果不存在抛出异常）
-        if (pictureId != null) {
+        /* if (pictureId != null) {
             boolean exist = this.lambdaQuery().eq(Picture::getId, pictureId).exists();
             ThrowUtils.throwIf(!exist, ErrorCode.NOT_FOUND_ERROR, "图片不存在");
+        } */
+        //【新增权限验证】
+        if (pictureId != null) {
+            Picture oldPicture = this.getById(pictureId);
+            ThrowUtils.throwIf(ObjectUtil.isEmpty(oldPicture), ErrorCode.NOT_FOUND_ERROR, "图片不存在");
+            // 仅本人获取管理员可编辑
+            if (!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+                throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "您的权限不足！");
+            }
         }
+
         // 3.上传图片，得到信息
         // 3.1根据用户id划分目录
         String uploadPathPrefix = String.format("/public/%s", loginUser.getId());
@@ -80,6 +92,11 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         picture.setPicScale(uploadPictureResult.getPicScale());
         picture.setPicFormat(uploadPictureResult.getPicFormat());
         picture.setUserId(loginUser.getId());
+
+        // 补充审核参数
+        fillReviewParams(picture, loginUser);
+
+
         // 如果pictureId不为空，表示更新，否则更新
         if (pictureId != null) {
             picture.setId(pictureId);
@@ -232,6 +249,25 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         boolean result = this.updateById(updatePicture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "操作失败");
     }
+
+    /**
+     * 填充审核参数
+     */
+    @Override
+    public void fillReviewParams(Picture picture, User loginUser) {
+        // 判断当前是否是管理员
+        if (userService.isAdmin(loginUser)) {
+            // 管理员自动过审
+            picture.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
+            picture.setReviewerId(loginUser.getId());
+            picture.setReviewReason("管理员自动过审");
+            picture.setReviewTime(new Date());
+        } else {
+            // 非管理员，创建和编辑都要将图片改为待审核
+            picture.setReviewStatus(PictureReviewStatusEnum.REVIEWING.getValue());
+        }
+    }
+
 
 }
 
