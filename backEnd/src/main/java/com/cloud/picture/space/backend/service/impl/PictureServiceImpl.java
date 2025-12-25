@@ -149,6 +149,11 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         String sortField = pictureQueryRequest.getSortField();
         String sortOrder = pictureQueryRequest.getSortOrder();
 
+        //添加审核状态参数
+        Integer reviewStatus = pictureQueryRequest.getReviewStatus();
+        String reviewReason = pictureQueryRequest.getReviewReason();
+        Long  reviewerId = pictureQueryRequest.getReviewerId();
+
         // 如果是多字段搜索要拼接查询条件
         if (StrUtil.isNotBlank(searchText)) {
             queryWrapper.and(qw -> qw.like("name", searchText)
@@ -165,6 +170,12 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         queryWrapper.eq(ObjectUtil.isNotEmpty(picWidth), "picWidth", picWidth);
         queryWrapper.eq(ObjectUtil.isNotEmpty(picHeight), "picHeight", picHeight);
         queryWrapper.eq(ObjectUtil.isNotEmpty(picScale), "picScale", picScale);
+
+        //添加搜索条件
+        queryWrapper.eq(ObjectUtil.isNotEmpty(reviewStatus), "reviewStatus", reviewStatus);
+        queryWrapper.like(StrUtil.isNotBlank(reviewReason), "reviewReason", reviewReason);
+        queryWrapper.eq(ObjectUtil.isNotEmpty(reviewerId), "reviewerId", reviewerId);
+
         // JSON数组查询
         if (CollUtil.isNotEmpty(tags)) {
             for (String tag : tags) {

@@ -13,6 +13,7 @@ import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.picture.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.User;
+import com.cloud.picture.space.backend.model.enums.PictureReviewStatusEnum;
 import com.cloud.picture.space.backend.model.vo.PictureTagCategory;
 import com.cloud.picture.space.backend.model.vo.PictureVo;
 import com.cloud.picture.space.backend.service.PictureService;
@@ -166,6 +167,10 @@ public class PictureController {
         long size = pictureQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+
+        //普通用户默认只能查看已过审的数据
+        pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
+
         Page<Picture> picturePage = pictureService.page(new Page<>(current, size), pictureService.getQueryWrapper(pictureQueryRequest));
         Page<PictureVo> pictureVoPage = pictureService.getPictureVoPage(picturePage, request);
         return ResultUtils.success(pictureVoPage);
