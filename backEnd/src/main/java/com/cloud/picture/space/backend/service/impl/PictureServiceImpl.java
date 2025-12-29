@@ -10,7 +10,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
+import com.cloud.picture.space.backend.manager.CosManager;
 import com.cloud.picture.space.backend.manager.FileManager;
+import com.cloud.picture.space.backend.manager.upload.FilePictureUpload;
+import com.cloud.picture.space.backend.manager.upload.PictureUploadTemplate;
+import com.cloud.picture.space.backend.manager.upload.UrlPictureUpload;
 import com.cloud.picture.space.backend.model.dto.file.UploadPictureResult;
 import com.cloud.picture.space.backend.model.dto.picture.PictureQueryRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureReviewRequest;
@@ -27,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
@@ -43,21 +48,34 @@ import java.util.stream.Collectors;
 public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         implements PictureService {
 
-    private final FileManager fileManager;
-    private final UserService userService;
+    @Resource
+    private FileManager fileManager;
 
-    public PictureServiceImpl(FileManager fileManager, UserService userService) {
-        this.fileManager = fileManager;
-        this.userService = userService;
-    }
+    @Resource
+    private UserService userService;
+
+
+    @Resource
+    private CosManager cosManager;
+
+    @Resource
+    private FilePictureUpload filePictureUpload;
+
+    @Resource
+    private UrlPictureUpload urlPictureUpload;
+
 
     /**
      * 上传图片
      */
     @Override
-    public PictureVo uploadPicture(MultipartFile multipartFile, PictureUploadRequest pictureUploadRequest, User loginUser) {
+    public PictureVo uploadPicture(Object inputSource, PictureUploadRequest pictureUploadRequest, User loginUser) {
         // 1.校验用户是否为空
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR);
+
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(inputSource),ErrorCode.PARAMS_ERROR,"图片不存在");
+
+
         // 2.判断当前操作是新增还是修改
         Long pictureId = null;
         if (pictureUploadRequest != null) {
@@ -81,7 +99,13 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         // 3.上传图片，得到信息
         // 3.1根据用户id划分目录
         String uploadPathPrefix = String.format("/public/%s", loginUser.getId());
-        UploadPictureResult uploadPictureResult = fileManager.uploadPicture(multipartFile, uploadPathPrefix);
+        // 根据inputSource类型区分上传方式
+        PictureUploadTemplate pictureUploadTemplate = filePictureUpload;
+        if ( inputSource instanceof String ){
+            pictureUploadTemplate = urlPictureUpload;
+        }
+        UploadPictureResult uploadPictureResult = pictureUploadTemplate.uploadPicture(inputSource, uploadPathPrefix);
+
         // 4.构造入库的图片信息，使用数据万象获取
         Picture picture = new Picture();
         picture.setUrl(uploadPictureResult.getUrl());
@@ -149,10 +173,10 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         String sortField = pictureQueryRequest.getSortField();
         String sortOrder = pictureQueryRequest.getSortOrder();
 
-        //添加审核状态参数
+        // 添加审核状态参数
         Integer reviewStatus = pictureQueryRequest.getReviewStatus();
         String reviewReason = pictureQueryRequest.getReviewReason();
-        Long  reviewerId = pictureQueryRequest.getReviewerId();
+        Long reviewerId = pictureQueryRequest.getReviewerId();
 
         // 如果是多字段搜索要拼接查询条件
         if (StrUtil.isNotBlank(searchText)) {
@@ -171,7 +195,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         queryWrapper.eq(ObjectUtil.isNotEmpty(picHeight), "picHeight", picHeight);
         queryWrapper.eq(ObjectUtil.isNotEmpty(picScale), "picScale", picScale);
 
-        //添加搜索条件
+        // 添加搜索条件
         queryWrapper.eq(ObjectUtil.isNotEmpty(reviewStatus), "reviewStatus", reviewStatus);
         queryWrapper.like(StrUtil.isNotBlank(reviewReason), "reviewReason", reviewReason);
         queryWrapper.eq(ObjectUtil.isNotEmpty(reviewerId), "reviewerId", reviewerId);

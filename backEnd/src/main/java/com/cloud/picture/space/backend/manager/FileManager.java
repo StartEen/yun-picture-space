@@ -38,10 +38,11 @@ import java.util.List;
  * @CreateTime: 2025-12-24  09:59
  * @Description: TODO 图片上传服务
  * <p>
- * 提供上传图片并返回图片解析的方法
+ * 提供上传图片并返回图片解析的方法 【该类已废弃】
  */
 @Slf4j
 @Service
+@Deprecated
 public class FileManager {
 
     @Resource
