@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.model.dto.picture.PictureQueryRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureReviewRequest;
+import com.cloud.picture.space.backend.model.dto.picture.PictureUploadByBatchRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -23,7 +24,7 @@ public interface PictureService extends IService<Picture> {
     /**
      * 上传图片
      *
-     * @param inputSource        上传的文件
+     * @param inputSource          上传的文件
      * @param pictureUploadRequest 上传图片请求体
      * @param loginUser            登录用户
      * @return 图片信息
@@ -79,10 +80,20 @@ public interface PictureService extends IService<Picture> {
     /**
      * 填充审核参数
      *
-     * @param picture  图片信息
+     * @param picture   图片信息
      * @param loginUser 登录用户
      */
     void fillReviewParams(Picture picture, User loginUser);
+
+
+    /**
+     * 批量抓取并上传图片
+     *
+     * @param pictureUploadByBatchRequest 图片上传批量请求通过抓取
+     * @param loginUser                   登录用户
+     * @return 创建的图片数量
+     */
+    Integer uploadPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser);
 
 
 }
