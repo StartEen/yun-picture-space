@@ -117,7 +117,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         // 4.构造入库的图片信息，使用数据万象获取
         Picture picture = new Picture();
         picture.setUrl(uploadPictureResult.getUrl());
-        picture.setName(uploadPictureResult.getPicName());
+
+        // 优化入库名称
+        String picName = uploadPictureResult.getPicName();
+        if (pictureUploadRequest != null && StrUtil.isNotBlank(pictureUploadRequest.getPicName())) {
+            picName = pictureUploadRequest.getPicName();
+        }
+
+        picture.setName(picName);
         picture.setPicSize(uploadPictureResult.getPicSize());
         picture.setPicWidth(uploadPictureResult.getPicWidth());
         picture.setPicHeight(uploadPictureResult.getPicHeight());
@@ -322,6 +329,12 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         ThrowUtils.throwIf(StrUtil.isBlank(searchText), ErrorCode.PARAMS_ERROR, "搜索内容不能为空");
         ThrowUtils.throwIf(count > 30, ErrorCode.PARAMS_ERROR, "一次抓取数量最多30条");
 
+        // 名称前缀
+        String namePrefix = pictureUploadByBatchRequest.getNamePrefix();
+        if (StrUtil.isBlank(namePrefix)) {
+            namePrefix = searchText;
+        }
+
         // 定义抓取的地址
         String fetchUrl = String.format("https://cn.bing.com/images/async?q=%s&mmasync=1", searchText);
         Document document;
@@ -349,16 +362,34 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             int questionMarkIndex = fileUrl.indexOf("?");
             if (questionMarkIndex > -1) {
                 fileUrl = fileUrl.substring(0, questionMarkIndex);
+                log.info("处理后的图片地址：{}", fileUrl);
             }
-            //上传图片
+            // 上传图片
             PictureUploadRequest pictureUploadRequest = new PictureUploadRequest();
+            if (StrUtil.isNotBlank(namePrefix)) {
+                pictureUploadRequest.setPicName(namePrefix + "_" + (uploadCount + 1));
+            }
+
             try {
                 PictureVo pictureVo = this.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
                 log.info("上传成功：{}", pictureVo);
                 uploadCount++;
-            }catch (Exception e){
+            } catch (Exception e) {
                 log.error("上传图片失败：{}", e);
                 continue;
+            }
+            // 添加延迟，降低请求频率，减少被封禁风险
+            if (uploadCount < count) { // 最后一次不需要延迟
+                try {
+                    // 随机延迟1-3秒，避免固定的请求模式
+                    int delay = 1000 + (int) (Math.random() * 2000); // 1000-3000毫秒
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    log.warn("线程睡眠被中断", e);
+                    // 恢复中断状态
+                    Thread.currentThread().interrupt();
+                    break;
+                }
             }
             if (uploadCount >= count) {
                 break;

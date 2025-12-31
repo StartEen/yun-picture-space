@@ -87,7 +87,12 @@ public class UrlPictureUpload extends PictureUploadTemplate {
     protected String getOriginalFilename(Object inputSource) {
         String fileUrl = (String) inputSource;
         // 从URL中获取文件名
-        return FileUtil.getName(fileUrl);
+        String url = FileUtil.getName(fileUrl);
+        // 校验文件类型
+        String suffix = FileUtil.getSuffix(url);
+        suffix = validFileSuffix(suffix);
+        url = url.substring(0, url.lastIndexOf(".")) + "." + suffix;
+        return url;
     }
 
     @Override
@@ -96,4 +101,24 @@ public class UrlPictureUpload extends PictureUploadTemplate {
         // 下载图片到临时文件
         HttpUtil.downloadFile(fileUrl, file);
     }
+
+
+    /**
+     * 校验文件后缀
+     */
+    private String validFileSuffix(String suffix) {
+        // 检测是否是规定的模版样式
+        if (StrUtil.isBlank(suffix)) {
+            // 允许的图片类型
+            final List<String> ALLOW_CONTENT_TYPE = Arrays.asList("jpeg", "png", "jpg", "webp");
+            for (String allowContentType : ALLOW_CONTENT_TYPE) {
+                if (allowContentType.equals(suffix)) {
+                    return suffix;
+                }
+            }
+        }
+        // 如果不是规定的模版样式，统一返回jpg格式
+        return "jpg";
+    }
+
 }
