@@ -1,6 +1,7 @@
 package com.cloud.picture.space.backend.manager.upload;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -11,12 +12,15 @@ import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.manager.CosManager;
 import com.cloud.picture.space.backend.model.dto.file.UploadPictureResult;
 import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
+import com.qcloud.cos.model.ciModel.persistence.ProcessResults;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: StartEnd
@@ -62,8 +66,16 @@ public abstract class PictureUploadTemplate {
             PutObjectResult putObjectResult = cosManager.putPictureObject(uploadPath, file);
             ImageInfo imageInfo = putObjectResult.getCiUploadResult().getOriginalInfo().getImageInfo();
 
+            ProcessResults processResults = putObjectResult.getCiUploadResult().getProcessResults();
+            List<CIObject> objectList = processResults.getObjectList();
+            if (CollUtil.isNotEmpty(objectList)) {
+                CIObject ciObject = objectList.get(0);
+                return buildResult(originalFilename, ciObject);
+            }
+
+
             // 5. 封装返回结果
-            return bulidResult(originalFilename, file, uploadPath, imageInfo);
+            return buildResult(originalFilename, file, uploadPath, imageInfo);
 
         } catch (Exception e) {
             log.error("图片上传失败,存储失败", e);
@@ -96,8 +108,10 @@ public abstract class PictureUploadTemplate {
 
     /**
      * 封装返回结果
+     *
+     * @version 1.0
      */
-    private UploadPictureResult bulidResult(String originalFilename, File file, String uploadPath, ImageInfo imageInfo) {
+    private UploadPictureResult buildResult(String originalFilename, File file, String uploadPath, ImageInfo imageInfo) {
         UploadPictureResult uploadPictureResult = new UploadPictureResult();
         int picWidth = imageInfo.getWidth();
         int picHeight = imageInfo.getHeight();
@@ -109,6 +123,26 @@ public abstract class PictureUploadTemplate {
         uploadPictureResult.setPicHeight(picHeight);
         uploadPictureResult.setPicScale(picScale);
         uploadPictureResult.setPicFormat(imageInfo.getFormat());
+        return uploadPictureResult;
+    }
+
+    /**
+     * 封装返回结果
+     *
+     * @version 2.0
+     */
+    private UploadPictureResult buildResult(String originalFilename, CIObject ciObject) {
+        UploadPictureResult uploadPictureResult = new UploadPictureResult();
+        int picWidth = ciObject.getWidth();
+        int picHeight = ciObject.getHeight();
+        double picScale = NumberUtil.round(picWidth * 1.0 / picHeight, 2).doubleValue();
+        uploadPictureResult.setPicName(FileUtil.mainName(originalFilename));
+        uploadPictureResult.setPicWidth(picWidth);
+        uploadPictureResult.setPicHeight(picHeight);
+        uploadPictureResult.setPicScale(picScale);
+        uploadPictureResult.setPicFormat(ciObject.getFormat());
+        uploadPictureResult.setPicSize(ciObject.getSize().longValue());
+        uploadPictureResult.setUrl(clientConfig.getHost() + "/" + ciObject.getKey());
         return uploadPictureResult;
     }
 
