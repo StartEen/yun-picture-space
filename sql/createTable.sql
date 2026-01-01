@@ -63,3 +63,35 @@ CREATE INDEX idx_reviewStatus ON picture (reviewStatus);
 ALTER TABLE picture
     -- 添加新列
     ADD COLUMN thumbnailUrl VARCHAR(512) null comment '缩略图url';
+
+
+-- 空间表
+create table if not exists space
+(
+    id         bigint auto_increment comment 'id' primary key,
+    spaceName  varchar(128)                       null comment '空间名称',
+    spaceLevel int      default 0                 null comment '空间等级:0-普通版 1-专业版 2-旗舰版',
+    maxSize    bigint   default 0                 null comment '空间中图片的最大总大小',
+    maxCount   bigint   default 0                 null comment '空间中图片的最大数量',
+    totalSize  bigint   default 0                 null comment '当前空间中图片的总大小',
+    totalCount bigint   default 0                 null comment '当前空间中图片的数量',
+    userId     bigint                             not null comment '创建用户id',
+    createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    editTime   datetime default CURRENT_TIMESTAMP not null comment '编辑时间',
+    updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete   tinyint  default 0                 not null comment '是否删除',
+    -- 索引设计
+    INDEX idx_userId (userId),        -- 提升基于用户ID的查询性能
+    INDEX idx_spaceName (spaceName),  -- 提升基于空间名称的查询性能
+    INDEX idx_spaceLevel (spaceLevel) -- 提升基于空间等级的查询性能
+) comment '空间' collate = utf8mb4_unicode_ci;
+
+
+-- 新增空间表字段
+ALTER TABLE space
+    -- 添加新列
+    ADD COLUMN spaceId BIGINT null comment '空间id(为空表示公共空间)';
+-- 创建基于spaceId列的索引
+CREATE INDEX idx_spaceId ON space (spaceId);
+
+
