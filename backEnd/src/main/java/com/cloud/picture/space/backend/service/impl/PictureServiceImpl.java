@@ -117,6 +117,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         // 4.构造入库的图片信息，使用数据万象获取
         Picture picture = new Picture();
         picture.setUrl(uploadPictureResult.getUrl());
+        picture.setThumbnailUrl(uploadPictureResult.getThumbnailUrl());
 
         // 优化入库名称
         String picName = uploadPictureResult.getPicName();

@@ -57,3 +57,9 @@ ALTER TABLE picture
     ADD COLUMN reviewTime   DATETIME      null comment '审核时间';
 -- 创建基于reviewStatus列的索引
 CREATE INDEX idx_reviewStatus ON picture (reviewStatus);
+
+
+-- 新增图片表字段
+ALTER TABLE picture
+    -- 添加新列
+    ADD COLUMN thumbnailUrl VARCHAR(512) null comment '缩略图url';

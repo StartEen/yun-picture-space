@@ -69,8 +69,9 @@ public abstract class PictureUploadTemplate {
             ProcessResults processResults = putObjectResult.getCiUploadResult().getProcessResults();
             List<CIObject> objectList = processResults.getObjectList();
             if (CollUtil.isNotEmpty(objectList)) {
-                CIObject ciObject = objectList.get(0);
-                return buildResult(originalFilename, ciObject);
+                CIObject compressedCIObject = objectList.get(0);
+                CIObject thumbnailCIObject = objectList.get(1);
+                return buildResult(originalFilename, compressedCIObject, thumbnailCIObject);
             }
 
 
@@ -131,18 +132,19 @@ public abstract class PictureUploadTemplate {
      *
      * @version 2.0
      */
-    private UploadPictureResult buildResult(String originalFilename, CIObject ciObject) {
+    private UploadPictureResult buildResult(String originalFilename, CIObject compressedCIObject, CIObject thumbnailCIObject) {
         UploadPictureResult uploadPictureResult = new UploadPictureResult();
-        int picWidth = ciObject.getWidth();
-        int picHeight = ciObject.getHeight();
+        int picWidth = compressedCIObject.getWidth();
+        int picHeight = compressedCIObject.getHeight();
         double picScale = NumberUtil.round(picWidth * 1.0 / picHeight, 2).doubleValue();
         uploadPictureResult.setPicName(FileUtil.mainName(originalFilename));
         uploadPictureResult.setPicWidth(picWidth);
         uploadPictureResult.setPicHeight(picHeight);
         uploadPictureResult.setPicScale(picScale);
-        uploadPictureResult.setPicFormat(ciObject.getFormat());
-        uploadPictureResult.setPicSize(ciObject.getSize().longValue());
-        uploadPictureResult.setUrl(clientConfig.getHost() + "/" + ciObject.getKey());
+        uploadPictureResult.setPicFormat(compressedCIObject.getFormat());
+        uploadPictureResult.setPicSize(compressedCIObject.getSize().longValue());
+        uploadPictureResult.setUrl(clientConfig.getHost() + "/" + compressedCIObject.getKey());
+        uploadPictureResult.setThumbnailUrl(clientConfig.getHost() + "/" + thumbnailCIObject.getKey());
         return uploadPictureResult;
     }
 
