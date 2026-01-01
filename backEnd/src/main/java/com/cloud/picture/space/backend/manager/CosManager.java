@@ -5,6 +5,7 @@ import cn.hutool.core.io.FileUtil;
 import com.cloud.picture.space.backend.config.CosClientConfig;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.demo.PutObjectDemo;
+import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import org.springframework.stereotype.Component;
@@ -112,6 +113,16 @@ public class CosManager {
     public COSObject getObject(String key) {
         GetObjectRequest getObjectRequest = new GetObjectRequest(clientConfig.getBucket(), key);
         return cosClient.getObject(getObjectRequest);
+    }
+
+
+    /**
+     * 删除对象
+     *
+     * @param key 对象的键（key）
+     */
+    public void deleteObject(String key) throws CosClientException {
+        cosClient.deleteObject(clientConfig.getBucket(), key);
     }
 
 
