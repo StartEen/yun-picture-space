@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.controller;
+package com.cloud.picture.space.backend.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
