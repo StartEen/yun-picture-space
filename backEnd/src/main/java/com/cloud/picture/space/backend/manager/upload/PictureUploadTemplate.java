@@ -70,7 +70,14 @@ public abstract class PictureUploadTemplate {
             List<CIObject> objectList = processResults.getObjectList();
             if (CollUtil.isNotEmpty(objectList)) {
                 CIObject compressedCIObject = objectList.get(0);
-                CIObject thumbnailCIObject = objectList.get(1);
+
+                // 如果没有生成缩缩略图，才得到缩略图
+                CIObject thumbnailCIObject = compressedCIObject;
+                // 如果生成缩略图，才能得到缩略图
+                if (objectList.size() > 1) {
+                    thumbnailCIObject = objectList.get(1);
+                }
+
                 return buildResult(originalFilename, compressedCIObject, thumbnailCIObject);
             }
 
