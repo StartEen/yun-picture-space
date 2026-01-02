@@ -3,9 +3,13 @@ package com.cloud.picture.space.backend.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cloud.picture.space.backend.common.DeleteRequest;
+import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
+import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.entity.Space;
+import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.mapper.SpaceMapper;
@@ -61,6 +65,39 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
         }
 
 
+    }
+
+    /**
+     * 创建空间
+     */
+    @Override
+    public long addSpace(SpaceAddRequest spaceAddRequest, User loginUser) {
+
+
+        return 0;
+    }
+
+    /**
+     * 删除空间
+     */
+    @Override
+    public boolean deleteSpace(Long spaceId, User loginUser) {
+        // 校验参数
+        ThrowUtils.throwIf(spaceId <= 0, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR);
+
+        // 判断当前空间是否存在
+        Space oldSpace = this.getById(spaceId);
+        ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR);
+        // 仅本人或管理员可删除
+        if (!oldSpace.getUserId().equals(loginUser.getId()) && !loginUser.getUserRole().equals("admin")) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        boolean result = this.removeById(spaceId);
+        if (!result) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "删除失败");
+        }
+        return true;
     }
 
 
