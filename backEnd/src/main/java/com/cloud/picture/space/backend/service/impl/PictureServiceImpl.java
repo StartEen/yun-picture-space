@@ -423,6 +423,32 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         }
     }
 
+    /**
+     * 图片删除操作
+     */
+    @Override
+    public void deletePicture(long pictureId, User loginUser) {
+        // 校验参数
+        ThrowUtils.throwIf(pictureId <= 0, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR);
+
+
+        // 判断当前文件是否存在
+        Picture oldPicture = this.getById(pictureId);
+        ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
+
+        // 仅本人活管理员可删除
+        if (!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+
+        // 开启事务
+        boolean result = this.removeById(pictureId);
+        if (!result) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "删除失败");
+        }
+        this.clearPictureFile(oldPicture);
+    }
 
 
 }
