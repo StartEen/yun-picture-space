@@ -112,4 +112,16 @@ public interface PictureService extends IService<Picture> {
      * @return 是否成功
      */
     void deletePicture(long pictureId, User loginUser);
+
+
+    /**
+     * 检查操作图片权限
+     * （要删除的图片在私有空间中；也就是有空间id）
+     *
+     * @param loginUser 登录用户
+     * @param picture   图片信息
+     */
+    void checkPictureAuth(User loginUser, Picture picture);
+
+
 }
