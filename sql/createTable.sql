@@ -88,10 +88,15 @@ create table if not exists space
 
 
 -- 新增空间表字段
-ALTER TABLE space
+ALTER TABLE picture
     -- 添加新列
     ADD COLUMN spaceId BIGINT null comment '空间id(为空表示公共空间)';
 -- 创建基于spaceId列的索引
-CREATE INDEX idx_spaceId ON space (spaceId);
+CREATE INDEX idx_spaceId ON picture (spaceId);
+
+
+
+
+
 
 

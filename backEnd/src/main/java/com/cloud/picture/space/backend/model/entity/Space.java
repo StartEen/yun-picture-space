@@ -76,10 +76,6 @@ public class Space implements Serializable {
      */
     private Integer isDelete;
 
-    /**
-     * 空间id(为空表示公共空间)
-     */
-    private Long spaceId;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
