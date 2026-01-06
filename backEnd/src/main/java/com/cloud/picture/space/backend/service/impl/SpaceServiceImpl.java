@@ -11,6 +11,7 @@ import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
+import com.cloud.picture.space.backend.model.vo.SpaceVo;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.mapper.SpaceMapper;
 import com.cloud.picture.space.backend.service.UserService;
@@ -21,8 +22,9 @@ import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author yz2025120101
@@ -54,7 +56,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
         // 创建时，参数不能为空
         if (add) {
-            ThrowUtils.throwIf(StrUtil.isNotBlank(spaceName), ErrorCode.PARAMS_ERROR, "空间名称不能为空");
+            ThrowUtils.throwIf(StrUtil.isBlank(spaceName), ErrorCode.PARAMS_ERROR, "空间名称不能为空");
             ThrowUtils.throwIf(ObjectUtil.isNull(spaceLevelEnum), ErrorCode.PARAMS_ERROR, "空间等级不能为空");
         }
 
@@ -82,6 +84,8 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
     }
 
+    private final Map<Long, Object> lockMap = new ConcurrentHashMap<>();
+
     /**
      * 创建空间
      */
@@ -91,7 +95,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
         Space space = new Space();
         BeanUtils.copyProperties(spaceAddRequest, space);
         // 设置默认值
-        if (StrUtil.isBlank(space.getSpaceName())) {
+        if (StrUtil.isBlank(spaceAddRequest.getSpaceName())) {
             space.setSpaceName("默认空间");
         }
         if (spaceAddRequest.getSpaceLevel() == null) {
@@ -108,20 +112,41 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "您当前的权限，不足以创建指定级别空间");
         }
         // 针对用户进行加锁
-        String lock = String.valueOf(userId).intern();
+        // region
+        // String lock = String.valueOf(userId).intern();
+        // synchronized (lock) {
+        //     Long newSpaceId = transactionTemplate.execute(action -> {
+        //         // 每个用户只有一个私有空间，所以需要检验
+        //         boolean exists = this.lambdaQuery().eq(Space::getUserId, userId).exists();
+        //         ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR,
+        //                 "您已创建过私有空间,每个用户仅能拥有一个私有空间");
+        //         // 写入数据库
+        //         boolean result = this.save(space);
+        //         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建空间失败");
+        //         return space.getId();
+        //     });
+        //     // 返回结果是包装类；
+        //     return Optional.ofNullable(newSpaceId).orElse(-1L);
+        // }
+        // endregion
+        Object lock = lockMap.computeIfAbsent(userId, k -> new Object());
         synchronized (lock) {
-            Long newSpaceId = transactionTemplate.execute(action -> {
-                // 每个用户只有一个私有空间，所以需要检验
-                boolean exists = this.lambdaQuery().eq(Space::getUserId, userId).exists();
-                ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR,
-                        "您已创建过私有空间,每个用户仅能拥有一个私有空间");
-                // 写入数据库
-                boolean result = this.save(space);
-                ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建空间失败");
-                return space.getId();
-            });
-            // 返回结果是包装类；
-            return Optional.ofNullable(newSpaceId).orElse(-1L);
+            try {
+                Long newSpaceId = transactionTemplate.execute(action -> {
+                    // 每个用户只有一个私有空间，所以需要检验
+                    boolean exists = this.lambdaQuery().eq(Space::getUserId, userId).exists();
+                    ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR,
+                            "您已创建过私有空间,每个用户仅能拥有一个私有空间");
+                    // 写入数据库
+                    boolean result = this.save(space);
+                    ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建空间失败");
+                    return space.getId();
+                });
+                // 返回结果是包装类；
+                return Optional.ofNullable(newSpaceId).orElse(-1L);
+            } finally {
+                lockMap.remove(userId);
+            }
         }
     }
 
