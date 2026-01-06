@@ -9,10 +9,13 @@ import com.cloud.picture.space.backend.common.DeleteRequest;
 import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
+import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.dto.user.*;
 import com.cloud.picture.space.backend.model.entity.User;
+import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
 import com.cloud.picture.space.backend.model.vo.LoginUserVo;
 import com.cloud.picture.space.backend.model.vo.UserVo;
+import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.UserConstant;
 import com.cloud.picture.space.backend.service.UserService;
 import org.springframework.beans.BeanUtils;
@@ -35,6 +38,9 @@ public class UserController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private SpaceService spaceService;
+
     /**
      * 用户注册
      */
@@ -46,8 +52,16 @@ public class UserController {
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
-        long result = userService.userRegister(userAccount, userPassword, checkPassword);
-        return ResultUtils.success(result);
+        long userId = userService.userRegister(userAccount, userPassword, checkPassword);
+
+        // 创建用户私有空间
+        SpaceAddRequest spaceAddRequest = new SpaceAddRequest();
+        spaceAddRequest.setSpaceName("默认私有空间");
+        spaceAddRequest.setSpaceLevel(SpaceLevelEnum.COMMON.getValue());
+        User user = userService.getById(userId);
+        spaceService.addSpace(spaceAddRequest, user);
+
+        return ResultUtils.success(userId);
 
     }
 
