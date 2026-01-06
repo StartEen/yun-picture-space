@@ -447,13 +447,29 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             return;
         }
         // FIXME 注意，这里的url包含了域名，实际上只要传key值（存储路径）就够了；
-        cosManager.deleteObject(pictureUrl);
+        cosManager.deleteObject(extractObjectKey(pictureUrl));
         // 清理缩率图
         String thumbnailUrl = oldPicture.getThumbnailUrl();
         if (StrUtil.isNotBlank(thumbnailUrl)) {
-            cosManager.deleteObject(thumbnailUrl);
+            cosManager.deleteObject(extractObjectKey(thumbnailUrl));
         }
     }
+
+    private String extractObjectKey(String fullUrl) {
+        if (StrUtil.isBlank(fullUrl)) {
+            return fullUrl;
+        }
+        // 从完整 URL 中提取对象键
+        int startIndex = fullUrl.indexOf("//");
+        if (startIndex != -1) {
+            int endIndex = fullUrl.indexOf("/", startIndex + 2);
+            if (endIndex != -1) {
+                return fullUrl.substring(endIndex + 1); // 去除域名部分
+            }
+        }
+        return fullUrl;
+    }
+
 
     /**
      * 图片删除操作
@@ -477,6 +493,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         if (!result) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "删除失败");
         }
+        // 清理图片cos文件
         this.clearPictureFile(oldPicture);
     }
 
