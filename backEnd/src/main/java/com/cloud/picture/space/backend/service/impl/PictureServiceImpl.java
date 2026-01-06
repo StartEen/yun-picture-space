@@ -2,6 +2,7 @@ package com.cloud.picture.space.backend.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,12 +22,14 @@ import com.cloud.picture.space.backend.model.dto.picture.PictureReviewRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureUploadByBatchRequest;
 import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
 import com.cloud.picture.space.backend.model.entity.Picture;
+import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.PictureReviewStatusEnum;
 import com.cloud.picture.space.backend.model.vo.PictureVo;
 import com.cloud.picture.space.backend.model.vo.UserVo;
 import com.cloud.picture.space.backend.service.PictureService;
 import com.cloud.picture.space.backend.mapper.PictureMapper;
+import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -73,6 +76,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     @Resource
     private UrlPictureUpload urlPictureUpload;
 
+    @Resource
+    private SpaceService spaceService;
+
 
     /**
      * 上传图片
@@ -81,6 +87,15 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     public PictureVo uploadPicture(Object inputSource, PictureUploadRequest pictureUploadRequest, User loginUser) {
         // 1.校验用户是否为空
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR);
+
+        // 校验空间是否存在
+        Long spaceId = pictureUploadRequest.getSpaceId();
+        if (spaceId != null) {
+            Space space = spaceService.getById(spaceId);
+            ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
+            // 必须空间创建人（管理员）才能上传
+            ThrowUtils.throwIf(!space.getUserId().equals(loginUser.getId()), ErrorCode.NO_AUTH_ERROR, "您没有权限上传图片");
+        }
 
         ThrowUtils.throwIf(ObjectUtil.isEmpty(inputSource), ErrorCode.PARAMS_ERROR, "图片不存在");
 
@@ -103,11 +118,27 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             if (!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "您的权限不足！");
             }
+
+            // 校验空间是否一致
+            // 如果没传空间id，就复用原有的图片
+            if (spaceId == null) {
+                if (oldPicture.getSpaceId() != null) {
+                    spaceId = oldPicture.getSpaceId();
+                }
+            } else {
+                // 传了，就必须和原有图片保持一致
+                ThrowUtils.throwIf(ObjUtil.notEqual(spaceId, oldPicture.getSpaceId()), ErrorCode.PARAMS_ERROR, "空间id不一致");
+            }
         }
 
         // 3.上传图片，得到信息
-        // 3.1根据用户id划分目录
-        String uploadPathPrefix = String.format("/public/%s", loginUser.getId());
+        // 3.1根据用户id划分目录 => 按照空间划分目录
+        String uploadPathPrefix;
+        if (spaceId == null) {
+            uploadPathPrefix = String.format("/public/%s", loginUser.getId());
+        } else {
+            uploadPathPrefix = String.format("/space/%s", spaceId);
+        }
         // 根据inputSource类型区分上传方式
         PictureUploadTemplate pictureUploadTemplate = filePictureUpload;
         if (inputSource instanceof String) {
@@ -133,6 +164,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         picture.setPicScale(uploadPictureResult.getPicScale());
         picture.setPicFormat(uploadPictureResult.getPicFormat());
         picture.setUserId(loginUser.getId());
+        picture.setSpaceId(spaceId);
 
         // 补充审核参数
         fillReviewParams(picture, loginUser);
