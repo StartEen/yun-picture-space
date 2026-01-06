@@ -2,10 +2,7 @@ package com.cloud.picture.space.backend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.picture.space.backend.model.dto.picture.PictureQueryRequest;
-import com.cloud.picture.space.backend.model.dto.picture.PictureReviewRequest;
-import com.cloud.picture.space.backend.model.dto.picture.PictureUploadByBatchRequest;
-import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
+import com.cloud.picture.space.backend.model.dto.picture.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cloud.picture.space.backend.model.entity.User;
@@ -122,6 +119,14 @@ public interface PictureService extends IService<Picture> {
      * @param picture   图片信息
      */
     void checkPictureAuth(User loginUser, Picture picture);
+
+    /**
+     * 编辑图片
+     *
+     * @param pictureEditRequest 图片编辑请求体
+     * @param loginUser           登录用户
+     */
+    public void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
 
 
 }

@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,10 +18,7 @@ import com.cloud.picture.space.backend.manager.upload.FilePictureUpload;
 import com.cloud.picture.space.backend.manager.upload.PictureUploadTemplate;
 import com.cloud.picture.space.backend.manager.upload.UrlPictureUpload;
 import com.cloud.picture.space.backend.model.dto.file.UploadPictureResult;
-import com.cloud.picture.space.backend.model.dto.picture.PictureQueryRequest;
-import com.cloud.picture.space.backend.model.dto.picture.PictureReviewRequest;
-import com.cloud.picture.space.backend.model.dto.picture.PictureUploadByBatchRequest;
-import com.cloud.picture.space.backend.model.dto.picture.PictureUploadRequest;
+import com.cloud.picture.space.backend.model.dto.picture.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
@@ -36,6 +34,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -516,6 +515,35 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             }
 
         }
+
+    }
+
+    /**
+     * 编辑图片
+     */
+    @Override
+    public void editPicture(PictureEditRequest pictureEditRequest, User loginUser) {
+        // 将DTO转成实体类
+        Picture picture = new Picture();
+        BeanUtils.copyProperties(pictureEditRequest, picture);
+        // 标签类型转换
+        picture.setTags(JSONUtil.toJsonStr(pictureEditRequest.getTags()));
+        // 设置编辑时间
+        picture.setEditTime(new Date());
+        // 校验数据
+        this.validPicture(picture);
+
+
+        long id = pictureEditRequest.getId();
+        Picture oldPicture = this.getById(id);
+        ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
+
+        // 设置权限
+        checkPictureAuth(loginUser, oldPicture);
+        // 补充审核参数
+        this.fillReviewParams(picture, loginUser);
+        boolean result = this.updateById(picture);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
 
     }
 
