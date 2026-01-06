@@ -49,4 +49,9 @@ public class UploadPictureResult {
      * 缩略图
      */
     private String thumbnailUrl;
+
+    /**
+     * 原图url
+     */
+    private String originalUrl;
 }

@@ -128,6 +128,12 @@ public class Picture implements Serializable {
      */
     private Long spaceId;
 
+    /**
+     * 原图 url
+     */
+    private String originalUrl;
+
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

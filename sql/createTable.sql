@@ -95,8 +95,10 @@ ALTER TABLE picture
 CREATE INDEX idx_spaceId ON picture (spaceId);
 
 
-
-
+-- 新增图片表字段
+ALTER TABLE picture
+    -- 添加新列
+    ADD COLUMN originalUrl VARCHAR(512) null comment '原始图片url';
 
 
 
