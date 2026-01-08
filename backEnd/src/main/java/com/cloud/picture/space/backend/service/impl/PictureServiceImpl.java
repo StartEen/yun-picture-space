@@ -112,6 +112,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
         // 2.判断当前操作是新增还是修改
         Long pictureId = null;
+        Picture oldPicture = null;
         if (pictureUploadRequest != null) {
             pictureId = pictureUploadRequest.getId();
         }
@@ -122,7 +123,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         } */
         //【新增权限验证】
         if (pictureId != null) {
-            Picture oldPicture = this.getById(pictureId);
+            oldPicture = this.getById(pictureId);
             ThrowUtils.throwIf(ObjectUtil.isEmpty(oldPicture), ErrorCode.NOT_FOUND_ERROR, "图片不存在");
             // 仅本人获取管理员可编辑
             if (!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
@@ -189,9 +190,16 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
         // 开启事务
         Long finalSpaceId = spaceId;
+        Picture finalOldPicture = oldPicture;
         transactionTemplate.execute(status -> {
             boolean result = this.saveOrUpdate(picture);
             ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "图片上传失败");
+
+            // 如果是更新操作，清理旧的COS文件
+            if (finalOldPicture != null) {
+                this.clearPictureFile(finalOldPicture);
+            }
+
             if (finalSpaceId != null) {
                 boolean update = spaceService.lambdaUpdate()
                         .eq(Space::getId, finalSpaceId)
@@ -202,8 +210,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             }
             return picture;
         });
-
-
 
         return PictureVo.objToVo(picture);
     }
