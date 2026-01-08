@@ -221,6 +221,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         String userId = pictureQueryRequest.getUserId();
         String sortField = pictureQueryRequest.getSortField();
         String sortOrder = pictureQueryRequest.getSortOrder();
+        Long spaceId = pictureQueryRequest.getSpaceId();
+        boolean nullSpaceId = pictureQueryRequest.isNullSpaceId();
 
         // 添加审核状态参数
         Integer reviewStatus = pictureQueryRequest.getReviewStatus();
@@ -248,6 +250,10 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         queryWrapper.eq(ObjectUtil.isNotEmpty(reviewStatus), "reviewStatus", reviewStatus);
         queryWrapper.like(StrUtil.isNotBlank(reviewReason), "reviewReason", reviewReason);
         queryWrapper.eq(ObjectUtil.isNotEmpty(reviewerId), "reviewerId", reviewerId);
+
+        queryWrapper.eq(ObjectUtil.isNotEmpty(spaceId), "spaceId", spaceId);
+        queryWrapper.isNull(nullSpaceId, "spaceId");
+
 
         // JSON数组查询
         if (CollUtil.isNotEmpty(tags)) {
