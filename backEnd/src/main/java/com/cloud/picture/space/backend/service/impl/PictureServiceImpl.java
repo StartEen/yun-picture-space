@@ -195,19 +195,30 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             boolean result = this.saveOrUpdate(picture);
             ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "图片上传失败");
 
+            if (finalSpaceId != null) {
+
+                long sizeDiff = picture.getPicSize(); // 默认为新图片大小
+                long countDiff = 1; // 默认增加1个文件
+
+                // 如果是更新操作，需要计算大小差异
+                if (finalOldPicture != null) {
+                    sizeDiff = picture.getPicSize() - finalOldPicture.getPicSize(); // 新旧图片大小差值
+                    countDiff = 0; // 更新操作文件数不变
+                }
+
+
+                boolean update = spaceService.lambdaUpdate()
+                        .eq(Space::getId, finalSpaceId)
+                        .setSql("totalSize = totalSize +" + sizeDiff)
+                        .setSql("totalCount = totalCount + " + countDiff)
+                        .update();
+                ThrowUtils.throwIf(!update, ErrorCode.OPERATION_ERROR, "空间额度更新失败");
+            }
             // 如果是更新操作，清理旧的COS文件
             if (finalOldPicture != null) {
                 this.clearPictureFile(finalOldPicture);
             }
 
-            if (finalSpaceId != null) {
-                boolean update = spaceService.lambdaUpdate()
-                        .eq(Space::getId, finalSpaceId)
-                        .setSql("totalSize = totalSize +" + picture.getPicSize())
-                        .setSql("totalCount = totalCount + 1")
-                        .update();
-                ThrowUtils.throwIf(!update, ErrorCode.OPERATION_ERROR, "空间额度更新失败");
-            }
             return picture;
         });
 
