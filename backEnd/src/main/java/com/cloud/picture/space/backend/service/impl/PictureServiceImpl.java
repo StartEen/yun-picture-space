@@ -540,10 +540,24 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         checkPictureAuth(loginUser, oldPicture);
 
         // 开启事务
-        boolean result = this.removeById(pictureId);
-        if (!result) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "删除失败");
-        }
+
+        transactionTemplate.execute(status -> {
+            boolean result = this.removeById(pictureId);
+            if (!result) {
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "删除失败");
+            }
+            // 释放额度
+            Long spaceId = oldPicture.getSpaceId();
+            if (spaceId != null) {
+                boolean update = spaceService.lambdaUpdate().eq(Space::getId, spaceId)
+                        .setSql("totalSize = totalSize -" + oldPicture.getPicSize())
+                        .setSql("totalCount = totalCount - 1 ")
+                        .update();
+                ThrowUtils.throwIf(!update, ErrorCode.OPERATION_ERROR, "释放额度失败");
+            }
+            return true;
+        });
+
         // 清理图片cos文件
         this.clearPictureFile(oldPicture);
     }
