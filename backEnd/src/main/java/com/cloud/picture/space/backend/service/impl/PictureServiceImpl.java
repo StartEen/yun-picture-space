@@ -214,14 +214,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
                         .update();
                 ThrowUtils.throwIf(!update, ErrorCode.OPERATION_ERROR, "空间额度更新失败");
             }
-            // 如果是更新操作，清理旧的COS文件
-            if (finalOldPicture != null) {
-                this.clearPictureFile(finalOldPicture);
-            }
 
             return picture;
         });
 
+        // 如果是更新操作，清理旧的COS文件
+        if (finalOldPicture != null) {
+            this.clearPictureFile(finalOldPicture);
+        }
         return PictureVo.objToVo(picture);
     }
 
