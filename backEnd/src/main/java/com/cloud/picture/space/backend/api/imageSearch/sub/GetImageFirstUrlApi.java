@@ -24,8 +24,8 @@ public class GetImageFirstUrlApi {
     /**
      * 获取图片的第一张图片
      *
-     * @param url 图片页面链接
-     * @return 图片的第一张图片
+     * @param url 页面链接
+     * @return 返回图片的URL
      */
     public static String getImageFirstUrl(String url) {
         try {
