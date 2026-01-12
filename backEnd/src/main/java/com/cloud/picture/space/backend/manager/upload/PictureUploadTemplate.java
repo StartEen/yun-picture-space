@@ -78,7 +78,7 @@ public abstract class PictureUploadTemplate {
                     thumbnailCIObject = objectList.get(1);
                 }
 
-                return buildResult(originalFilename, compressedCIObject, thumbnailCIObject, uploadPath);
+                return buildResult(originalFilename, compressedCIObject, thumbnailCIObject, uploadPath, imageInfo);
             }
 
 
@@ -131,6 +131,7 @@ public abstract class PictureUploadTemplate {
         uploadPictureResult.setPicHeight(picHeight);
         uploadPictureResult.setPicScale(picScale);
         uploadPictureResult.setPicFormat(imageInfo.getFormat());
+        uploadPictureResult.setPicColor(imageInfo.getAve());
         return uploadPictureResult;
     }
 
@@ -139,7 +140,7 @@ public abstract class PictureUploadTemplate {
      *
      * @version 2.0
      */
-    private UploadPictureResult buildResult(String originalFilename, CIObject compressedCIObject, CIObject thumbnailCIObject, String uploadPath) {
+    private UploadPictureResult buildResult(String originalFilename, CIObject compressedCIObject, CIObject thumbnailCIObject, String uploadPath, ImageInfo imageInfo) {
         UploadPictureResult uploadPictureResult = new UploadPictureResult();
         int picWidth = compressedCIObject.getWidth();
         int picHeight = compressedCIObject.getHeight();
@@ -150,6 +151,7 @@ public abstract class PictureUploadTemplate {
         uploadPictureResult.setPicScale(picScale);
         uploadPictureResult.setPicFormat(compressedCIObject.getFormat());
         uploadPictureResult.setPicSize(compressedCIObject.getSize().longValue());
+        uploadPictureResult.setPicColor(imageInfo.getAve());
         uploadPictureResult.setUrl(clientConfig.getHost() + "/" + compressedCIObject.getKey());
         uploadPictureResult.setThumbnailUrl(clientConfig.getHost() + "/" + thumbnailCIObject.getKey());
         uploadPictureResult.setOriginalUrl(clientConfig.getHost() + "/" + uploadPath);
