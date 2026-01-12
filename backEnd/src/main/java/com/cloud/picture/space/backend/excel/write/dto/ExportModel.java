@@ -19,7 +19,7 @@ public class ExportModel {
     @ExcelProperty("字段二")
     private Integer fieldTwo;
 
-    @ExcelProperty("字段三")
+    @ExcelProperty("字段三") 
     private String fieldThree;
 
     @ExcelProperty("字段四")
