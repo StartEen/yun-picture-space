@@ -127,7 +127,7 @@ public interface PictureService extends IService<Picture> {
      * @param pictureEditRequest 图片编辑请求体
      * @param loginUser          登录用户
      */
-    public void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
 
 
     /**
@@ -138,7 +138,16 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser 登录用户
      * @return 图片信息
      */
-    public List<PictureVo> searchPictureByColor(Long spaceId, String picColor, User loginUser);
+    List<PictureVo> searchPictureByColor(Long spaceId, String picColor, User loginUser);
+
+
+    /**
+     * 批量编辑图片
+     *
+     * @param pictureEditByBatchRequest 图片批量编辑请求体
+     * @param loginUser                 登录用户
+     */
+    void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
 
 
 }

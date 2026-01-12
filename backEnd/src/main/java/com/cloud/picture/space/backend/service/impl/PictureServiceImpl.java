@@ -662,6 +662,16 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     }
 
 
+    /**
+     * 批量编辑图片
+     */
+    @Override
+    public void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser) {
+
+
+
+
+    }
 }
 
 
