@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * @Author: StartEnd
  * @CreateTime: 2026-01-09  11:13
- * @Description: TODO
+ * @Description: TODO  获取图片的页面链接
  */
 @Slf4j
 public class GetImagePageUrlApi {
