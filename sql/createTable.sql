@@ -101,4 +101,11 @@ ALTER TABLE picture
     ADD COLUMN originalUrl VARCHAR(512) null comment '原始图片url';
 
 
+-- 图片表新增字段
+ALTER TABLE picture
+    ADD COLUMN picColor varchar(16) null comment '图片主色调';
+
+
+
+
 

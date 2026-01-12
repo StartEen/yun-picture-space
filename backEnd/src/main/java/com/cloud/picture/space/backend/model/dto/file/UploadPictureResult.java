@@ -54,4 +54,11 @@ public class UploadPictureResult {
      * 原图url
      */
     private String originalUrl;
+
+    /**
+     * 图片主色调
+     */
+    private String picColor;
+
+
 }
