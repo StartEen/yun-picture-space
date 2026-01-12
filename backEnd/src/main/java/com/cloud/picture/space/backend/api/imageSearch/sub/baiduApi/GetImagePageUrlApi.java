@@ -1,7 +1,6 @@
-package com.cloud.picture.space.backend.api.imageSearch.sub;
+package com.cloud.picture.space.backend.api.imageSearch.sub.baiduApi;
 
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
@@ -13,7 +12,6 @@ import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.internal.StringUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;

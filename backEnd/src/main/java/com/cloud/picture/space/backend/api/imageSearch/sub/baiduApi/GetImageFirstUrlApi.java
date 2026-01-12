@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.imageSearch.sub;
+package com.cloud.picture.space.backend.api.imageSearch.sub.baiduApi;
 
 
 import com.cloud.picture.space.backend.exception.BusinessException;
