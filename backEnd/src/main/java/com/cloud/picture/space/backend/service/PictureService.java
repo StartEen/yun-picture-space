@@ -10,6 +10,7 @@ import com.cloud.picture.space.backend.model.vo.PictureVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author yz2025120101
@@ -124,9 +125,20 @@ public interface PictureService extends IService<Picture> {
      * 编辑图片
      *
      * @param pictureEditRequest 图片编辑请求体
-     * @param loginUser           登录用户
+     * @param loginUser          登录用户
      */
     public void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
+
+    /**
+     * 根据颜色搜索图片
+     *
+     * @param spaceId   空间id
+     * @param picColor  图片颜色
+     * @param loginUser 登录用户
+     * @return 图片信息
+     */
+    public List<PictureVo> searchPictureByColor(Long spaceId, String picColor, User loginUser);
 
 
 }

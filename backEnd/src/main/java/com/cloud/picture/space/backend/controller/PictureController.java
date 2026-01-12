@@ -397,4 +397,19 @@ public class PictureController {
     }
 
 
+    /**
+     * 以颜色搜图
+     */
+    @PostMapping("/search/color")
+    public BaseResponse<List<PictureVo>> searchPictureByColor(@RequestBody SearchPictureByColorRequest searchPictureByColorRequest,
+                                                              HttpServletRequest request) {
+        ThrowUtils.throwIf(searchPictureByColorRequest == null, ErrorCode.PARAMS_ERROR);
+        String picColor = searchPictureByColorRequest.getPicColor();
+        Long spaceId = searchPictureByColorRequest.getSpaceId();
+        User loginUser = userService.getLoginUser(request);
+        List<PictureVo> results = pictureService.searchPictureByColor(spaceId, picColor, loginUser);
+        return ResultUtils.success(results);
+    }
+
+
 }
