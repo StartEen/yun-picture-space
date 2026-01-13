@@ -25,16 +25,6 @@ public class PictureEditByBatchRequest implements Serializable {
     private Long spaceId;
 
     /**
-     * 图片名称
-     */
-    private String name;
-
-    /**
-     * 图片简介
-     */
-    private String introduction;
-
-    /**
      * 图片分类
      */
     private String category;
