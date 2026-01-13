@@ -709,11 +709,51 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     }
 
 
+    /**
+     * 批量编辑图片分类和标签参数校验
+     */
+    public void validateBatchEditRequest(PictureEditByBatchRequest pictureEditByBatchRequest, Long spaceId, Long loginUserId) {
+        List<Long> pictureIdList = pictureEditByBatchRequest.getPictureIdList();
+        String category = pictureEditByBatchRequest.getCategory();
+        List<String> tags = pictureEditByBatchRequest.getTags();
+        User loginUser = userService.getById(loginUserId);
 
+        // 1.校验参数
+        ThrowUtils.throwIf(pictureIdList == null || CollUtil.isEmpty(pictureIdList), ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR);
 
+        // 2.校验空间
+        Space space = spaceService.getById(spaceId);
+        ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
+        if (!loginUser.getId().equals(space.getUserId())) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间的访问权限");
+        }
 
+        // 3.校验分类和标签参数（两者有一个不为空）
+        if (StrUtil.isBlank(category) && CollUtil.isEmpty(tags)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "分类和标签不能同时为空");
+        }
+    }
 
+    /**
+     * 批量编辑图片元数据
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchEditPictureMetadata(PictureEditByBatchRequest request, Long spaceId, Long loginUserId) {
+        // // 1.校验参数
+        // validateBatchEditRequest(request, spaceId, loginUserId);
+        //
+        // // 2.查询指定图片，仅选择需要的字段
+        // List<Picture> pictureList = this.lambdaQuery()
+        //         .eq(Picture::getSpaceId, spaceId)
+        //         .in(Picture::getId, request.getPictureIdList())
+        //         .list();
+        // if (CollUtil.isEmpty(pictureList)) {
+        //     throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "指定图片不存在或图片不属于该空间");
+        // }
 
+    }
 
 
 }

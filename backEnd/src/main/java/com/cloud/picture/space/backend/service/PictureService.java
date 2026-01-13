@@ -150,4 +150,14 @@ public interface PictureService extends IService<Picture> {
     void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
 
 
+    /**
+     * 批量编辑图片分类和标签
+     *
+     * @param request     图片批量编辑请求体（批量编辑图片分类和标签）
+     * @param spaceId     空间id
+     * @param loginUserId 登录用户id
+     */
+    void batchEditPictureMetadata(PictureEditByBatchRequest request, Long spaceId, Long loginUserId);
+
+
 }
