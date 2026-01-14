@@ -72,8 +72,7 @@ public class PictureController {
      */
     @PostMapping("/upload")
     // @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<PictureVo> uploadPicture(@RequestPart("file") MultipartFile multipartFile,
-                                                 PictureUploadRequest pictureUploadRequest, HttpServletRequest request) {
+    public BaseResponse<PictureVo> uploadPicture(@RequestPart("file") MultipartFile multipartFile, PictureUploadRequest pictureUploadRequest, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         PictureVo pictureVo = pictureService.uploadPicture(multipartFile, pictureUploadRequest, loginUser);
         return ResultUtils.success(pictureVo);
@@ -319,11 +318,7 @@ public class PictureController {
 
 
     // 构造本地缓存
-    private final Cache<String, String> LOCAL_CACHE =
-            Caffeine.newBuilder().initialCapacity(1024)
-                    .maximumSize(10000L)
-                    .expireAfterWrite(5, TimeUnit.MINUTES)
-                    .build();
+    private final Cache<String, String> LOCAL_CACHE = Caffeine.newBuilder().initialCapacity(1024).maximumSize(10000L).expireAfterWrite(5, TimeUnit.MINUTES).build();
 
 
     /**
@@ -401,14 +396,36 @@ public class PictureController {
      * 以颜色搜图
      */
     @PostMapping("/search/color")
-    public BaseResponse<List<PictureVo>> searchPictureByColor(@RequestBody SearchPictureByColorRequest searchPictureByColorRequest,
-                                                              HttpServletRequest request) {
+    public BaseResponse<List<PictureVo>> searchPictureByColor(@RequestBody SearchPictureByColorRequest searchPictureByColorRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(searchPictureByColorRequest == null, ErrorCode.PARAMS_ERROR);
         String picColor = searchPictureByColorRequest.getPicColor();
         Long spaceId = searchPictureByColorRequest.getSpaceId();
         User loginUser = userService.getLoginUser(request);
         List<PictureVo> results = pictureService.searchPictureByColor(spaceId, picColor, loginUser);
         return ResultUtils.success(results);
+    }
+
+
+    /**
+     * 批量编辑
+     */
+    @PostMapping("/edit/batch")
+    public BaseResponse<Boolean> editPictureByBatch(@RequestBody PictureEditByBatchRequest pictureEditByBatchRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(pictureEditByBatchRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        pictureService.editPictureByBatch(pictureEditByBatchRequest, loginUser);
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 批量修改图片标签和分类
+     */
+    @PostMapping("/edit/batch/tagAndCategory")
+    public BaseResponse<Boolean> batchEditPictureMetadata(@RequestBody PictureEditByBatchRequest pictureEditByBatchRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(pictureEditByBatchRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        pictureService.batchEditPictureMetadata(pictureEditByBatchRequest, pictureEditByBatchRequest.getSpaceId(), loginUser.getId());
+        return ResultUtils.success(true);
     }
 
 
