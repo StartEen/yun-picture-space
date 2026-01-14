@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.model.vo;
+package com.cloud.picture.space.backend.model.vo.picture;
 
 
 import lombok.Data;

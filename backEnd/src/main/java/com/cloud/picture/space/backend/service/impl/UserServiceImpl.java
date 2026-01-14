@@ -11,8 +11,8 @@ import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.user.UserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.UserRoleEnum;
-import com.cloud.picture.space.backend.model.vo.LoginUserVo;
-import com.cloud.picture.space.backend.model.vo.UserVo;
+import com.cloud.picture.space.backend.model.vo.user.LoginUserVo;
+import com.cloud.picture.space.backend.model.vo.user.UserVo;
 import com.cloud.picture.space.backend.service.UserConstant;
 import com.cloud.picture.space.backend.service.UserService;
 import com.cloud.picture.space.backend.mapper.UserMapper;
@@ -23,7 +23,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

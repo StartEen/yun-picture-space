@@ -10,7 +10,7 @@ import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
-import com.cloud.picture.space.backend.model.vo.SpaceLevel;
+import com.cloud.picture.space.backend.model.vo.space.SpaceLevel;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.UserConstant;
 import com.cloud.picture.space.backend.service.UserService;

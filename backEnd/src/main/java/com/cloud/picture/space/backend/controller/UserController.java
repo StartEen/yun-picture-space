@@ -13,13 +13,12 @@ import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.dto.user.*;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
-import com.cloud.picture.space.backend.model.vo.LoginUserVo;
-import com.cloud.picture.space.backend.model.vo.UserVo;
+import com.cloud.picture.space.backend.model.vo.user.LoginUserVo;
+import com.cloud.picture.space.backend.model.vo.user.UserVo;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.UserConstant;
 import com.cloud.picture.space.backend.service.UserService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

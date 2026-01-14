@@ -1,10 +1,11 @@
-package com.cloud.picture.space.backend.model.vo;
+package com.cloud.picture.space.backend.model.vo.picture;
 
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.cloud.picture.space.backend.model.entity.Picture;
+import com.cloud.picture.space.backend.model.vo.user.UserVo;
 import lombok.Data;
 
 import java.io.Serializable;

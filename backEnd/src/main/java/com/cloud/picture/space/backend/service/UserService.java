@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cloud.picture.space.backend.model.dto.user.UserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cloud.picture.space.backend.model.vo.LoginUserVo;
-import com.cloud.picture.space.backend.model.vo.UserVo;
+import com.cloud.picture.space.backend.model.vo.user.LoginUserVo;
+import com.cloud.picture.space.backend.model.vo.user.UserVo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

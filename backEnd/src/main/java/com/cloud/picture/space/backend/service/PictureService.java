@@ -6,8 +6,7 @@ import com.cloud.picture.space.backend.model.dto.picture.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cloud.picture.space.backend.model.entity.User;
-import com.cloud.picture.space.backend.model.vo.PictureVo;
-import org.springframework.web.multipart.MultipartFile;
+import com.cloud.picture.space.backend.model.vo.picture.PictureVo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

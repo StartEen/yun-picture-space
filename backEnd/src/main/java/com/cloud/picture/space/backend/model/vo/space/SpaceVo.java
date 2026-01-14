@@ -1,8 +1,8 @@
-package com.cloud.picture.space.backend.model.vo;
+package com.cloud.picture.space.backend.model.vo.space;
 
 
-import cn.hutool.core.bean.BeanUtil;
 import com.cloud.picture.space.backend.model.entity.Space;
+import com.cloud.picture.space.backend.model.vo.user.UserVo;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
