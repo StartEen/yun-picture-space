@@ -21,12 +21,12 @@ public class SpaceAnalyzeRequest implements Serializable {
     /**
      * 是否查询公共图库
      */
-    private Boolean queryPublic;
+    private boolean queryPublic;
 
     /**
      * 全空间分析
      */
-    private Boolean queryAll;
+    private boolean queryAll;
 
 
     private static final long serialVersionUID = 1L;

@@ -1,9 +1,12 @@
 package com.cloud.picture.space.backend.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.analyze.SpaceAnalyzeRequest;
+import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.service.SpaceAnalyzeService;
@@ -35,7 +38,7 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
      */
     @Override
     public void checkSpaceAnalyzeAuth(SpaceAnalyzeRequest spaceAnalyzeRequest, User loginUser) {
-        if (spaceAnalyzeRequest.getQueryAll() || spaceAnalyzeRequest.getQueryPublic()) {
+        if (spaceAnalyzeRequest.isQueryAll() || spaceAnalyzeRequest.isQueryPublic()) {
             // 全空间分析或者公共图库权限校验，仅管理员可用
             ThrowUtils.throwIf(!userService.isAdmin(loginUser), ErrorCode.NO_AUTH_ERROR, "无权访问公共图库");
         } else {
@@ -46,6 +49,27 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
             spaceService.checkSpaceAuth(loginUser, space);
         }
-
     }
+
+    /**
+     * 填充图片空间数据分析查询条件
+     */
+    @Override
+    public void fillAnalyzeQueryWrapper(SpaceAnalyzeRequest spaceAnalyzeRequest, QueryWrapper<Picture> queryWrapper) {
+        if (spaceAnalyzeRequest.isQueryAll()) {
+            return;
+        }
+        if (spaceAnalyzeRequest.isQueryPublic()) {
+            queryWrapper.isNull("spaceId");
+            return;
+        }
+        Long spaceId = spaceAnalyzeRequest.getSpaceId();
+        if (spaceId != null) {
+            queryWrapper.eq("spaceId", spaceId);
+            return;
+        }
+        throw new BusinessException(ErrorCode.OPERATION_ERROR, "未指定查询范围");
+    }
+
+
 }

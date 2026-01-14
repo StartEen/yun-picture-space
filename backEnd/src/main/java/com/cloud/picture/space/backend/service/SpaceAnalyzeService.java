@@ -1,6 +1,8 @@
 package com.cloud.picture.space.backend.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cloud.picture.space.backend.model.dto.analyze.SpaceAnalyzeRequest;
+import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.User;
 
 /**
@@ -17,6 +19,15 @@ public interface SpaceAnalyzeService {
      * @param loginUser           登录用户
      */
     void checkSpaceAnalyzeAuth(SpaceAnalyzeRequest spaceAnalyzeRequest, User loginUser);
+
+
+    /**
+     * 填充图片空间数据分析查询条件
+     *
+     * @param spaceAnalyzeRequest 图片空间数据分析请求体
+     * @param queryWrapper        查询条件
+     **/
+    void fillAnalyzeQueryWrapper(SpaceAnalyzeRequest spaceAnalyzeRequest, QueryWrapper<Picture> queryWrapper);
 
 
 }
