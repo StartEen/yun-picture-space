@@ -79,6 +79,9 @@ knife4j:
 #    region: xxxxxxx
 #    bucket: xxxxxxx
 
-
-
+thread-pool:
+  core-pool-size: 10
+  max-pool-size: 20
+  keep-alive-time: 60
+  queue-capacity: 200
 
