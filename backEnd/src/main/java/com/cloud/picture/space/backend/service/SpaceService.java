@@ -47,4 +47,12 @@ public interface SpaceService extends IService<Space> {
      * @return 是否成功
      */
     boolean deleteSpace(Long spaceId, User loginUser);
+
+    /**
+     * 校验空间权限
+     *
+     * @param loginUser 登录用户
+     * @param space     空间
+     */
+    void checkSpaceAuth(User loginUser, Space space);
 }

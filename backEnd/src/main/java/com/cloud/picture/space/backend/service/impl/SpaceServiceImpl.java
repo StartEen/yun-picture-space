@@ -29,8 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @createDate 2026-01-01 15:05:53
  */
 @Service
-public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
-        implements SpaceService {
+public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements SpaceService {
 
     @Resource
     private UserService userService;
@@ -132,8 +131,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
                 Long newSpaceId = transactionTemplate.execute(action -> {
                     // 每个用户只有一个私有空间，所以需要检验
                     boolean exists = this.lambdaQuery().eq(Space::getUserId, userId).exists();
-                    ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR,
-                            "您已创建过私有空间,每个用户仅能拥有一个私有空间");
+                    ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR, "您已创建过私有空间,每个用户仅能拥有一个私有空间");
                     // 写入数据库
                     boolean result = this.save(space);
                     ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建空间失败");
@@ -168,6 +166,17 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "删除失败");
         }
         return true;
+    }
+
+    /**
+     * 校验空间权限
+     */
+    @Override
+    public void checkSpaceAuth(User loginUser, Space space) {
+        // 仅本人或管理员可编辑
+        if (!space.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
     }
 
 
