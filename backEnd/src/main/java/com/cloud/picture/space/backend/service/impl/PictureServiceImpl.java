@@ -49,6 +49,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -83,6 +85,10 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     @Resource
     private TransactionTemplate transactionTemplate;
+
+
+    @Resource
+    private ThreadPoolExecutor customExecutor;
 
 
     /**
@@ -741,17 +747,45 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchEditPictureMetadata(PictureEditByBatchRequest request, Long spaceId, Long loginUserId) {
-        // // 1.校验参数
-        // validateBatchEditRequest(request, spaceId, loginUserId);
-        //
-        // // 2.查询指定图片，仅选择需要的字段
-        // List<Picture> pictureList = this.lambdaQuery()
-        //         .eq(Picture::getSpaceId, spaceId)
-        //         .in(Picture::getId, request.getPictureIdList())
-        //         .list();
-        // if (CollUtil.isEmpty(pictureList)) {
-        //     throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "指定图片不存在或图片不属于该空间");
-        // }
+        // 1.校验参数
+        validateBatchEditRequest(request, spaceId, loginUserId);
+
+        // 2.查询指定图片，仅选择需要的字段
+        List<Picture> pictureList = this.lambdaQuery()
+                .eq(Picture::getSpaceId, spaceId)
+                .in(Picture::getId, request.getPictureIdList())
+                .list();
+        if (CollUtil.isEmpty(pictureList)) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "指定图片不存在或图片不属于该空间");
+        }
+
+        // 分批处理避免长事务
+        int batchSize = 100;
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        for (int i = 0; i < pictureList.size(); i += batchSize) {
+            List<Picture> bath = pictureList.subList(i, Math.min(i + batchSize, pictureList.size()));
+
+            // 异步处理每批数据
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                bath.forEach(picture -> {
+                    // 编辑分类和标签
+                    if (request.getCategory() != null) {
+                        picture.setCategory(request.getCategory());
+                    }
+                    if (request.getTags() != null) {
+                        picture.setTags(String.join(",", request.getTags()));
+                    }
+                });
+                boolean result = this.updateBatchById(bath);
+                if (!result) {
+                    throw new BusinessException(ErrorCode.OPERATION_ERROR, "批量更新失败");
+                }
+            }, customExecutor);
+            futures.add(future);
+        }
+
+        // 等待所有任务完成
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
     }
 
