@@ -678,6 +678,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Long spaceId = pictureEditByBatchRequest.getSpaceId();
         String category = pictureEditByBatchRequest.getCategory();
         List<String> tags = pictureEditByBatchRequest.getTags();
+        String nameRule = pictureEditByBatchRequest.getNameRule();
+
 
         // 1.校验参数
         ThrowUtils.throwIf(pictureIdList == null || CollUtil.isEmpty(pictureIdList), ErrorCode.PARAMS_ERROR);
@@ -708,38 +710,38 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
                 picture.setTags(JSONUtil.toJsonStr(tags));
             }
         });
+        if (StrUtil.isNotBlank(nameRule)) {
+            fillPictureWithNameRule(pictureList, nameRule);
+        }
 
         // 5.批量更新
         boolean result = this.updateBatchById(pictureList);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "批量更新失败");
     }
 
-
     /**
-     * 批量编辑图片分类和标签参数校验
+     * 批零编辑，图片名称填充
+     *
+     * @param pictureList 图片列表
+     * @param nameRule    图片名称规则
      */
-    public void validateBatchEditRequest(PictureEditByBatchRequest pictureEditByBatchRequest, Long spaceId, Long loginUserId) {
-        List<Long> pictureIdList = pictureEditByBatchRequest.getPictureIdList();
-        String category = pictureEditByBatchRequest.getCategory();
-        List<String> tags = pictureEditByBatchRequest.getTags();
-        User loginUser = userService.getById(loginUserId);
-
-        // 1.校验参数
-        ThrowUtils.throwIf(pictureIdList == null || CollUtil.isEmpty(pictureIdList), ErrorCode.PARAMS_ERROR);
-        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR);
-
-        // 2.校验空间
-        Space space = spaceService.getById(spaceId);
-        ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
-        if (!loginUser.getId().equals(space.getUserId())) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间的访问权限");
+    private void fillPictureWithNameRule(List<Picture> pictureList, String nameRule) {
+        if (CollUtil.isEmpty(pictureList) || StrUtil.isBlank(nameRule)) {
+            return;
         }
+        int count = 1;
+        try {
+            for (Picture picture : pictureList) {
+                String newName = nameRule.replaceAll("\\{序号}", String.valueOf(count++));
+                picture.setName(newName);
+            }
 
-        // 3.校验分类和标签参数（两者有一个不为空）
-        if (StrUtil.isBlank(category) && CollUtil.isEmpty(tags)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "分类和标签不能同时为空");
+        } catch (Exception e) {
+            log.error("名称解析填充失败", e);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "图片名称填充失败");
         }
     }
+
 
     /**
      * 批量编辑图片元数据
@@ -789,6 +791,35 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     }
 
+    /**
+     * 批量编辑图片分类和标签参数校验
+     *
+     * @param pictureEditByBatchRequest 图片批量编辑请求
+     * @param spaceId                   空间id
+     * @param loginUserId               登录用户id
+     */
+    private void validateBatchEditRequest(PictureEditByBatchRequest pictureEditByBatchRequest, Long spaceId, Long loginUserId) {
+        List<Long> pictureIdList = pictureEditByBatchRequest.getPictureIdList();
+        String category = pictureEditByBatchRequest.getCategory();
+        List<String> tags = pictureEditByBatchRequest.getTags();
+        User loginUser = userService.getById(loginUserId);
+
+        // 1.校验参数
+        ThrowUtils.throwIf(pictureIdList == null || CollUtil.isEmpty(pictureIdList), ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR);
+
+        // 2.校验空间
+        Space space = spaceService.getById(spaceId);
+        ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
+        if (!loginUser.getId().equals(space.getUserId())) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间的访问权限");
+        }
+
+        // 3.校验分类和标签参数（两者有一个不为空）
+        if (StrUtil.isBlank(category) && CollUtil.isEmpty(tags)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "分类和标签不能同时为空");
+        }
+    }
 
 }
 
