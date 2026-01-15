@@ -145,8 +145,6 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
             return spaceUsageAnalyzeResponse;
         }
 
-
-        return null;
     }
 
 
