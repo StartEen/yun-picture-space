@@ -5,8 +5,10 @@ import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
+import com.cloud.picture.space.backend.model.dto.analyze.SpaceCategoryAnalyzeRequest;
 import com.cloud.picture.space.backend.model.dto.analyze.SpaceUsageAnalyzeRequest;
 import com.cloud.picture.space.backend.model.entity.User;
+import com.cloud.picture.space.backend.model.vo.analyze.SpaceCategoryAnalyzeResponse;
 import com.cloud.picture.space.backend.model.vo.analyze.SpaceUsageAnalyzeResponse;
 import com.cloud.picture.space.backend.service.SpaceAnalyzeService;
 import com.cloud.picture.space.backend.service.SpaceService;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @Author: StartEnd
@@ -43,6 +46,19 @@ public class SpaceAnalyzeController {
         User loginUser = userService.getLoginUser(request);
         SpaceUsageAnalyzeResponse spaceUsageAnalyzeResponse = spaceAnalyzeService.getSpaceUsageAnalyze(spaceUsageAnalyzeRequest, loginUser);
         return ResultUtils.success(spaceUsageAnalyzeResponse);
+    }
+
+
+    /**
+     * 空间图片分类使用分析
+     */
+    @PostMapping("/category")
+    public BaseResponse<List<SpaceCategoryAnalyzeResponse>> getSpaceCategoryAnalyze(@RequestBody SpaceCategoryAnalyzeRequest spaceCategoryAnalyzeRequest,
+                                                                                    HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceCategoryAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        List<SpaceCategoryAnalyzeResponse> spaceCategoryAnalyzeResponses = spaceAnalyzeService.getSpaceCategoryAnalyze(spaceCategoryAnalyzeRequest, loginUser);
+        return ResultUtils.success(spaceCategoryAnalyzeResponses);
     }
 
 

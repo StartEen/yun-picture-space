@@ -7,10 +7,12 @@ import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.analyze.SpaceAnalyzeRequest;
+import com.cloud.picture.space.backend.model.dto.analyze.SpaceCategoryAnalyzeRequest;
 import com.cloud.picture.space.backend.model.dto.analyze.SpaceUsageAnalyzeRequest;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
+import com.cloud.picture.space.backend.model.vo.analyze.SpaceCategoryAnalyzeResponse;
 import com.cloud.picture.space.backend.model.vo.analyze.SpaceUsageAnalyzeResponse;
 import com.cloud.picture.space.backend.service.PictureService;
 import com.cloud.picture.space.backend.service.SpaceAnalyzeService;
@@ -21,7 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author: StartEnd
@@ -83,7 +87,7 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
 
 
     /**
-     * 获取图片空间使用情况()
+     * 获取图片空间使用情况
      */
     @Override
     public SpaceUsageAnalyzeResponse getSpaceUsageAnalyze(SpaceUsageAnalyzeRequest spaceUsageAnalyzeRequest, User loginUser) {
@@ -145,6 +149,32 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
             return spaceUsageAnalyzeResponse;
         }
 
+    }
+
+    /**
+     * 获取图片空间分类使用情况
+     */
+    @Override
+    public List<SpaceCategoryAnalyzeResponse> getSpaceCategoryAnalyze(SpaceCategoryAnalyzeRequest spaceCategoryAnalyzeRequest, User loginUser) {
+        // 检验前端参数
+        ThrowUtils.throwIf(spaceCategoryAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+
+        // 校验空间权限
+        checkSpaceAnalyzeAuth(spaceCategoryAnalyzeRequest, loginUser);
+
+        // 钢构件查询条件
+        QueryWrapper<Picture> queryWrapper = new QueryWrapper<>();
+        fillAnalyzeQueryWrapper(spaceCategoryAnalyzeRequest, queryWrapper);// 填充查询条件
+        // 分组查询
+        queryWrapper.select("category AS category", "COUNT(*) AS count", "SUM(picSize) AS totalSize").groupBy("category");
+        List<SpaceCategoryAnalyzeResponse> spaceCategoryAnalyzeResponseList = pictureService.getBaseMapper().selectMaps(queryWrapper).stream()
+                .map(result -> {
+                    String category = result.get("category") != null ? result.get("category").toString() : "未分类";
+                    Long count = ((Number) result.get("count")).longValue();
+                    Long totalSize = ((Number) result.get("totalSize")).longValue();
+                    return new SpaceCategoryAnalyzeResponse(category, count, totalSize);
+                }).collect(Collectors.toList());
+        return spaceCategoryAnalyzeResponseList;
     }
 
 
