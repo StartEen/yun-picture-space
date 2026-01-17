@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cloud.picture.space.backend.model.dto.analyze.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.User;
-import com.cloud.picture.space.backend.model.vo.analyze.SpaceCategoryAnalyzeResponse;
-import com.cloud.picture.space.backend.model.vo.analyze.SpaceSizeAnalyzeResponse;
-import com.cloud.picture.space.backend.model.vo.analyze.SpaceTagAnalyzeResponse;
-import com.cloud.picture.space.backend.model.vo.analyze.SpaceUsageAnalyzeResponse;
+import com.cloud.picture.space.backend.model.vo.analyze.*;
 
 import java.util.List;
 
@@ -75,6 +72,16 @@ public interface SpaceAnalyzeService {
      * @return 图片空间大小使用情况
      */
     List<SpaceSizeAnalyzeResponse> getSpaceSizeAnalyze(SpaceSizeAnalyzeRequest spaceSizeAnalyzeRequest, User loginUser);
+
+
+    /**
+     * 获取图片空间用户使用情况
+     *
+     * @param spaceUserAnalyzeRequest 空间图片用户数据分析请求体
+     * @param loginUser               登录用户
+     * @return 图片空间用户使用情况
+     */
+    List<SpaceUserAnalyzeResponse> getSpaceUserAnalyze(SpaceUserAnalyzeRequest spaceUserAnalyzeRequest, User loginUser);
 
 
 }

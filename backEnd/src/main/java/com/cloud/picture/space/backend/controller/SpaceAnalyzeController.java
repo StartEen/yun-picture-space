@@ -5,15 +5,9 @@ import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
-import com.cloud.picture.space.backend.model.dto.analyze.SpaceCategoryAnalyzeRequest;
-import com.cloud.picture.space.backend.model.dto.analyze.SpaceSizeAnalyzeRequest;
-import com.cloud.picture.space.backend.model.dto.analyze.SpaceTagAnalyzeRequest;
-import com.cloud.picture.space.backend.model.dto.analyze.SpaceUsageAnalyzeRequest;
+import com.cloud.picture.space.backend.model.dto.analyze.*;
 import com.cloud.picture.space.backend.model.entity.User;
-import com.cloud.picture.space.backend.model.vo.analyze.SpaceCategoryAnalyzeResponse;
-import com.cloud.picture.space.backend.model.vo.analyze.SpaceSizeAnalyzeResponse;
-import com.cloud.picture.space.backend.model.vo.analyze.SpaceTagAnalyzeResponse;
-import com.cloud.picture.space.backend.model.vo.analyze.SpaceUsageAnalyzeResponse;
+import com.cloud.picture.space.backend.model.vo.analyze.*;
 import com.cloud.picture.space.backend.service.SpaceAnalyzeService;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.UserService;
@@ -88,6 +82,19 @@ public class SpaceAnalyzeController {
         User loginUser = userService.getLoginUser(request);
         List<SpaceSizeAnalyzeResponse> spaceSizeAnalyzeResponses = spaceAnalyzeService.getSpaceSizeAnalyze(spaceSizeAnalyzeRequest, loginUser);
         return ResultUtils.success(spaceSizeAnalyzeResponses);
+    }
+
+
+    /**
+     * 获取空间图片用户使用分析
+     */
+    @PostMapping("/user")
+    public BaseResponse<List<SpaceUserAnalyzeResponse>> getSpaceUserAnalyze(@RequestBody SpaceUserAnalyzeRequest spaceUserAnalyzeRequest,
+                                                                            HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceUserAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        List<SpaceUserAnalyzeResponse> spaceUserAnalyzeResponses = spaceAnalyzeService.getSpaceUserAnalyze(spaceUserAnalyzeRequest, loginUser);
+        return ResultUtils.success(spaceUserAnalyzeResponses);
     }
 
 
