@@ -6,6 +6,7 @@ import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.analyze.*;
+import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.analyze.*;
 import com.cloud.picture.space.backend.service.SpaceAnalyzeService;
@@ -95,6 +96,19 @@ public class SpaceAnalyzeController {
         User loginUser = userService.getLoginUser(request);
         List<SpaceUserAnalyzeResponse> spaceUserAnalyzeResponses = spaceAnalyzeService.getSpaceUserAnalyze(spaceUserAnalyzeRequest, loginUser);
         return ResultUtils.success(spaceUserAnalyzeResponses);
+    }
+
+
+    /**
+     * 获取空间图片使用排行【管理员功能】
+     */
+    @PostMapping("/rank")
+    public BaseResponse<List<Space>> getSpaceRankAnalyze(@RequestBody SpaceRankAnalyzeRequest spaceRankAnalyzeRequest,
+                                                         HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceRankAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        List<Space> spaceRankAnalyzeResponses = spaceAnalyzeService.getSpaceRankAnalyze(spaceRankAnalyzeRequest, loginUser);
+        return ResultUtils.success(spaceRankAnalyzeResponses);
     }
 
 

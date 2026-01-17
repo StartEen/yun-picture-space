@@ -3,6 +3,7 @@ package com.cloud.picture.space.backend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cloud.picture.space.backend.model.dto.analyze.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
+import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.analyze.*;
 
@@ -83,5 +84,15 @@ public interface SpaceAnalyzeService {
      */
     List<SpaceUserAnalyzeResponse> getSpaceUserAnalyze(SpaceUserAnalyzeRequest spaceUserAnalyzeRequest, User loginUser);
 
+
+
+    /**
+     * 获取图片空间排行【仅管理员可用】
+     *
+     * @param spaceRankAnalyzeRequest 图片空间排行数据分析请求体
+     * @param loginUser               登录用户
+     * @return 图片空间排行
+     */
+    List<Space> getSpaceRankAnalyze(SpaceRankAnalyzeRequest spaceRankAnalyzeRequest, User loginUser);
 
 }

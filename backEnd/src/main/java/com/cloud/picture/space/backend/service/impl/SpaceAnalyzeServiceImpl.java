@@ -307,5 +307,25 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
         return resultList;
     }
 
+    /**
+     * 获取图片空间排行【管理员功能】
+     */
+    @Override
+    public List<Space> getSpaceRankAnalyze(SpaceRankAnalyzeRequest spaceRankAnalyzeRequest, User loginUser) {
+        // 校验前端参数
+        ThrowUtils.throwIf(spaceRankAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+
+        // 仅管理员可查看空间排行
+        ThrowUtils.throwIf(!userService.isAdmin(loginUser), ErrorCode.NO_AUTH_ERROR, "您没有管理员权限,无法查看空间排行");
+
+        QueryWrapper<Space> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "spaceName", "userId", "totalSize")
+                .orderByDesc("totalSize")
+                .last("LIMIT " + spaceRankAnalyzeRequest.getTopN());
+
+        List<Space> list = spaceService.list(queryWrapper);
+        return list;
+    }
+
 
 }
