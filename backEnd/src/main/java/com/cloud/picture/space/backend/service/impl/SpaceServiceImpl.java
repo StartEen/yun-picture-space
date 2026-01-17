@@ -1,7 +1,9 @@
 package com.cloud.picture.space.backend.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
@@ -11,6 +13,8 @@ import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
 import com.cloud.picture.space.backend.model.enums.SpaceTypeEnum;
+import com.cloud.picture.space.backend.model.vo.space.SpaceVo;
+import com.cloud.picture.space.backend.model.vo.user.UserVo;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.mapper.SpaceMapper;
 import com.cloud.picture.space.backend.service.UserService;
@@ -21,8 +25,10 @@ import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author yz2025120101
@@ -137,7 +143,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
                 Long newSpaceId = transactionTemplate.execute(action -> {
                     // 每个用户只有一个私有空间，所以需要检验
                     boolean exists = this.lambdaQuery().eq(Space::getUserId, userId)
-                            .eq(Space::getSpaceType,spaceAddRequest.getSpaceType())
+                            .eq(Space::getSpaceType, spaceAddRequest.getSpaceType())
                             .exists();
                     ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR, "您已创建过私有空间,每个用户仅能拥有一个私有空间");
                     // 写入数据库
@@ -185,6 +191,51 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
         if (!space.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
+    }
+
+
+    /**
+     * 获取空间视图(单条)
+     */
+    @Override
+    public SpaceVo getSpaceVO(Space space, HttpServletRequest request) {
+        SpaceVo spaceVo = SpaceVo.objToVo(space);
+        Long userId = space.getUserId();
+        if (userId != null && userId > 0) {
+            User user = userService.getById(userId);
+            UserVo userVo = userService.getUserVo(user);
+            spaceVo.setUser(userVo);
+        }
+        return spaceVo;
+    }
+
+    /**
+     * 获取空间视图列表
+     */
+    @Override
+    public Page<SpaceVo> getSpaceVOPage(Page<Space> spacePage, HttpServletRequest request) {
+        List<Space> spaceList = spacePage.getRecords();
+        Page<SpaceVo> spaceVoPage = new Page<>(spacePage.getCurrent(), spacePage.getSize(), spacePage.getTotal());
+        if (CollUtil.isEmpty(spaceList)) {
+            return spaceVoPage;
+        }
+        // 对象列表进行流转换
+        List<SpaceVo> spaceVoList = spaceList.stream()
+                .map(SpaceVo::objToVo).collect(Collectors.toList());
+
+        Set<Long> userIdSet = spaceList.stream().map(Space::getUserId).collect(Collectors.toSet());
+        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream().collect(Collectors.groupingBy(User::getId));
+        spaceVoList.forEach(spaceVo -> {
+            Long userId = spaceVo.getUserId();
+            User user = null;
+            if (userIdUserListMap.containsKey(userId)) {
+                user = userIdUserListMap.get(userId).get(0);
+            }
+            spaceVo.setUser(userService.getUserVo(user));
+        });
+        spaceVoPage.setRecords(spaceVoList);
+
+        return spaceVoPage;
     }
 
 

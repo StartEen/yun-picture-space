@@ -1,10 +1,14 @@
 package com.cloud.picture.space.backend.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.common.DeleteRequest;
 import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cloud.picture.space.backend.model.entity.User;
+import com.cloud.picture.space.backend.model.vo.space.SpaceVo;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author yz2025120101
@@ -57,10 +61,24 @@ public interface SpaceService extends IService<Space> {
     void checkSpaceAuth(User loginUser, Space space);
 
 
+    /**
+     * 获取空间视图(单条)
+     *
+     * @param space   空间
+     * @param request 请求
+     * @return 空间视图
+     */
+    SpaceVo getSpaceVO(Space space, HttpServletRequest request);
 
 
-
-
+    /**
+     * 获取空间视图列表
+     *
+     * @param spacePage 分页参数
+     * @param request   请求
+     * @return 列表
+     */
+    Page<SpaceVo> getSpaceVOPage(Page<Space> spacePage, HttpServletRequest request);
 
 
 }
