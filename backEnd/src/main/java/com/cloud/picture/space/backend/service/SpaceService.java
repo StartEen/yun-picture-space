@@ -1,8 +1,10 @@
 package com.cloud.picture.space.backend.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.common.DeleteRequest;
 import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
+import com.cloud.picture.space.backend.model.dto.space.SpaceQueryRequest;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cloud.picture.space.backend.model.entity.User;
@@ -79,6 +81,15 @@ public interface SpaceService extends IService<Space> {
      * @return 列表
      */
     Page<SpaceVo> getSpaceVOPage(Page<Space> spacePage, HttpServletRequest request);
+
+
+    /**
+     * 获取查询条件
+     *
+     * @param spaceQueryRequest 查询条件
+     * @return 查询条件
+     */
+    QueryWrapper<Space> getQueryWrapper(SpaceQueryRequest spaceQueryRequest);
 
 
 }
