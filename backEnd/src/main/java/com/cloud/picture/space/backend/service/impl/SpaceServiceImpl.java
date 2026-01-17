@@ -10,6 +10,7 @@ import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
+import com.cloud.picture.space.backend.model.enums.SpaceTypeEnum;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.mapper.SpaceMapper;
 import com.cloud.picture.space.backend.service.UserService;
@@ -49,15 +50,17 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
         String spaceName = space.getSpaceName();
         Integer spaceLevel = space.getSpaceLevel();
         SpaceLevelEnum spaceLevelEnum = SpaceLevelEnum.getEnumByValue(spaceLevel);
+        SpaceTypeEnum spaceTypeEnum = SpaceTypeEnum.getEnumByValue(space.getSpaceType());
 
         // 创建时，参数不能为空
         if (add) {
             ThrowUtils.throwIf(StrUtil.isBlank(spaceName), ErrorCode.PARAMS_ERROR, "空间名称不能为空");
             ThrowUtils.throwIf(ObjectUtil.isNull(spaceLevelEnum), ErrorCode.PARAMS_ERROR, "空间等级不能为空");
+            ThrowUtils.throwIf(ObjectUtil.isNull(spaceTypeEnum), ErrorCode.PARAMS_ERROR, "空间类型不能为空");
         }
 
         // 修改数据时，如果要改空间级别
-        ThrowUtils.throwIf((spaceLevel != null && spaceLevelEnum == null), ErrorCode.PARAMS_ERROR, "空间等级不能为空");
+        ThrowUtils.throwIf((spaceTypeEnum != null && spaceLevelEnum == null), ErrorCode.PARAMS_ERROR, "空间等级与类型不能为空");
         ThrowUtils.throwIf(StrUtil.isNotBlank(spaceName) && spaceName.length() > 30, ErrorCode.PARAMS_ERROR, "空间名称不能过长");
 
     }
@@ -97,6 +100,9 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
         if (spaceAddRequest.getSpaceLevel() == null) {
             space.setSpaceLevel(SpaceLevelEnum.COMMON.getValue());
         }
+        if (spaceAddRequest.getSpaceType() == null) {
+            space.setSpaceType(SpaceTypeEnum.PRIVATE.getValue());
+        }
         // 填充数据
         this.fillSpaceBySpaceLevel(space);
         // 数据校验
@@ -130,7 +136,9 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
             try {
                 Long newSpaceId = transactionTemplate.execute(action -> {
                     // 每个用户只有一个私有空间，所以需要检验
-                    boolean exists = this.lambdaQuery().eq(Space::getUserId, userId).exists();
+                    boolean exists = this.lambdaQuery().eq(Space::getUserId, userId)
+                            .eq(Space::getSpaceType,spaceAddRequest.getSpaceType())
+                            .exists();
                     ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR, "您已创建过私有空间,每个用户仅能拥有一个私有空间");
                     // 写入数据库
                     boolean result = this.save(space);
