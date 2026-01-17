@@ -105,7 +105,10 @@ ALTER TABLE picture
 ALTER TABLE picture
     ADD COLUMN picColor varchar(16) null comment '图片主色调';
 
-
+-- 空间表添加字段
+ALTER TABLE space
+    ADD COLUMN spaceType int default 0 not null comment '空间类型：0-私有个人空间 1-团队空间';
+CREATE INDEX idx_spaceType ON space (spaceType);
 
 
 
