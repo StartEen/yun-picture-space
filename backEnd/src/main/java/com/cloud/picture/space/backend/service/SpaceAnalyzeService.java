@@ -3,10 +3,12 @@ package com.cloud.picture.space.backend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cloud.picture.space.backend.model.dto.analyze.SpaceAnalyzeRequest;
 import com.cloud.picture.space.backend.model.dto.analyze.SpaceCategoryAnalyzeRequest;
+import com.cloud.picture.space.backend.model.dto.analyze.SpaceTagAnalyzeRequest;
 import com.cloud.picture.space.backend.model.dto.analyze.SpaceUsageAnalyzeRequest;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.analyze.SpaceCategoryAnalyzeResponse;
+import com.cloud.picture.space.backend.model.vo.analyze.SpaceTagAnalyzeResponse;
 import com.cloud.picture.space.backend.model.vo.analyze.SpaceUsageAnalyzeResponse;
 
 import java.util.List;
@@ -40,7 +42,7 @@ public interface SpaceAnalyzeService {
      * 获取图片空间使用情况
      * TODO 分析空间分为全空间、公共空间的情况（使用仅管理员可访问）与分析单个空间情况（使用普通用户可访问）
      *
-     * @param spaceUsageAnalyzeRequest 图片空间数据分析请求体
+     * @param spaceUsageAnalyzeRequest 图片空间数据使用分析请求体
      * @param loginUser                登录用户
      * @return 图片空间使用情况
      */
@@ -50,11 +52,26 @@ public interface SpaceAnalyzeService {
     /**
      * 获取图片空间分类使用情况
      *
-     * @param spaceCategoryAnalyzeRequest 图片空间数据分析请求体
+     * @param spaceCategoryAnalyzeRequest 空间图片分类数据分析请求体
      * @param loginUser                   登录用户
      * @return 图片空间使用情况
      */
     List<SpaceCategoryAnalyzeResponse> getSpaceCategoryAnalyze(SpaceCategoryAnalyzeRequest spaceCategoryAnalyzeRequest, User loginUser);
+
+
+    /**
+     * 获取图片空间标签使用情况
+     *
+     * @param spaceTagAnalyzeRequest 空间图片标签数据分析请求体
+     * @param loginUser              登录用户
+     * @return 图片空间使用情况
+     */
+    List<SpaceTagAnalyzeResponse> getSpaceTagAnalyze(SpaceTagAnalyzeRequest spaceTagAnalyzeRequest, User loginUser);
+
+
+
+
+
 
 
 }
