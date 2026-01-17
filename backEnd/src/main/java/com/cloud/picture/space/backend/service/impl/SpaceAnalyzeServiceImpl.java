@@ -8,14 +8,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
-import com.cloud.picture.space.backend.model.dto.analyze.SpaceAnalyzeRequest;
-import com.cloud.picture.space.backend.model.dto.analyze.SpaceCategoryAnalyzeRequest;
-import com.cloud.picture.space.backend.model.dto.analyze.SpaceTagAnalyzeRequest;
-import com.cloud.picture.space.backend.model.dto.analyze.SpaceUsageAnalyzeRequest;
+import com.cloud.picture.space.backend.model.dto.analyze.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.analyze.SpaceCategoryAnalyzeResponse;
+import com.cloud.picture.space.backend.model.vo.analyze.SpaceSizeAnalyzeResponse;
 import com.cloud.picture.space.backend.model.vo.analyze.SpaceTagAnalyzeResponse;
 import com.cloud.picture.space.backend.model.vo.analyze.SpaceUsageAnalyzeResponse;
 import com.cloud.picture.space.backend.service.PictureService;
@@ -28,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -110,8 +109,7 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
                 queryWrapper.isNull("spaceId");
             }
             List<Object> pictureObjList = pictureService.getBaseMapper().selectObjs(queryWrapper);
-            long usedSize = pictureObjList.stream().mapToLong(result ->
-                    result instanceof Long ? (Long) result : 0).sum();
+            long usedSize = pictureObjList.stream().mapToLong(result -> result instanceof Long ? (Long) result : 0).sum();
             long usedCount = pictureObjList.size();
 
             // 封装返回结果
@@ -172,13 +170,12 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
         fillAnalyzeQueryWrapper(spaceCategoryAnalyzeRequest, queryWrapper);// 填充查询条件
         // 分组查询
         queryWrapper.select("category AS category", "COUNT(*) AS count", "SUM(picSize) AS totalSize").groupBy("category");
-        List<SpaceCategoryAnalyzeResponse> spaceCategoryAnalyzeResponseList = pictureService.getBaseMapper().selectMaps(queryWrapper).stream()
-                .map(result -> {
-                    String category = result.get("category") != null ? result.get("category").toString() : "未分类";
-                    Long count = ((Number) result.get("count")).longValue();
-                    Long totalSize = ((Number) result.get("totalSize")).longValue();
-                    return new SpaceCategoryAnalyzeResponse(category, count, totalSize);
-                }).collect(Collectors.toList());
+        List<SpaceCategoryAnalyzeResponse> spaceCategoryAnalyzeResponseList = pictureService.getBaseMapper().selectMaps(queryWrapper).stream().map(result -> {
+            String category = result.get("category") != null ? result.get("category").toString() : "未分类";
+            Long count = ((Number) result.get("count")).longValue();
+            Long totalSize = ((Number) result.get("totalSize")).longValue();
+            return new SpaceCategoryAnalyzeResponse(category, count, totalSize);
+        }).collect(Collectors.toList());
         return spaceCategoryAnalyzeResponseList;
     }
 
@@ -199,23 +196,71 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
 
         // 查询
         queryWrapper.select("tags");
-        List<String> tagsJsonList = pictureService.getBaseMapper().selectObjs(queryWrapper)
-                .stream().filter(ObjUtil::isNotNull)
-                .map(Object::toString)
-                .collect(Collectors.toList());
+        List<String> tagsJsonList = pictureService.getBaseMapper().selectObjs(queryWrapper).stream().filter(ObjUtil::isNotNull).map(Object::toString).collect(Collectors.toList());
         // 合并所有标签并统计使用情况
-        Map<String, Long> tagCountMap = tagsJsonList.stream()
-                .flatMap(tagsJson -> JSONUtil.toList(tagsJson, String.class).stream())
-                .collect(Collectors.groupingBy(tag -> tag, Collectors.counting()));
+        Map<String, Long> tagCountMap = tagsJsonList.stream().flatMap(tagsJson -> JSONUtil.toList(tagsJson, String.class).stream()).collect(Collectors.groupingBy(tag -> tag, Collectors.counting()));
 
         // 转换为响应对象，并按照使用次数降序排序
-        List<SpaceTagAnalyzeResponse> resultList = tagCountMap.entrySet().stream()
-                .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
-                .map(entry -> new SpaceTagAnalyzeResponse(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+        List<SpaceTagAnalyzeResponse> resultList = tagCountMap.entrySet().stream().sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue())).map(entry -> new SpaceTagAnalyzeResponse(entry.getKey(), entry.getValue())).collect(Collectors.toList());
 
         return resultList;
     }
+
+    /**
+     * 获取图片空间大小使用情况
+     */
+    @Override
+    public List<SpaceSizeAnalyzeResponse> getSpaceSizeAnalyze(SpaceSizeAnalyzeRequest spaceSizeAnalyzeRequest, User loginUser) {
+        // 校验前端参数
+        ThrowUtils.throwIf(spaceSizeAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+
+        // 校验空间权限
+        checkSpaceAnalyzeAuth(spaceSizeAnalyzeRequest, loginUser);
+
+        // 构建查询条件
+        QueryWrapper<Picture> queryWrapper = new QueryWrapper<>();
+        fillAnalyzeQueryWrapper(spaceSizeAnalyzeRequest, queryWrapper);// 填充查询参数
+
+
+        queryWrapper.select("picSize");
+
+        List<Long> picSizeList = pictureService.getBaseMapper().selectObjs(queryWrapper).stream().map(size -> ((Number) size).longValue()).collect(Collectors.toList());
+        // 统计数据
+        /*Map<String, Long> sizeRanges = new LinkedHashMap<>();
+        sizeRanges.put("<100KB", picSizeList.stream().filter(size -> size < 100 * 1024).count());
+        sizeRanges.put("100KB~500KB", picSizeList.stream().filter(size -> size >= 100 * 1024 && size < 500 * 1024).count());
+        sizeRanges.put("500KB~1MB", picSizeList.stream().filter(size -> size >= 500 * 1024 && size < 1024 * 1024).count());
+        sizeRanges.put("1MB~2MB", picSizeList.stream().filter(size -> size >= 1024 * 1024 && size < 2 * 1024 * 1024).count());
+        sizeRanges.put(">2MB", picSizeList.stream().filter(size -> size >= 2 * 1024 * 1024).count()); */
+        LinkedHashMap<String, Long> sizeRanges = picSizeList.stream().collect(Collectors.groupingBy(
+                this::getSizeRange,
+                LinkedHashMap::new,
+                Collectors.counting()
+        ));
+        // 转换为响应对象
+        List<SpaceSizeAnalyzeResponse> resultList = sizeRanges.entrySet().stream().map(entry -> new SpaceSizeAnalyzeResponse(entry.getKey(), entry.getValue())).collect(Collectors.toList());
+
+        return resultList;
+    }
+
+    /**
+     * 根据图片大小获取范围
+     */
+    private String getSizeRange(long size) {
+        if (size < 100 * 1024) {
+            return "<100KB";
+        } else if (size < 500 * 1024) {
+            return "100KB~500KB";
+        } else if (size < 1024 * 1024) {
+            return "500KB~1MB";
+        } else if (size < 2 * 1024 * 1024) {
+            return "1MB~2MB";
+        } else {
+            return ">2MB";
+        }
+    }
+
+
 
 
 }
