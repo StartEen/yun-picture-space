@@ -1,8 +1,15 @@
 package com.cloud.picture.space.backend.model.enums;
 
 
+import cn.hutool.core.util.ObjUtil;
 import lombok.Data;
 import lombok.Getter;
+import org.apache.catalina.LifecycleState;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author: StartEnd
@@ -28,6 +35,45 @@ public enum SpaceRoleEnum {
     }
 
 
+    /**
+     * 根据value值获取枚举
+     */
+    public static SpaceRoleEnum getEnumByValue(String value) {
+        if (ObjUtil.isEmpty(value)) {
+            return null;
+        }
+        for (SpaceRoleEnum anEnum : SpaceRoleEnum.values()) {
+            if (anEnum.value.equals(value)) {
+                return anEnum;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * 获取所有枚举的文本列表
+     *
+     * @return 文本列表
+     */
+    public static List<String> getAllTexts() {
+        return Arrays.stream(SpaceRoleEnum.values())
+                .map(SpaceRoleEnum::getText)
+                .collect(Collectors.toList());
+    }
+
+
+
+    /**
+     * 获取所有枚举的value列表
+     *
+     * @return value列表
+     */
+    public static List<String> getAllValues() {
+        return Arrays.stream(SpaceRoleEnum.values())
+                .map(SpaceRoleEnum::getValue)
+                .collect(Collectors.toList());
+    }
 
 
 }
