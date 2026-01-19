@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cloud.picture.space.backend.model.vo.spaceUser.SpaceUserVo;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author yz2025120101
@@ -51,6 +52,18 @@ public interface SpaceUserService extends IService<SpaceUser> {
      * @return 空间用户视图
      */
     SpaceUserVo getSpaceUserVo(SpaceUser spaceUser, HttpServletRequest request);
+
+
+    /**
+     * 获取空间成员视图列表
+     *
+     * @param spaceUserList  空间用户列表
+     * @return 空间用户视图列表
+     */
+    List<SpaceUserVo> getSpaceUserVoList(List<SpaceUser> spaceUserList);
+
+
+
 
 
 }

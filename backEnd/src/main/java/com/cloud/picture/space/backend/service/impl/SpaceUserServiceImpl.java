@@ -1,5 +1,6 @@
 package com.cloud.picture.space.backend.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -23,6 +24,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author yz2025120101
@@ -107,25 +113,64 @@ public class SpaceUserServiceImpl extends ServiceImpl<SpaceUserMapper, SpaceUser
      */
     @Override
     public SpaceUserVo getSpaceUserVo(SpaceUser spaceUser, HttpServletRequest request) {
-        //对象转封装类
+        // 对象转封装类
         SpaceUserVo spaceUserVo = SpaceUserVo.objToVo(spaceUser);
 
         // 关联查询用户信息
         Long userId = spaceUser.getUserId();
-        if (ObjectUtil.isNotEmpty(userId)){
+        if (ObjectUtil.isNotEmpty(userId)) {
             User user = userService.getById(userId);
             UserVo userVo = userService.getUserVo(user);
             spaceUserVo.setUser(userVo);
         }
-        //关联空间信息
+        // 关联空间信息
         Long spaceId = spaceUser.getSpaceId();
-        if (ObjectUtil.isNotEmpty(spaceId)){
+        if (ObjectUtil.isNotEmpty(spaceId)) {
             Space space = spaceService.getById(spaceId);
-            SpaceVo spaceVO = spaceService.getSpaceVO(space,request);
+            SpaceVo spaceVO = spaceService.getSpaceVO(space, request);
             spaceUserVo.setSpace(spaceVO);
         }
 
         return spaceUserVo;
+    }
+
+    /**
+     * 获取空间用户VO列表
+     */
+    @Override
+    public List<SpaceUserVo> getSpaceUserVoList(List<SpaceUser> spaceUserList) {
+        // 判断输入列表是否为空
+        if (CollUtil.isEmpty(spaceUserList)) {
+            return Collections.emptyList();
+        }
+        // 列表转换
+        List<SpaceUserVo> spaceUserVoList = spaceUserList.stream().map(SpaceUserVo::objToVo).collect(Collectors.toList());
+        // 收集用户ID和空间ID
+        Set<Long> userIdSet = spaceUserList.stream().map(SpaceUser::getUserId).collect(Collectors.toSet());
+        Set<Long> spaceIdSet = spaceUserList.stream().map(SpaceUser::getSpaceId).collect(Collectors.toSet());
+
+        // 批零查询用户和空间
+        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream().collect(Collectors.groupingBy(User::getId));
+        Map<Long, List<Space>> spaceIdSpaceListMap = spaceService.listByIds(spaceIdSet).stream().collect(Collectors.groupingBy(Space::getId));
+
+        // 填充信息
+        spaceUserVoList.forEach(spaceUserVo -> {
+            Long userId = spaceUserVo.getUserId();
+            Long spaceId = spaceUserVo.getSpaceId();
+            // 填充用户信息
+            User user = null;
+            if (userIdUserListMap.containsKey(userId)) {
+                user = userIdUserListMap.get(userId).get(0);
+            }
+            spaceUserVo.setUser(userService.getUserVo(user));
+            // 填充空间信息
+            Space space = null;
+            if (spaceIdSpaceListMap.containsKey(spaceId)) {
+                space = spaceIdSpaceListMap.get(spaceId).get(0);
+            }
+            spaceUserVo.setSpace(SpaceVo.objToVo(space));
+        });
+        return spaceUserVoList;
     }
 
 
