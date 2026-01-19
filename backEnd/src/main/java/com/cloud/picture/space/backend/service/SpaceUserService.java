@@ -5,6 +5,9 @@ import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserAddRequest;
 import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.SpaceUser;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cloud.picture.space.backend.model.vo.spaceUser.SpaceUserVo;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author yz2025120101
@@ -38,6 +41,16 @@ public interface SpaceUserService extends IService<SpaceUser> {
      * @return 查询条件
      */
     QueryWrapper<SpaceUser> getQueryWrapper(SpaceUserQueryRequest spaceUserQueryRequest);
+
+
+    /**
+     * 获取单个空间成员视图
+     *
+     * @param spaceUser  空间用户
+     * @param request    请求
+     * @return 空间用户视图
+     */
+    SpaceUserVo getSpaceUserVo(SpaceUser spaceUser, HttpServletRequest request);
 
 
 }

@@ -11,6 +11,9 @@ import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.SpaceUser;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceRoleEnum;
+import com.cloud.picture.space.backend.model.vo.space.SpaceVo;
+import com.cloud.picture.space.backend.model.vo.spaceUser.SpaceUserVo;
+import com.cloud.picture.space.backend.model.vo.user.UserVo;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.SpaceUserService;
 import com.cloud.picture.space.backend.mapper.SpaceUserMapper;
@@ -19,6 +22,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author yz2025120101
@@ -96,6 +100,32 @@ public class SpaceUserServiceImpl extends ServiceImpl<SpaceUserMapper, SpaceUser
         queryWrapper.eq(ObjectUtil.isNotEmpty(userId), "userId", userId);
         queryWrapper.eq(ObjectUtil.isNotEmpty(spaceRole), "spaceRole", spaceRole);
         return queryWrapper;
+    }
+
+    /**
+     * 获取空间用户VO
+     */
+    @Override
+    public SpaceUserVo getSpaceUserVo(SpaceUser spaceUser, HttpServletRequest request) {
+        //对象转封装类
+        SpaceUserVo spaceUserVo = SpaceUserVo.objToVo(spaceUser);
+
+        // 关联查询用户信息
+        Long userId = spaceUser.getUserId();
+        if (ObjectUtil.isNotEmpty(userId)){
+            User user = userService.getById(userId);
+            UserVo userVo = userService.getUserVo(user);
+            spaceUserVo.setUser(userVo);
+        }
+        //关联空间信息
+        Long spaceId = spaceUser.getSpaceId();
+        if (ObjectUtil.isNotEmpty(spaceId)){
+            Space space = spaceService.getById(spaceId);
+            SpaceVo spaceVO = spaceService.getSpaceVO(space,request);
+            spaceUserVo.setSpace(spaceVO);
+        }
+
+        return spaceUserVo;
     }
 
 
