@@ -1,13 +1,32 @@
 package com.cloud.picture.space.backend.service;
 
+import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserAddRequest;
 import com.cloud.picture.space.backend.model.entity.SpaceUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
-* @author yz2025120101
-* @description 针对表【space_user(空间用户关联)】的数据库操作Service
-* @createDate 2026-01-17 14:15:30
-*/
+ * @author yz2025120101
+ * @description 针对表【space_user(空间用户关联)】的数据库操作Service
+ * @createDate 2026-01-17 14:15:30
+ */
 public interface SpaceUserService extends IService<SpaceUser> {
+
+
+    /**
+     * 校验空间成员对象
+     *
+     * @param spaceUser 空间成员对象
+     * @param add       是否为创建
+     */
+    void validSpaceUser(SpaceUser spaceUser, boolean add);
+
+    /**
+     * 添加空间用户
+     *
+     * @param spaceUserAddRequest 添加的空间用户信息
+     * @return 添加的空间用户id
+     */
+    long addSpaceUser(SpaceUserAddRequest spaceUserAddRequest);
+
 
 }
