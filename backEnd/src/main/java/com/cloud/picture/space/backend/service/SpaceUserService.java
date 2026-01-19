@@ -1,6 +1,8 @@
 package com.cloud.picture.space.backend.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserAddRequest;
+import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.SpaceUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -27,6 +29,15 @@ public interface SpaceUserService extends IService<SpaceUser> {
      * @return 添加的空间用户id
      */
     long addSpaceUser(SpaceUserAddRequest spaceUserAddRequest);
+
+
+    /**
+     * 获取空间用户查询条件
+     *
+     * @param spaceUserQueryRequest 查询条件
+     * @return 查询条件
+     */
+    QueryWrapper<SpaceUser> getQueryWrapper(SpaceUserQueryRequest spaceUserQueryRequest);
 
 
 }
