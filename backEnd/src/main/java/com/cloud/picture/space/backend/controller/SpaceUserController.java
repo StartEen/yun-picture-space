@@ -8,6 +8,7 @@ import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserAddRequest;
+import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserEditRequest;
 import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.SpaceUser;
 import com.cloud.picture.space.backend.model.vo.spaceUser.SpaceUserVo;
@@ -15,6 +16,7 @@ import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.SpaceUserService;
 import com.cloud.picture.space.backend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,6 +97,32 @@ public class SpaceUserController {
         ThrowUtils.throwIf(spaceUserQueryRequest == null, ErrorCode.PARAMS_ERROR);
         List<SpaceUser> spaceUserList = spaceUserService.list(spaceUserService.getQueryWrapper(spaceUserQueryRequest));
         return ResultUtils.success(spaceUserService.getSpaceUserVoList(spaceUserList));
+    }
+
+
+    /**
+     * 编辑空间成员(设置权限)
+     */
+    @PostMapping("/edit")
+    public BaseResponse<Boolean> editSpaceUser(@RequestBody SpaceUserEditRequest spaceUserEditRequest,
+                                               HttpServletRequest request) {
+        ThrowUtils.throwIf((spaceUserEditRequest == null || spaceUserEditRequest.getId() <= 0), ErrorCode.PARAMS_ERROR);
+        // 将实体类和DTO进行转换
+        SpaceUser spaceUser = new SpaceUser();
+        BeanUtils.copyProperties(spaceUserEditRequest, spaceUser);
+
+        // 数据校验
+        spaceUserService.validSpaceUser(spaceUser, false);
+
+        // 判断是否存在
+        Long id = spaceUserEditRequest.getId();
+        SpaceUser oldSpaceUser = spaceUserService.getById(id);
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(oldSpaceUser), ErrorCode.NOT_FOUND_ERROR);
+
+        boolean result = spaceUserService.updateById(spaceUser);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+
+        return ResultUtils.success(true);
     }
 
 
