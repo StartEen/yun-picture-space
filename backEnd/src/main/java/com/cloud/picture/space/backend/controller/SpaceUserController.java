@@ -1,12 +1,14 @@
 package com.cloud.picture.space.backend.controller;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.DeleteRequest;
 import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserAddRequest;
+import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.SpaceUser;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.SpaceUserService;
@@ -49,6 +51,10 @@ public class SpaceUserController {
         return ResultUtils.success(id);
     }
 
+
+    /**
+     * 删除空间成员
+     */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteSpaceUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         ThrowUtils.throwIf((deleteRequest == null || deleteRequest.getId() <= 0), ErrorCode.PARAMS_ERROR);
@@ -60,6 +66,20 @@ public class SpaceUserController {
         boolean result = spaceUserService.removeById(id);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
+    }
+
+
+    @PostMapping("/get")
+    public BaseResponse<SpaceUser> getSpaceUser(@RequestBody SpaceUserQueryRequest spaceUserQueryRequest) {
+        // 校验参数
+        ThrowUtils.throwIf(spaceUserQueryRequest == null, ErrorCode.PARAMS_ERROR);
+        Long spaceId = spaceUserQueryRequest.getSpaceId();
+        Long userId = spaceUserQueryRequest.getUserId();
+        ThrowUtils.throwIf(ObjectUtil.hasEmpty(spaceId, userId), ErrorCode.PARAMS_ERROR);
+        // 查询数据库
+        SpaceUser spaceUser = spaceUserService.getOne(spaceUserService.getQueryWrapper(spaceUserQueryRequest));
+        ThrowUtils.throwIf(spaceUser == null, ErrorCode.NOT_FOUND_ERROR);
+        return ResultUtils.success(spaceUser);
     }
 
 
