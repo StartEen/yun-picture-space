@@ -10,6 +10,7 @@ import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserAddRequest;
 import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.SpaceUser;
+import com.cloud.picture.space.backend.model.vo.spaceUser.SpaceUserVo;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.SpaceUserService;
 import com.cloud.picture.space.backend.service.UserService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @Author: StartEnd
@@ -68,7 +70,9 @@ public class SpaceUserController {
         return ResultUtils.success(true);
     }
 
-
+    /**
+     * 获取某个成员在某个空间的信息
+     */
     @PostMapping("/get")
     public BaseResponse<SpaceUser> getSpaceUser(@RequestBody SpaceUserQueryRequest spaceUserQueryRequest) {
         // 校验参数
@@ -80,6 +84,17 @@ public class SpaceUserController {
         SpaceUser spaceUser = spaceUserService.getOne(spaceUserService.getQueryWrapper(spaceUserQueryRequest));
         ThrowUtils.throwIf(spaceUser == null, ErrorCode.NOT_FOUND_ERROR);
         return ResultUtils.success(spaceUser);
+    }
+
+
+    /**
+     * 获取某个空间下的所有成员
+     */
+    @PostMapping("/list")
+    public BaseResponse<List<SpaceUserVo>> listSpaceUser(@RequestBody SpaceUserQueryRequest spaceUserQueryRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceUserQueryRequest == null, ErrorCode.PARAMS_ERROR);
+        List<SpaceUser> spaceUserList = spaceUserService.list(spaceUserService.getQueryWrapper(spaceUserQueryRequest));
+        return ResultUtils.success(spaceUserService.getSpaceUserVoList(spaceUserList));
     }
 
 
