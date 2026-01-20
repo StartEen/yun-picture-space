@@ -11,11 +11,13 @@ import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserAddRequest;
 import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserEditRequest;
 import com.cloud.picture.space.backend.model.dto.spaceUser.SpaceUserQueryRequest;
 import com.cloud.picture.space.backend.model.entity.SpaceUser;
+import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.spaceUser.SpaceUserVo;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.SpaceUserService;
 import com.cloud.picture.space.backend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Connection;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -123,6 +125,21 @@ public class SpaceUserController {
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
 
         return ResultUtils.success(true);
+    }
+
+
+    /**
+     * 获取当前用户加入的空间空间列表
+     */
+    @PostMapping("/list/my")
+    public BaseResponse<List<SpaceUserVo>> listMyTeamSpace(HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        SpaceUserQueryRequest spaceUserQueryRequest = new SpaceUserQueryRequest();
+        spaceUserQueryRequest.setUserId(loginUser.getId());
+        List<SpaceUser> spaceUserList = spaceUserService.list(
+                spaceUserService.getQueryWrapper(spaceUserQueryRequest)
+        );
+        return ResultUtils.success(spaceUserService.getSpaceUserVoList(spaceUserList));
     }
 
 
