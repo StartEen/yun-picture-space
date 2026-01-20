@@ -12,6 +12,7 @@ import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.SpaceUser;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceRoleEnum;
+import com.cloud.picture.space.backend.model.enums.SpaceTypeEnum;
 import com.cloud.picture.space.backend.model.vo.space.SpaceVo;
 import com.cloud.picture.space.backend.model.vo.spaceUser.SpaceUserVo;
 import com.cloud.picture.space.backend.model.vo.user.UserVo;

@@ -13,13 +13,16 @@ import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.dto.space.SpaceQueryRequest;
 import com.cloud.picture.space.backend.model.entity.Space;
+import com.cloud.picture.space.backend.model.entity.SpaceUser;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
+import com.cloud.picture.space.backend.model.enums.SpaceRoleEnum;
 import com.cloud.picture.space.backend.model.enums.SpaceTypeEnum;
 import com.cloud.picture.space.backend.model.vo.space.SpaceVo;
 import com.cloud.picture.space.backend.model.vo.user.UserVo;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.mapper.SpaceMapper;
+import com.cloud.picture.space.backend.service.SpaceUserService;
 import com.cloud.picture.space.backend.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +51,10 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
     private TransactionTemplate transactionTemplate;
     @Autowired
     private ResourceTransactionManager resourceTransactionManager;
+
+
+    @Resource
+    private SpaceUserService spaceUserService;
 
 
     @Override
@@ -152,6 +159,14 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
                     // 写入数据库
                     boolean result = this.save(space);
                     ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建空间失败");
+                    if (SpaceTypeEnum.TEAM.getValue() == spaceAddRequest.getSpaceType()) {
+                        SpaceUser spaceUser = new SpaceUser();
+                        spaceUser.setSpaceId(space.getId());
+                        spaceUser.setUserId(userId);
+                        spaceUser.setSpaceRole(SpaceRoleEnum.ADMIN.getValue());
+                        result = spaceUserService.save(spaceUser);
+                        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建团队空间成员记录失败");
+                    }
                     return space.getId();
                 });
                 // 返回结果是包装类；
