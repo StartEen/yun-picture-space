@@ -12,7 +12,7 @@ import lombok.Data;
  */
 
 @Data
-public class SpaceUserAuthConstant {
+public class SpaceUserAuthContext {
 
     /**
      * 临时参数，不同请求对应的ID不同

@@ -10,7 +10,7 @@ import cn.hutool.http.Header;
 import cn.hutool.json.JSONUtil;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
-import com.cloud.picture.space.backend.manager.auth.model.SpaceUserAuthConstant;
+import com.cloud.picture.space.backend.manager.auth.model.SpaceUserAuthContext;
 import com.cloud.picture.space.backend.manager.auth.model.SpaceUserPermissionConstant;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.cloud.picture.space.backend.model.entity.Space;
@@ -19,9 +19,7 @@ import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceRoleEnum;
 import com.cloud.picture.space.backend.model.enums.SpaceTypeEnum;
 import com.cloud.picture.space.backend.service.*;
-import com.squareup.okhttp.internal.framed.Http2;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -29,7 +27,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -72,7 +69,7 @@ public class StpInterfaceImpl implements StpInterface {
         }
         List<String> ADMIN_PERMISSIONS = spaceUserAuthManager.getPermissionsByRole(SpaceRoleEnum.ADMIN.getValue());
         // 获取授权上下文对象
-        SpaceUserAuthConstant authConstant = getAuthConstantByRequest();
+        SpaceUserAuthContext authConstant = getAuthContextByRequest();
         // 如果所有字段为空，标识查询公共图库，可以通过
         if (isAllFieldsNull(authConstant)) {
             return ADMIN_PERMISSIONS;
@@ -194,17 +191,17 @@ public class StpInterfaceImpl implements StpInterface {
     /**
      * 从请求中获取上下文对象
      */
-    private SpaceUserAuthConstant getAuthConstantByRequest() {
+    private SpaceUserAuthContext getAuthContextByRequest() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String contentType = request.getHeader(Header.CONTENT_TYPE.getValue());
-        SpaceUserAuthConstant authRequest;
+        SpaceUserAuthContext authRequest;
         // 兼容 get 和 post 操作
         if (ContentType.JSON.getValue().equals(contentType)) {
             String body = ServletUtil.getBody(request);
-            authRequest = JSONUtil.toBean(body, SpaceUserAuthConstant.class);
+            authRequest = JSONUtil.toBean(body, SpaceUserAuthContext.class);
         } else {
             Map<String, String> paramMap = ServletUtil.getParamMap(request);
-            authRequest = BeanUtil.toBean(paramMap, SpaceUserAuthConstant.class);
+            authRequest = BeanUtil.toBean(paramMap, SpaceUserAuthContext.class);
         }
         // 根据请求路径区分id字段的含义
         Long id = authRequest.getId();
