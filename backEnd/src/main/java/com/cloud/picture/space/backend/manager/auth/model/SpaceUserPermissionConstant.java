@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.manager.auth;
+package com.cloud.picture.space.backend.manager.auth.model;
 
 /**
  * @Author: StartEnd
