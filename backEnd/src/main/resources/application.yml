@@ -85,3 +85,6 @@ thread-pool:
   keep-alive-time: 60
   queue-capacity: 200
 
+#############Sa-Token配置##################
+sa-token:
+  is-log: true
