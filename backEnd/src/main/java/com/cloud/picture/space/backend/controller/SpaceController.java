@@ -8,12 +8,15 @@ import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
+import com.cloud.picture.space.backend.model.dto.space.SpaceUpdateRequest;
+import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
 import com.cloud.picture.space.backend.model.vo.space.SpaceLevel;
 import com.cloud.picture.space.backend.service.SpaceService;
 import com.cloud.picture.space.backend.service.UserConstant;
 import com.cloud.picture.space.backend.service.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -68,14 +71,28 @@ public class SpaceController {
     /**
      * 【管理员功能】更新空间(可修改空间级别)
      */
-    @PostMapping("/updateSpace")
+    @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> updateSpace(@RequestBody SpaceAddRequest spaceAddRequest, HttpServletRequest request) {
+    public BaseResponse<Boolean> updateSpace(@RequestBody SpaceUpdateRequest spaceUpdateRequest, HttpServletRequest request) {
         // 校验参数
-        ThrowUtils.throwIf(spaceAddRequest == null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(spaceUpdateRequest == null || spaceUpdateRequest.getId() <= 0, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
+        // 将实体类和DTO进行转换
+        Space space = new Space();
+        BeanUtils.copyProperties(spaceUpdateRequest,space);
+        //自动填充数据
+        spaceService.fillSpaceBySpaceLevel(space);
+        //数据校验
+        spaceService.validSpace(space,false);
 
+        // 判断是否存在
+        Long id = spaceUpdateRequest.getId();
+        Space oldSpace = spaceService.getById(id);
+        ThrowUtils.throwIf(oldSpace==null,ErrorCode.NOT_FOUND_ERROR);
 
+        //操作数据库
+        boolean result = spaceService.updateById(space);
+        ThrowUtils.throwIf(!result,ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
 
@@ -97,17 +114,15 @@ public class SpaceController {
      */
     @GetMapping("/list/level")
     public BaseResponse<List<SpaceLevel>> listSpaceLevel() {
-       List<SpaceLevel> spaceLevelList = Arrays.stream(SpaceLevelEnum.values())
-               .map(spaceLevelEnum -> new SpaceLevel(
-                       spaceLevelEnum.getValue(),
-                       spaceLevelEnum.getText(),
-                       spaceLevelEnum.getMaxCount(),
-                       spaceLevelEnum.getMaxSize()
-               )).collect(Collectors.toList());
+        List<SpaceLevel> spaceLevelList = Arrays.stream(SpaceLevelEnum.values())
+                .map(spaceLevelEnum -> new SpaceLevel(
+                        spaceLevelEnum.getValue(),
+                        spaceLevelEnum.getText(),
+                        spaceLevelEnum.getMaxCount(),
+                        spaceLevelEnum.getMaxSize()
+                )).collect(Collectors.toList());
         return ResultUtils.success(spaceLevelList);
     }
-
-
 
 
 }
