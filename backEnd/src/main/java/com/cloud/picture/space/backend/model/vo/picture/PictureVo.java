@@ -9,6 +9,7 @@ import com.cloud.picture.space.backend.model.vo.user.UserVo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -118,6 +119,11 @@ public class PictureVo implements Serializable {
      */
     private String picColor;
 
+
+    /**
+     * 权限校验
+     */
+    private List<String> permissionList = new ArrayList<>();
 
 
     private static final long serialVersionUID = 1L;
