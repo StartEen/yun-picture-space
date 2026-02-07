@@ -8,6 +8,7 @@ import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
+import com.cloud.picture.space.backend.model.dto.space.SpaceEditRequest;
 import com.cloud.picture.space.backend.model.dto.space.SpaceUpdateRequest;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,33 +81,49 @@ public class SpaceController {
         User loginUser = userService.getLoginUser(request);
         // 将实体类和DTO进行转换
         Space space = new Space();
-        BeanUtils.copyProperties(spaceUpdateRequest,space);
-        //自动填充数据
+        BeanUtils.copyProperties(spaceUpdateRequest, space);
+        // 自动填充数据
         spaceService.fillSpaceBySpaceLevel(space);
-        //数据校验
-        spaceService.validSpace(space,false);
+        // 数据校验
+        spaceService.validSpace(space, false);
 
         // 判断是否存在
         Long id = spaceUpdateRequest.getId();
         Space oldSpace = spaceService.getById(id);
-        ThrowUtils.throwIf(oldSpace==null,ErrorCode.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR);
 
-        //操作数据库
+        // 操作数据库
         boolean result = spaceService.updateById(space);
-        ThrowUtils.throwIf(!result,ErrorCode.OPERATION_ERROR);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
 
     /**
      * 编辑空间
      */
-    @PostMapping("/editSpace")
-    public BaseResponse<Boolean> editSpace(@RequestBody SpaceAddRequest spaceAddRequest, HttpServletRequest request) {
+    @PostMapping("/edit")
+    public BaseResponse<Boolean> editSpace(@RequestBody SpaceEditRequest spaceEditRequest, HttpServletRequest request) {
         // 校验参数
-        ThrowUtils.throwIf(spaceAddRequest == null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(spaceEditRequest == null || spaceEditRequest.getId() <= 0, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
+        // 将实体类和DTO进行转换
+        Space space = new Space();
+        BeanUtils.copyProperties(spaceEditRequest, space);
+        // 自动填充数据
+        spaceService.fillSpaceBySpaceLevel(space);
+        space.setEditTime(new Date());
+        // 数据校验
+        spaceService.validSpace(space, false);
+        // 判断是否存在
+        Long id = spaceEditRequest.getId();
+        Space oldSpace = spaceService.getById(id);
+        ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR);
 
-
+        // 仅本人或管理员可编辑
+        spaceService.checkSpaceAuth(loginUser, oldSpace);
+        // 操作数据库
+        boolean result = spaceService.updateById(space);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
 
