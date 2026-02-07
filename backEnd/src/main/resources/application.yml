@@ -39,6 +39,39 @@ spring:
     store-type: redis
     timeout: 2592000
 
+  #空间图片分表
+  shardingsphere:
+    datasource:
+      name: yun-picture
+      yun-picture:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/yun-picture
+        username: root
+        password: 123456
+    rules:
+      sharding:
+        tables:
+          picture:
+            actual-data-nodes: yun-picture.picture
+            table-strategy:
+              standard:
+                sharding-column: spaceId
+                sharding-algorithm-name: picture_sharding_algorithm #使用自定义分片算法
+        sharding-algorithms:
+          picture_sharding_algorithm:
+            type: CLASS_BASED
+            props:
+              strategy: standard
+              algorithmClassName: com.cloud.picture.space.backend.manager.sharding.PictureShardingAlgorithm
+    props:
+      sql-show: true
+
+
+
+
+
+
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
@@ -48,7 +81,7 @@ mybatis-plus:
       logic-delete-field: isDeleted #全局逻辑删除字段名
       logic-delete-value: 1 #逻辑已删除值（默认为 1）
       logic-not-delete-value: 0 #逻辑未删除值（默认为 0）
-
+    enable-sql-runner: true
 
 # 接口文档配置
 
