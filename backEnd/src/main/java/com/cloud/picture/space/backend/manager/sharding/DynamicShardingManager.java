@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * @Description: TODO 动态分表维护
  */
 @Slf4j
-@Component
+// @Component
 public class DynamicShardingManager {
 
     @Resource

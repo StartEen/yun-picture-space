@@ -179,6 +179,11 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         picture.setPicScale(uploadPictureResult.getPicScale());
         picture.setPicFormat(uploadPictureResult.getPicFormat());
         picture.setUserId(loginUser.getId());
+        // if (spaceId == null) {
+        //     picture.setSpaceId(0L);
+        // } else {
+        //     picture.setSpaceId(spaceId);
+        // }
         picture.setSpaceId(spaceId);
         picture.setOriginalUrl(uploadPictureResult.getOriginalUrl());
         picture.setPicColor(uploadPictureResult.getPicColor());
@@ -287,6 +292,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
                     .or()
                     .like("introduction", searchText));
         }
+        // queryWrapper.eq(ObjectUtil.isNotEmpty(id), "id", id).eq("spaceId", spaceId);
         queryWrapper.eq(ObjectUtil.isNotEmpty(id), "id", id);
         queryWrapper.eq(ObjectUtil.isNotEmpty(userId), "userId", userId);
         queryWrapper.like(StrUtil.isNotBlank(name), "name", name);
@@ -304,6 +310,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         queryWrapper.eq(ObjectUtil.isNotEmpty(reviewerId), "reviewerId", reviewerId);
 
         queryWrapper.eq(ObjectUtil.isNotEmpty(spaceId), "spaceId", spaceId);
+        // queryWrapper.eq(nullSpaceId, "spaceId",0);
         queryWrapper.isNull(nullSpaceId, "spaceId");
         queryWrapper.ge(ObjectUtil.isNotEmpty(startEditTime), "editTime", startEditTime);
         queryWrapper.lt(ObjectUtil.isNotEmpty(endEditTime), "editTime", endEditTime);

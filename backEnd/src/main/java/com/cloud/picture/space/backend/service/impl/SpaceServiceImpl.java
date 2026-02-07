@@ -53,9 +53,9 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
     private TransactionTemplate transactionTemplate;
 
 
-    @Lazy
-    @Resource
-    private DynamicShardingManager dynamicShardingManager;
+    // @Lazy
+    // @Resource
+    // private DynamicShardingManager dynamicShardingManager;
 
 
     @Resource
@@ -175,7 +175,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
                     }
 
                     // 创建分表
-                    dynamicShardingManager.createSpacePictureTable(space);
+                    // dynamicShardingManager.createSpacePictureTable(space);
 
                     return space.getId();
                 });
