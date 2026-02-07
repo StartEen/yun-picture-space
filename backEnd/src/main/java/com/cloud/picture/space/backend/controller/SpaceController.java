@@ -7,6 +7,7 @@ import com.cloud.picture.space.backend.common.DeleteRequest;
 import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
+import com.cloud.picture.space.backend.manager.auth.SpaceUserAuthManager;
 import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.dto.space.SpaceEditRequest;
 import com.cloud.picture.space.backend.model.dto.space.SpaceUpdateRequest;
@@ -14,10 +15,14 @@ import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.enums.SpaceLevelEnum;
 import com.cloud.picture.space.backend.model.vo.space.SpaceLevel;
+import com.cloud.picture.space.backend.model.vo.space.SpaceVo;
 import com.cloud.picture.space.backend.service.SpaceService;
+import com.cloud.picture.space.backend.service.SpaceUserService;
 import com.cloud.picture.space.backend.service.UserConstant;
 import com.cloud.picture.space.backend.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -43,6 +48,10 @@ public class SpaceController {
 
     @Resource
     private SpaceService spaceService;
+
+
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
 
     /**
      * 创建空间
@@ -158,8 +167,22 @@ public class SpaceController {
     }
 
 
-
-
+    /**
+     * 根据 id 获取空间
+     */
+    @GetMapping("/get/vo")
+    public BaseResponse<SpaceVo> getSpaceVOById(long id, HttpServletRequest request) {
+        ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+        // 查询数据库
+        Space space = spaceService.getById(id);
+        ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
+        SpaceVo spaceVo = spaceService.getSpaceVO(space, request);
+        User loginUser = userService.getLoginUser(request);
+        // 拉取权限
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
+        spaceVo.setPermissionList(permissionList);
+        return ResultUtils.success(spaceVo);
+    }
 
 
 
