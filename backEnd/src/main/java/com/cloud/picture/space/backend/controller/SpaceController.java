@@ -47,7 +47,7 @@ public class SpaceController {
     /**
      * 创建空间
      */
-    @PostMapping("/addSpace")
+    @PostMapping("/add")
     public BaseResponse<Long> addSpace(@RequestBody SpaceAddRequest spaceAddRequest, HttpServletRequest request) {
         // 校验参数
         ThrowUtils.throwIf(spaceAddRequest == null, ErrorCode.PARAMS_ERROR);
@@ -60,7 +60,7 @@ public class SpaceController {
     /**
      * 删除空间
      */
-    @PostMapping("/deleteSpace")
+    @PostMapping("/delete")
     public BaseResponse<Boolean> deleteSpace(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         // 校验参数
         ThrowUtils.throwIf(deleteRequest == null, ErrorCode.PARAMS_ERROR);
