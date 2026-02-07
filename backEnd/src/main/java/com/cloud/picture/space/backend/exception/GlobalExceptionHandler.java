@@ -1,6 +1,8 @@
 package com.cloud.picture.space.backend.exception;
 
 
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -43,5 +45,30 @@ public class GlobalExceptionHandler {
         log.error("RuntimeException",e);
         return ResultUtils.error(ErrorCode.SYSTEM_ERROR,"系统错误");
     }
+
+    /**
+     * 统一处理未登录异常
+     *
+     * @param e 未登录异常
+     * @return 统一响应
+     */
+    @ExceptionHandler(NotLoginException.class)
+    public BaseResponse<?> notLoginException(NotLoginException e){
+        log.error("NotLoginException",e);
+        return ResultUtils.error(ErrorCode.NOT_LOGIN_ERROR,e.getMessage());
+    }
+
+    /**
+     * 统一处理未授权异常
+     *
+     * @param e 未授权异常
+     * @return 统一响应
+     */
+    @ExceptionHandler(NotPermissionException.class)
+    public BaseResponse<?> notPermissionExceptionHandler(NotPermissionException e){
+        log.error("NotPermissionException",e);
+        return ResultUtils.error(ErrorCode.NO_AUTH_ERROR,e.getMessage());
+    }
+
 
 }
