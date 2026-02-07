@@ -16,6 +16,7 @@ import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.manager.auth.SaSpaceCheckPermission;
+import com.cloud.picture.space.backend.manager.auth.SpaceUserAuthManager;
 import com.cloud.picture.space.backend.manager.auth.StpKit;
 import com.cloud.picture.space.backend.manager.auth.model.SpaceUserPermissionConstant;
 import com.cloud.picture.space.backend.model.dto.picture.*;
@@ -68,6 +69,8 @@ public class PictureController {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private SpaceService spaceService;
+    @Autowired
+    private SpaceUserAuthManager spaceUserAuthManager;
 
     /**
      * 上传图片(可重新上传)
@@ -181,13 +184,22 @@ public class PictureController {
         ThrowUtils.throwIf(picture == null, ErrorCode.NOT_FOUND_ERROR);
 
         // 校验空间权限
+        Space space = null;
         Long spaceId = picture.getSpaceId();
         if (spaceId != null) {
             boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
-            ThrowUtils.throwIf(!hasPermission,ErrorCode.NO_AUTH_ERROR);
+            ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH_ERROR);
+            space = spaceService.getById(spaceId);
+            ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR,"空间不存在");
         }
 
-        return ResultUtils.success(pictureService.getPictureVo(picture, request));
+        // 获取权限列表
+        User loginUser = userService.getLoginUser(request);
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space,loginUser);
+        PictureVo pictureVo = pictureService.getPictureVo(picture, request);
+        pictureVo.setPermissionList(permissionList);
+
+        return ResultUtils.success(pictureVo);
     }
 
     /**
@@ -228,7 +240,7 @@ public class PictureController {
         } else {
             // 私有空间
             boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
-            ThrowUtils.throwIf(!hasPermission,ErrorCode.NO_AUTH_ERROR);
+            ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH_ERROR);
         }
 
         Page<Picture> picturePage = pictureService.page(new Page<>(current, size), pictureService.getQueryWrapper(pictureQueryRequest));
