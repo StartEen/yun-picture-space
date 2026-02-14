@@ -16,12 +16,12 @@ const router = createRouter({
     {
       path: '/user/login',
       name: '用户登录',
-      component: () => import('@/pages/user/UserLoginPage.vue'),
+      component: () => import('@/pages/User/UserLoginPage.vue'), // 更新路径
     },
     {
       path: '/user/register',
       name: '用户注册',
-      component: () => import('@/pages/user/UserRegisterPage.vue'),
+      component: () => import('@/pages/User/UserRegisterPage.vue'), // 统一小写路径
     },
   ],
 })
