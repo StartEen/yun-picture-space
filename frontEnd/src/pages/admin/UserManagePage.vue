@@ -1,5 +1,18 @@
 <template>
   <div id="userManagePage">
+
+    <a-form layout="inline" :model="searchParams" @finish="doSearch">
+      <a-form-item label="账号">
+        <a-input v-model:value="searchParams.userAccount" placeholder="输入账号" />
+      </a-form-item>
+      <a-form-item label="用户名">
+        <a-input v-model:value="searchParams.userName" placeholder="输入用户名" />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" html-type="submit">搜索</a-button>
+      </a-form-item>
+    </a-form>
+
     <!-- 表格 -->
     <a-table
       :columns="columns"
@@ -31,11 +44,15 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue'
+import {computed, onMounted, reactive, ref} from 'vue'
 import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { message, type TableColumnsType } from 'ant-design-vue'
-import { listUserVoByPageUsingPost } from '@/api/userController.ts'
+import {deleteUserUsingPost, listUserVoByPageUsingPost} from '@/api/userController.ts'
+import dayjs from 'dayjs' // 显式导入 dayjs
+
 const defaultAvatar = new URL('@/assets/user.png', import.meta.url).href
+
+
 const columns = [
   {
     title: 'id',
@@ -70,30 +87,80 @@ const columns = [
     key: 'action',
   },
 ]
+
+
 // 从后端获取数据
-const dataList = ref<API.UserVo[]>([])
+// 数据
+const dataList = ref([])
 const total = ref(0)
-//设置搜索条件
+
+// 搜索条件
 const searchParams = reactive<API.UserQueryRequest>({
   current: 1,
   pageSize: 10,
 })
-//获取数据
+
+// 获取数据
 const fetchData = async () => {
   const res = await listUserVoByPageUsingPost({
-    ...searchParams,
+    ...searchParams
   })
-  if (res.data.code === 0 && res.data.data) {
+  if (res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0
   } else {
-    message.error('获取失败：' + res.data.message)
+    message.error('获取数据失败，' + res.data.message)
   }
 }
-//使用vue生命周期挂载函数
+
+// 页面加载时请求一次
 onMounted(() => {
   fetchData()
 })
+
+
+// 分页参数
+const pagination = computed(() => {
+  return {
+    current: searchParams.current ?? 1,
+    pageSize: searchParams.pageSize ?? 10,
+    total: total.value,
+    showSizeChanger: true,
+    showTotal: (total) => `共 ${total} 条`,
+  }
+})
+
+// 表格变化处理
+const doTableChange = (page: any) => {
+  searchParams.current = page.current
+  searchParams.pageSize = page.pageSize
+  fetchData()
+}
+
+// 获取数据
+const doSearch = () => {
+  // 重置页码
+  searchParams.current = 1
+  fetchData()
+}
+
+
+// 删除数据
+const doDelete = async (id: string) => {
+  if (!id) {
+    return
+  }
+  const res = await deleteUserUsingPost({ id })
+  if (res.data.code === 0) {
+    message.success('删除成功')
+    // 刷新数据
+    fetchData()
+  } else {
+    message.error('删除失败')
+  }
+}
+
+
 </script>
 
 <style scoped>
