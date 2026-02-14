@@ -13,6 +13,7 @@ export const useLoginUserStore = defineStore('loginUser', () => {
    */
   const loginUser = ref<API.LoginUserVo>({
     userName: '未登录',
+    id:0
   })
 
   /**
