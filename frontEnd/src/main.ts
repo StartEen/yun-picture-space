@@ -6,7 +6,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import Antd from 'ant-design-vue'
-import "@/access/access.ts"
+import "@/access"
 
 const app = createApp(App)
 

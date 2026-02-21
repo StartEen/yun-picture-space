@@ -290,6 +290,7 @@ const cancel = (id: string) => {
   min-height: 80vh;
   border-radius: 20px;
   overflow: hidden;
+  margin-bottom: 10px;
 }
 
 

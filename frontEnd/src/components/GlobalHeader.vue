@@ -52,12 +52,65 @@ import {
   LogoutOutlined,
   UserOutlined,
   MoreOutlined,
+  PictureOutlined
 } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { userLogoutUsingPost } from '@/api/userController.ts'
 const loginUserStore = useLoginUserStore()
+
+// 菜单列表
+const originItems = [
+  {
+    key: '/',
+    icon: () => h(HomeOutlined),
+    label: '主页',
+    title: '主页',
+  },
+  {
+    key: '/add_picture',
+    icon: () => h(PictureOutlined),
+    label: '创建图片',
+    title: '创建图片',
+  },
+  {
+    key: '/admin/userManage',
+    icon: () => h(UserOutlined),
+    label: '用户管理',
+    title: '用户管理',
+  },
+  {
+    key: '/about',
+    icon: () => h(MoreOutlined),
+    label: '关于',
+    title: '关于',
+  },
+  {
+    key: '/others',
+    icon: () => h(SearchOutlined),
+    label: h('a', { href: 'https://www.biying.com', target: '_blank' }, '网站直达'),
+    title: '网站直达',
+  },
+
+]
+
+// 过滤菜单项
+const filterMenus = (menus = [] as MenuProps['items']) => {
+  return menus?.filter((menu) => {
+    if (menu.key.startsWith('/admin')) {
+      const loginUser = loginUserStore.loginUser
+      if (!loginUser || loginUser.userRole !== "admin") {
+        return false
+      }
+    }
+    return true
+  })
+}
+
+// 展示在菜单的路由数组
+const items = computed<MenuProps['items']>(() => filterMenus(originItems))
+
 
 const defaultAvatar = new URL('@/assets/user.png', import.meta.url).href
 
@@ -90,56 +143,6 @@ const doLogout = async () => {
     message.error('退出失败：' + res.data.message)
   }
 }
-
-// 菜单列表
-const originItems = [
-
-  {
-    key: '/',
-    icon: () => h(HomeOutlined),
-    label: '主页',
-    title: '主页',
-  },
-  {
-    key: '/admin/userManage',
-    icon: () => h(UserOutlined),
-    label: '用户管理',
-    title: '用户管理',
-  },
-  {
-    key: '/about',
-    icon: () => h(MoreOutlined),
-    label: '关于',
-    title: '关于',
-  },
-  {
-    key: '/others',
-    icon: () => h(SearchOutlined),
-    label: h('a', { href: 'https://www.biying.com', target: '_blank' }, '网站直达'),
-    title: '网站直达',
-  },
-
-
-]
-
-// 过滤菜单项
-const filterMenus = (menus = [] as MenuProps['items']) => {
-  return menus?.filter((menu) => {
-    if (menu.key.startsWith('/admin')) {
-      const loginUser = loginUserStore.loginUser
-      if (!loginUser || loginUser.userRole !== "admin") {
-        return false
-      }
-    }
-    return true
-  })
-}
-
-// 展示在菜单的路由数组
-const items = computed<MenuProps['items']>(() => filterMenus(originItems))
-
-
-
 
 </script>
 <style scoped>
