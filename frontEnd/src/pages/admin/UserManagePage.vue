@@ -286,9 +286,12 @@ const cancel = (id: string) => {
 <style scoped>
 #userManagePage {
   padding: 24px;
-  background: linear-gradient(135deg, #53b9c6 0%, #215ac6 100%);
+  background: linear-gradient(to bottom right, #6bdfed 0%, #215ac6 100%);
   min-height: 80vh;
+  border-radius: 20px;
+  overflow: hidden;
 }
+
 
 /* 搜索容器 */
 .search-container {
