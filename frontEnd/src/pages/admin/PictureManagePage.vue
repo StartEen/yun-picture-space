@@ -38,26 +38,73 @@
           </a-form-item>
         </div>
       </a-form>
+
+      <div class="search-right">
+        <a-button type="primary" href="/add_picture" target="_blank">
+          <AppstoreAddOutlined />
+          创建图片
+        </a-button>
+      </div>
     </div>
 
-
-
-
-
-
-
-
-
-
-
+    <!--表格-->
+    <!-- 表格 -->
+    <a-table
+      :columns="columns"
+      :data-source="dataList"
+      :pagination="pagination"
+      @change="doTableChange"
+    >
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'url'">
+          <a-image :src="record.url"  :width="120" />
+        </template>
+        <!--标签-->
+        <template v-if="column.dataIndex === 'tags'">
+          <a-space wrap>
+            <a-tag v-for="tag in JSON.parse(record.tags || '[]')" :key="tag">
+              {{ tag }}
+            </a-tag>
+          </a-space>
+        </template>
+        <!--图片信息-->
+        <template v-if="column.dataIndex === 'picInfo'">
+          <div>格式：{{ record.picFormat }}</div>
+          <div>宽度：{{ record.picWidth }}</div>
+          <div>高度：{{ record.picHeight }}</div>
+          <div>宽高比：{{ record.picScale }}</div>
+          <div>大小：{{ (record.picSize / 1024).toFixed(2) }}KB</div>
+        </template>
+        <template v-else-if="column.dataIndex === 'createTime'">
+          {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template v-else-if="column.dataIndex === 'editTime'">
+          {{ dayjs(record.editTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template v-else-if="column.key === 'action'">
+          <a-space>
+            <a-button type="primary" @click="doDelete(record.id)">
+              <DeleteOutlined />
+              删除
+            </a-button>
+          </a-space>
+        </template>
+      </template>
+    </a-table>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
-import { listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
+import { deletePictureUsingPost, listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import { SearchOutlined } from '@ant-design/icons-vue'
+import {
+  EditOutlined,
+  SearchOutlined,
+  DeleteOutlined,
+  AppstoreAddOutlined,
+} from '@ant-design/icons-vue'
+import dayjs from 'dayjs'
 
 const columns = [
   {
@@ -110,7 +157,7 @@ const columns = [
 ]
 
 // 数据
-const dataList = ref([])
+const dataList = ref<API.Picture[]>([])
 const total = ref(0)
 
 //搜索条件
@@ -137,7 +184,7 @@ const fetchData = async () => {
   const res = await listPictureVoByPageUsingPost({
     ...searchParams,
   })
-  if (res.data.data) {
+  if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0
   } else {
@@ -162,6 +209,21 @@ const doTableChange = (page: any) => {
   searchParams.pageSize = page.pageSize
   fetchData()
 }
+
+// 删除数据
+const doDelete = async (id: string) => {
+  if (!id) {
+    return
+  }
+  const res = await deletePictureUsingPost({ id })
+  if (res.data.code === 0) {
+    message.success('删除成功')
+    // 刷新数据
+    fetchData()
+  } else {
+    message.error('删除失败')
+  }
+}
 </script>
 
 <style scoped>
@@ -173,8 +235,6 @@ const doTableChange = (page: any) => {
   overflow: hidden;
   margin-bottom: 10px;
 }
-
-
 
 /* 搜索容器 */
 .search-container {
@@ -304,5 +364,4 @@ const doTableChange = (page: any) => {
 .search-button:active {
   transform: translateY(0);
 }
-
 </style>
