@@ -18,6 +18,11 @@ const router = createRouter({
       },
     },
     {
+      path: '/admin/pictureManage',
+      name: '图片管理',
+      component: () => import('@/pages/admin/PictureManagePage.vue'),
+    },
+    {
       path: '/user/login',
       name: '用户登录',
       component: () => import('@/pages/user/UserLoginPage.vue'), // 统一使用小写路径
@@ -32,7 +37,6 @@ const router = createRouter({
       name: '创建图片',
       component: () => import('@/pages/picture/AddPicturePage.vue'),
     },
-
 
 
   ],

@@ -61,7 +61,7 @@
           </div>
         </template>
         <template v-else-if="column.dataIndex === 'userAvatar'">
-          <a-image :src="record.userAvatar || defaultAvatar" :width="120" />
+          <a-image :src="record.userAvatar || defaultAvatar" :width="60" />
         </template>
         <template v-else-if="column.dataIndex === 'userRole'">
           <div v-if="record.userRole === 'admin'">
@@ -77,7 +77,7 @@
         <template v-else-if="column.key === 'action'">
           <div class="editable-row-operations">
             <span v-if="editableData[record.id]">
-              <a-button type="primary" size="small" @click="save(record.id)" class="action-button">
+              <a-button type="primary" size="small" @click="save(record.id)" class="action-button" style="margin-right: 15px">
                 保存
               </a-button>
               <a-popconfirm title="确定要取消吗？" @confirm="cancel(record.id)">
@@ -286,7 +286,7 @@ const cancel = (id: string) => {
 <style scoped>
 #userManagePage {
   padding: 24px;
-  background: linear-gradient(to bottom right, #6bdfed 0%, #215ac6 100%);
+/*  background: linear-gradient(to bottom right, #6bdfed 0%, #215ac6 100%);*/
   min-height: 80vh;
   border-radius: 20px;
   overflow: hidden;
@@ -318,17 +318,17 @@ const cancel = (id: string) => {
   padding: 24px;
   border-radius: 16px;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+    0 8px 32px rgba(0, 0, 0, 0.05),
+    0 4px 16px rgba(0, 0, 0, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.01);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-form:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.15),
-    0 6px 20px rgba(0, 0, 0, 0.1);
+    0 12px 40px rgba(0, 0, 0, 0.08),
+    0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
 /* 表单行布局 - 关键优化：垂直居中对齐 */
@@ -425,21 +425,15 @@ const cancel = (id: string) => {
 /* ========== 表格容器样式 ========== */
 .data-table {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #e8e8e8;
   animation: fadeInUp 0.6s ease-out;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.data-table:hover {
+  padding: 12px;
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.15),
-    0 6px 20px rgba(0, 0, 0, 0.1);
+    0 8px 32px rgba(0, 0, 0, 0.05),
+    0 4px 16px rgba(0, 0, 0, 0.01);
 }
 
 @keyframes fadeInUp {
@@ -455,11 +449,11 @@ const cancel = (id: string) => {
 
 /* 表格头部样式 */
 .data-table :deep(.ant-table-thead > tr > th) {
-  background: #24d5c3;
-  color: #ffffff;
+  background: #cccccc;
+  color: #333333;
   font-weight: 600;
   font-size: 14px;
-  padding: 16px;
+  padding: 14px;
   border: none;
   text-align: center;
   position: sticky;
@@ -471,37 +465,62 @@ const cancel = (id: string) => {
   display: none;
 }
 
+/* 表格行容器 */
+.data-table :deep(.ant-table-tbody) {
+  padding: 8px 0;
+}
+
 /* 表格行样式 */
 .data-table :deep(.ant-table-tbody > tr) {
   transition: all 0.3s ease;
   cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 6px 0;
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
 }
 
-.data-table :deep(.ant-table-tbody > tr:hover > td) {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%) !important;
-  transform: scale(1.01);
-}
+/* 悬浮效果 */
+.data-table :deep(.ant-table-tbody > tr:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-/* 斑马纹效果 */
-.data-table :deep(.ant-table-tbody > tr:nth-child(even) > td) {
-  background: rgba(102, 126, 234, 0.03);
-}
-
-.data-table :deep(.ant-table-tbody > tr:nth-child(odd) > td) {
-  background: rgba(89, 89, 89, 0.01);
 }
 
 /* 表格单元格样式 */
 .data-table :deep(.ant-table-tbody > tr > td) {
-  padding: 16px;
-  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+  padding: 14px;
   text-align: center;
-  transition: all 0.3s ease;
   vertical-align: middle;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
 }
 
-.data-table :deep(.ant-table-tbody > tr:last-child > td) {
-  border-bottom: none;
+/* 分页器样式 */
+.data-table :deep(.ant-pagination) {
+  margin: 5px 0 0 0;
+  text-align: center;
+}
+
+.data-table :deep(.ant-pagination-item) {
+  border-radius: 6px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+}
+
+.data-table :deep(.ant-pagination-item:hover) {
+  border-color: #4096ff;
+  color: #4096ff;
+}
+
+.data-table :deep(.ant-pagination-item-active) {
+  background: #4096ff;
+  border-color: #4096ff;
+}
+
+.data-table :deep(.ant-pagination-item-active a) {
+  color: white;
 }
 
 /* 头像样式优化 */
@@ -577,6 +596,8 @@ const cancel = (id: string) => {
 .delete-btn:hover {
   background: linear-gradient(135deg, #ee5a5a 0%, #ff6b6b 100%);
   box-shadow: 0 4px 12px rgba(238, 90, 90, 0.4);
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* 编辑输入框样式 */
@@ -601,8 +622,8 @@ const cancel = (id: string) => {
 
 /* 分页器样式优化 */
 .data-table :deep(.ant-pagination) {
-  margin: 24px 0 0 0;
-  padding: 16px;
+  margin: 10px 0 0 0;
+  padding: 8px;
 }
 
 .data-table :deep(.ant-pagination-item) {
