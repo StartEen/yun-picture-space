@@ -103,7 +103,7 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, reactive, ref, type UnwrapRef} from 'vue'
-import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue'
+import { SmileOutlined, DownOutlined, SearchOutlined } from '@ant-design/icons-vue'
 import { message, type TableColumnsType } from 'ant-design-vue'
 import {
   deleteUserUsingPost,
@@ -410,6 +410,7 @@ const cancel = (id: string) => {
   justify-content: center;
   font-size: 14px;
   letter-spacing: 0.5px;
+  gap: 2px; /* 调整图标和文字的间距 */
 }
 
 .search-button:hover {
