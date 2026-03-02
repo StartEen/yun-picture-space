@@ -4,7 +4,6 @@
       {{ route.query?.id ? '编辑图片' : '创建图片' }}
     </h2>
 
-
     <PictureUpload :picture="picture" :onSuccess="onSuccess" />
 
     <!--标签化信息-->
@@ -39,7 +38,7 @@
         />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit" style="width: 100%">创建</a-button>
+        <a-button type="primary" html-type="submit" style="width: 100%">保存</a-button>
       </a-form-item>
     </a-form>
   </div>

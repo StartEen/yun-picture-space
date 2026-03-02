@@ -108,7 +108,7 @@
           <a-space>
             <a-button
               type="primary"
-              href="`/add_picture?id=${record.id}`"
+              :href="`/add_picture?id=${record.id}`"
               target="_blank"
               class="action-button edit-button"
             >
