@@ -106,6 +106,15 @@
         </template>
         <template v-else-if="column.key === 'action'">
           <a-space>
+            <a-button
+              type="primary"
+              href="`/add_picture?id=${record.id}`"
+              target="_blank"
+              class="action-button edit-button"
+            >
+              <EditOutlined />
+              编辑
+            </a-button>
             <a-button type="primary" @click="doDelete(record.id)">
               <DeleteOutlined />
               删除
@@ -176,21 +185,20 @@ const columns = [
   {
     title: '创建时间',
     dataIndex: 'createTime',
-    width: 180,
+    width: 100,
   },
   {
     title: '编辑时间',
     dataIndex: 'editTime',
-    width: 180,
+    width: 100,
   },
   {
     title: '操作',
     key: 'action',
-    width: 100,
+    width: 180,
     fixed: 'right',
   },
 ]
-
 
 // 数据
 const dataList = ref<API.Picture[]>([])
@@ -263,15 +271,13 @@ const doDelete = async (id: string) => {
 
 // 添加到script部分
 const formatFileSize = (size: number | undefined): string => {
-  if (!size) return '0 KB';
-  const kb = size / 1024;
+  if (!size) return '0 KB'
+  const kb = size / 1024
   if (kb >= 1024) {
-    return `${(kb / 1024).toFixed(1)} MB`;
+    return `${(kb / 1024).toFixed(1)} MB`
   }
-  return `${kb.toFixed(1)} KB`;
-};
-
-
+  return `${kb.toFixed(1)} KB`
+}
 </script>
 
 <style scoped>
@@ -676,7 +682,6 @@ const formatFileSize = (size: number | undefined): string => {
   }
 }
 
-
 /* 操作按钮样式 */
 .data-table :deep(.ant-btn-primary) {
   border-radius: 8px;
@@ -700,6 +705,21 @@ const formatFileSize = (size: number | undefined): string => {
 .data-table :deep(.ant-btn-primary:active) {
   transform: translateY(0);
 }
+
+/* 编辑按钮自定义样式 */
+.edit-button {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
+  border-color: #1890ff !important;
+}
+
+.edit-button:hover {
+  background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%) !important;
+  border-color: #40a9ff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4) !important;
+}
+
+
 
 /* 分页器样式优化 */
 .data-table :deep(.ant-pagination) {
@@ -913,5 +933,4 @@ const formatFileSize = (size: number | undefined): string => {
   background: linear-gradient(135deg, #ffe58f 0%, #ffd666 100%);
   box-shadow: 0 4px 10px rgba(250, 173, 20, 0.25);
 }
-
 </style>
