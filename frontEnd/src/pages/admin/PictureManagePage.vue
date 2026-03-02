@@ -63,20 +63,41 @@
         </template>
         <!--标签-->
         <template v-if="column.dataIndex === 'tags'">
-          <a-space wrap>
-            <a-tag v-for="tag in record.tags" :key="tag">
+          <a-space wrap class="tags-container">
+            <a-tag
+              v-for="(tag, index) in record.tags"
+              :key="tag"
+              :class="['custom-tag', `tag-color-${index % 6}`]"
+            >
               {{ tag }}
             </a-tag>
           </a-space>
         </template>
+
         <!--图片信息-->
         <template v-if="column.dataIndex === 'picInfo'">
-          <div class="pic-info-item">格式：{{ record.picFormat }}</div>
-          <div class="pic-info-item">宽度：{{ record.picWidth }}</div>
-          <div class="pic-info-item">高度：{{ record.picHeight }}</div>
-          <div class="pic-info-item">宽高比：{{ record.picScale }}</div>
-          <div class="pic-info-item">大小：{{ (record.picSize / 1024).toFixed(2) }}KB</div>
+          <div class="pic-info-card">
+            <div class="pic-info-grid">
+              <div class="pic-info-item tag-color-0">
+                <span class="info-label">格式</span>
+                <span class="info-value">{{ record.picFormat }}</span>
+              </div>
+              <div class="pic-info-item tag-color-1">
+                <span class="info-label">尺寸</span>
+                <span class="info-value">{{ record.picWidth }}×{{ record.picHeight }}</span>
+              </div>
+              <div class="pic-info-item tag-color-3">
+                <span class="info-label">比例</span>
+                <span class="info-value">{{ record.picScale }}</span>
+              </div>
+              <div class="pic-info-item tag-color-5">
+                <span class="info-label">大小</span>
+                <span class="info-value">{{ formatFileSize(record.picSize) }}</span>
+              </div>
+            </div>
+          </div>
         </template>
+
         <template v-else-if="column.dataIndex === 'createTime'">
           {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
@@ -239,6 +260,18 @@ const doDelete = async (id: string) => {
     message.error('删除失败')
   }
 }
+
+// 添加到script部分
+const formatFileSize = (size: number | undefined): string => {
+  if (!size) return '0 KB';
+  const kb = size / 1024;
+  if (kb >= 1024) {
+    return `${(kb / 1024).toFixed(1)} MB`;
+  }
+  return `${kb.toFixed(1)} KB`;
+};
+
+
 </script>
 
 <style scoped>
@@ -502,6 +535,8 @@ const doDelete = async (id: string) => {
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.05),
     0 4px 16px rgba(0, 0, 0, 0.01);
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes fadeInUp {
@@ -599,25 +634,48 @@ const doDelete = async (id: string) => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 图片信息样式 */
-.pic-info-item {
-  margin: 4px 0;
-  font-size: 13px;
-  color: #5a6c7d;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+/* 图片信息容器样式 */
+/* 图片信息卡片样式 - 现代简约设计 */
+.pic-info-card {
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.3s ease;
 }
 
-.pic-info-item::before {
-  content: '';
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #4096ff;
-  margin-right: 8px;
+.pic-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
 }
+
+.pic-info-item {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(245, 247, 250, 0.9);
+}
+
+.info-label {
+  font-size: 12px;
+  color: #333;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.info-value {
+  font-size: 13px;
+  font-weight: 450;
+  color: #666;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .pic-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 /* 操作按钮样式 */
 .data-table :deep(.ant-btn-primary) {
@@ -754,9 +812,106 @@ const doDelete = async (id: string) => {
   }
 }
 
-/* 加载动画 */
-.data-table :deep(.ant-spin-dot-item) {
-  /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+/* 标签容器样式 */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* 自定义标签基础样式 */
+.custom-tag {
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-tag::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+}
+
+.custom-tag:hover::before {
+  left: 100%;
+}
+
+.custom-tag:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* 多彩标签颜色样式 */
+.tag-color-0 {
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+  color: #1890ff;
+}
+
+.tag-color-0:hover {
+  background: linear-gradient(135deg, #bae7ff 0%, #91d5ff 100%);
+  box-shadow: 0 4px 10px rgba(24, 144, 255, 0.25);
+}
+
+.tag-color-1 {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
+  color: #52c41a;
+}
+
+.tag-color-1:hover {
+  background: linear-gradient(135deg, #d9f7be 0%, #b7eb8f 100%);
+  box-shadow: 0 4px 10px rgba(82, 196, 26, 0.25);
+}
+
+.tag-color-2 {
+  background: linear-gradient(135deg, #fff2e8 0%, #ffccc7 100%);
+  color: #fa541c;
+}
+
+.tag-color-2:hover {
+  background: linear-gradient(135deg, #ffccc7 0%, #ffa39e 100%);
+  box-shadow: 0 4px 10px rgba(250, 84, 28, 0.25);
+}
+
+.tag-color-3 {
+  background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%);
+  color: #722ed1;
+}
+
+.tag-color-3:hover {
+  background: linear-gradient(135deg, #efdbff 0%, #d3adf7 100%);
+  box-shadow: 0 4px 10px rgba(114, 46, 209, 0.25);
+}
+
+.tag-color-4 {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffadd2 100%);
+  color: #eb2f96;
+}
+
+.tag-color-4:hover {
+  background: linear-gradient(135deg, #ffadd2 0%, #f759ab 100%);
+  box-shadow: 0 4px 10px rgba(235, 47, 150, 0.25);
+}
+
+.tag-color-5 {
+  background: linear-gradient(135deg, #fffbe6 0%, #ffe58f 100%);
+  color: #faad14;
+}
+
+.tag-color-5:hover {
+  background: linear-gradient(135deg, #ffe58f 0%, #ffd666 100%);
+  box-shadow: 0 4px 10px rgba(250, 173, 20, 0.25);
 }
 
 </style>
