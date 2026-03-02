@@ -450,7 +450,7 @@ const cancel = (id: string) => {
 
 /* 表格头部样式 */
 .data-table :deep(.ant-table-thead > tr > th) {
-  background: #cccccc;
+  background: #ececec;
   color: #333333;
   font-weight: 600;
   font-size: 14px;
@@ -641,7 +641,7 @@ const cancel = (id: string) => {
 }
 
 .data-table :deep(.ant-pagination-item-active) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
   border-color: transparent;
 }
 
@@ -712,7 +712,7 @@ const cancel = (id: string) => {
 
 /* 加载动画 */
 .data-table :deep(.ant-spin-dot-item) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
 }
 
 
