@@ -10,7 +10,7 @@
         @mouseleave="hoveredIndex = -1"
       >
         <div class="image-card">
-          <div class="image-wrapper">
+          <div class="image-wrapper" @click="doClickPicture(picture)">
             <img
               :alt="picture.name"
               :src="picture.url ?? picture.thumbnailUrl"
@@ -38,6 +38,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import {useRouter} from "vue-router";
 
 interface Props {
   dataList: any[]
@@ -57,12 +58,12 @@ const calculateColumnWidth = () => {
   const gap = 16
   const minColumnWidth = 260
   const maxColumnWidth = 320
-  
+
   // 计算可以容纳多少列
   const columns = Math.floor((containerWidth + gap) / (minColumnWidth + gap))
   // 计算每列宽度
   const width = (containerWidth - (columns - 1) * gap) / columns
-  
+
   columnWidth.value = Math.min(Math.max(width, minColumnWidth), maxColumnWidth)
 }
 
@@ -86,6 +87,17 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
+
+const router = useRouter()
+// 跳转至图片详情页
+const doClickPicture = (picture: API.PictureVO) => {
+  router.push({
+    path: `/picture/${picture.id}`,
+  })
+}
+
+
+
 </script>
 
 <style scoped>
