@@ -1,92 +1,234 @@
 <template>
   <div class="picture-list">
-    <!-- 图片列表 -->
-    <a-list
-      :grid="{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 5, xxl: 6 }"
-      :data-source="dataList"
-      :loading="loading"
-    >
-      <template #renderItem="{ item: picture }">
-        <a-list-item style="padding: 0">
-          <!-- 单张图片 -->
-          <a-card hoverable>
-            <!--<a-card hoverable @click="doClickPicture(picture)">-->
-            <template #cover>
-              <img
-                :alt="picture.name"
-                :src="picture.url ?? picture.thumbnailUrl"
-                style="height: 180px; object-fit: cover"
-              />
-            </template>
-            <a-card-meta :title="picture.name || '未命名图片'">
-              <template #description>
-                <a-flex>
-                  <a-tag color="green">
-                    {{ picture.category || '默认' }}
-                  </a-tag>
-                  <a-tag v-for="tag in (picture.tags || [])" :key="tag">
+    <div class="waterfall-container" ref="containerRef">
+      <div
+        v-for="(picture, index) in dataList"
+        :key="picture.id || index"
+        class="waterfall-item"
+        :style="{ width: columnWidth + 'px' }"
+        @mouseenter="hoveredIndex = index"
+        @mouseleave="hoveredIndex = -1"
+      >
+        <div class="image-card">
+          <div class="image-wrapper">
+            <img
+              :alt="picture.name"
+              :src="picture.url ?? picture.thumbnailUrl"
+              class="waterfall-image"
+              loading="lazy"
+              @load="onImageLoad(index)"
+            />
+            <div class="image-overlay" :class="{ active: hoveredIndex === index }">
+              <div class="overlay-content">
+                <h4 class="image-title">{{ picture.name || '未命名图片' }}</h4>
+                <div class="image-tags">
+                  <span v-if="picture.category" class="tag category">{{ picture.category }}</span>
+                  <span v-for="tag in (picture.tags || []).slice(0, 3)" :key="tag" class="tag">
                     {{ tag }}
-                  </a-tag>
-                </a-flex>
-              </template>
-            </a-card-meta>
-          </a-card>
-        </a-list-item>
-      </template>
-    </a-list>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
-import { listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
-import { message } from 'ant-design-vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 
-//数据
-const dataList = ref([])
-const loading = ref(true)
-const total = ref(0)
-
-//搜索条件
-const searchParams = reactive<API.PictureQueryRequest>({
-  current: 1,
-  pageSize: 10,
-  sortField: 'createTime',
-  sortOrder: 'descend',
-})
-
-//分页参数
-const pagination = computed(() => {
-  return {
-    current: searchParams.current,
-    pageSize: searchParams.pageSize,
-    total: total.value,
-    //切换页号时，会修改索索参数并获取数据
-    onChange: (page, pageSize) => {
-      searchParams.current = page
-      searchParams.pageSize = pageSize
-      fetchData()
-    },
-  }
-})
-
-//获取数据
-const fetchData = async () => {
-  loading.value = true
-  const res = await listPictureVoByPageUsingPost(searchParams)
-  if (res.data.code === 0 && res.data.data) {
-    dataList.value = res.data.data.records ?? []
-    total.value = res.data.data.total ?? 0
-  } else {
-    message.error('获取数据失败，' + res.data.message)
-  }
-  loading.value = false
+interface Props {
+  dataList: any[]
+  loading: boolean
 }
 
-//页面加载时请求
+defineProps<Props>()
+
+const hoveredIndex = ref(-1)
+const containerRef = ref<HTMLElement>()
+const columnWidth = ref(280)
+
+// 计算列宽
+const calculateColumnWidth = () => {
+  if (!containerRef.value) return
+  const containerWidth = containerRef.value.offsetWidth
+  const gap = 16
+  const minColumnWidth = 260
+  const maxColumnWidth = 320
+  
+  // 计算可以容纳多少列
+  const columns = Math.floor((containerWidth + gap) / (minColumnWidth + gap))
+  // 计算每列宽度
+  const width = (containerWidth - (columns - 1) * gap) / columns
+  
+  columnWidth.value = Math.min(Math.max(width, minColumnWidth), maxColumnWidth)
+}
+
+// 图片加载完成
+const onImageLoad = (index: number) => {
+  // 可以在这里处理图片加载后的布局调整
+}
+
+// 监听窗口大小变化
+const handleResize = () => {
+  calculateColumnWidth()
+}
+
 onMounted(() => {
-  fetchData()
+  nextTick(() => {
+    calculateColumnWidth()
+  })
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.picture-list {
+  min-height: 210px;
+  padding: 8px;
+}
+
+/* 瀑布流容器 - 使用 CSS columns */
+.waterfall-container {
+  column-count: 3;
+  column-gap: 24px;
+}
+
+/* 响应式列数 */
+@media (max-width: 1400px) {
+  .waterfall-container {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .waterfall-container {
+    column-count: 2;
+    column-gap: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .waterfall-container {
+    column-count: 1;
+  }
+}
+
+/* 瀑布流项 */
+.waterfall-item {
+  break-inside: avoid;
+  margin-bottom: 24px;
+  width: 100% !important;
+}
+
+/* 图片卡片 */
+.image-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f5f5f5;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* 图片容器 */
+.image-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.waterfall-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.image-card:hover .waterfall-image {
+  transform: scale(1.03);
+}
+
+/* 悬浮遮罩层 */
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.5) 30%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+.image-overlay.active {
+  opacity: 1;
+}
+
+.overlay-content {
+  transform: translateY(10px);
+  transition: transform 0.3s ease;
+}
+
+.image-overlay.active .overlay-content {
+  transform: translateY(0);
+}
+
+.image-title {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.image-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  border-radius: 6px;
+  font-size: 13px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.tag.category {
+  background: rgba(24, 144, 255, 0.8);
+  border-color: rgba(24, 144, 255, 0.9);
+}
+
+/* 加载状态 */
+:deep(.ant-spin) {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+</style>
