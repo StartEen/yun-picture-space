@@ -29,6 +29,16 @@
               style="min-width: 180px"
             />
           </a-form-item>
+          <a-form-item label="审核状态" name="reviewStatus" class="search-item">
+            <a-select
+              v-model:value="searchParams.reviewStatus"
+              placeholder="请选择审核状态"
+              class="search-input"
+              :options="PIC_REVIEW_STATUS_OPTIONS"
+              allow-clear
+              style="min-width: 180px"
+            />
+          </a-form-item>
 
           <a-form-item class="search-item">
             <a-button type="primary" html-type="submit" class="search-button">
@@ -65,7 +75,7 @@
         <template v-if="column.dataIndex === 'tags'">
           <a-space wrap class="tags-container">
             <a-tag
-              v-for="(tag, index) in record.tags"
+              v-for="(tag, index) in JSON.parse(record.tags || '[]')"
               :key="tag"
               :class="['custom-tag', `tag-color-${index % 6}`]"
             >
@@ -98,6 +108,16 @@
           </div>
         </template>
 
+        <!--审查状态-->
+        <template v-if="column.dataIndex === 'reviewReason'">
+          <div>审核状态：{{ PIC_REVIEW_STATUS_MAP[record.reviewStatus] }}</div>
+          <div>审核信息：{{ record.reviewReason }}</div>
+          <div>审核人：{{ record.reviewerId }}</div>
+          <div v-if="record.reviewTime">
+            审核时间：{{ dayjs(record.reviewTime).format('YYYY-MM-DD HH:mm:ss') }}
+          </div>
+        </template>
+
         <template v-else-if="column.dataIndex === 'createTime'">
           {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
@@ -106,6 +126,23 @@
         </template>
         <template v-else-if="column.key === 'action'">
           <a-space>
+            <!--审核按钮-->
+            <a-button
+              v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS"
+              type="link"
+              @click="handleReview(record, PIC_REVIEW_STATUS_ENUM.PASS)"
+            >
+              通过
+            </a-button>
+            <a-button
+              v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT"
+              type="link"
+              danger
+              @click="handleReview(record, PIC_REVIEW_STATUS_ENUM.REJECT)"
+            >
+              拒绝
+            </a-button>
+
             <a-button
               type="primary"
               :href="`/add_picture?id=${record.id}`"
@@ -128,7 +165,12 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
-import { deletePictureUsingPost, listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
+import {
+  deletePictureUsingPost,
+  doPictureReviewUsingPost,
+  listPictureByPageUsingPost,
+  listPictureVoByPageUsingPost,
+} from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import {
   EditOutlined,
@@ -137,6 +179,11 @@ import {
   AppstoreAddOutlined,
 } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
+import {
+  PIC_REVIEW_STATUS_ENUM,
+  PIC_REVIEW_STATUS_MAP,
+  PIC_REVIEW_STATUS_OPTIONS,
+} from '@/constants/picture.ts'
 
 const columns = [
   {
@@ -193,6 +240,11 @@ const columns = [
     width: 100,
   },
   {
+    title: '审核信息',
+    dataIndex: 'reviewReason',
+    width: 150,
+  },
+  {
     title: '操作',
     key: 'action',
     width: 180,
@@ -225,7 +277,7 @@ const pagination = computed(() => {
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listPictureVoByPageUsingPost({
+  const res = await listPictureByPageUsingPost({
     ...searchParams,
   })
   if (res.data.code === 0 && res.data.data) {
@@ -277,6 +329,24 @@ const formatFileSize = (size: number | undefined): string => {
     return `${(kb / 1024).toFixed(1)} MB`
   }
   return `${kb.toFixed(1)} KB`
+}
+
+// 添加审核功能
+const handleReview = async (record: API.Picture, reviewStatus: number) => {
+  const reviewReason =
+    reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS ? '管理员操作通过' : '管理员操作拒绝'
+  const res = await doPictureReviewUsingPost({
+    id: record.id,
+    reviewStatus,
+    reviewReason,
+  })
+  if (res.data.code === 0) {
+    message.success('审核操作成功')
+    // 刷新数据
+    fetchData()
+  } else {
+    message.error('审核操作失败，' + res.data.message)
+  }
 }
 </script>
 
@@ -718,8 +788,6 @@ const formatFileSize = (size: number | undefined): string => {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4) !important;
 }
-
-
 
 /* 分页器样式优化 */
 .data-table :deep(.ant-pagination) {
