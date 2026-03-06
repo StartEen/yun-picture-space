@@ -110,14 +110,33 @@
 
         <!--审查状态-->
         <template v-if="column.dataIndex === 'reviewReason'">
-          <div>审核状态：{{ PIC_REVIEW_STATUS_MAP[record.reviewStatus] }}</div>
-          <div>审核信息：{{ record.reviewReason }}</div>
-          <div>审核人：{{ record.reviewerId }}</div>
-          <div v-if="record.reviewTime">
-            审核时间：{{ dayjs(record.reviewTime).format('YYYY-MM-DD HH:mm:ss') }}
+          <div class="pic-info-card">
+            <div class="pic-info-grid">
+              <div class="pic-info-item tag-color-1">
+                <span class="info-label">审核状态</span>
+                <span class="info-value">{{ PIC_REVIEW_STATUS_MAP[record.reviewStatus] }}</span>
+              </div>
+              <div class="pic-info-item tag-color-5">
+                <span class="info-label">审核信息</span>
+                <span class="info-value info-value-ellipsis" :title="record.reviewReason">{{
+                  record.reviewReason
+                }}</span>
+              </div>
+              <div class="pic-info-item tag-color-0">
+                <span class="info-label">审核人</span>
+                <span class="info-value info-value-ellipsis" :title="record.reviewerId">{{
+                  record.reviewerId
+                }}</span>
+              </div>
+              <div class="pic-info-item tag-color-4" v-if="record.reviewTime">
+                <span class="info-label">审核时间</span>
+                <span class="info-value">{{
+                  dayjs(record.reviewTime).format('YYYY-MM-DD HH:mm:ss')
+                }}</span>
+              </div>
+            </div>
           </div>
         </template>
-
         <template v-else-if="column.dataIndex === 'createTime'">
           {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
@@ -206,19 +225,24 @@ const columns = [
   {
     title: '名称',
     dataIndex: 'name',
-    width: 150,
+    width: 100,
     ellipsis: true,
+  },
+  {
+    title: '用户 id',
+    dataIndex: 'userId',
+    width: 80,
   },
   {
     title: '简介',
     dataIndex: 'introduction',
-    width: 180,
+    width: 100,
     ellipsis: true,
   },
   {
     title: '类型',
     dataIndex: 'category',
-    width: 100,
+    width: 150,
     ellipsis: true,
   },
   {
@@ -232,10 +256,11 @@ const columns = [
     width: 200,
   },
   {
-    title: '用户 id',
-    dataIndex: 'userId',
-    width: 80,
+    title: '审核信息',
+    dataIndex: 'reviewReason',
+    width: 300,
   },
+
   {
     title: '创建时间',
     dataIndex: 'createTime',
@@ -246,11 +271,7 @@ const columns = [
     dataIndex: 'editTime',
     width: 100,
   },
-  {
-    title: '审核信息',
-    dataIndex: 'reviewReason',
-    width: 150,
-  },
+
   {
     title: '操作',
     key: 'action',
@@ -728,28 +749,36 @@ const handleReview = async (record: API.Picture, reviewStatus: number) => {
 .pic-info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .pic-info-item {
   display: flex;
   flex-direction: column;
-  padding: 6px 8px;
-  border-radius: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
   background: rgba(245, 247, 250, 0.9);
 }
 
 .info-label {
-  font-size: 12px;
+  font-size: 11px;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   font-weight: 700;
 }
 
 .info-value {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 450;
   color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+/* 审核信息值紧凑样式 */
+.review-info-grid .info-value {
+  font-size: 12px;
 }
 
 /* 响应式优化 */

@@ -7,9 +7,9 @@
         <div class="preview-section">
           <div class="preview-card">
             <div class="image-container">
-              <a-image 
-                :src="picture.url" 
-                class="preview-image" 
+              <a-image
+                :src="picture.url"
+                class="preview-image"
                 :preview="{
                   visible: fullImageVisible,
                   onVisibleChange: (visible) => fullImageVisible = visible
