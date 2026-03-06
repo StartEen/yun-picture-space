@@ -125,19 +125,21 @@
           {{ dayjs(record.editTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
         <template v-else-if="column.key === 'action'">
-          <a-space>
+          <div class="action-buttons">
             <!--审核按钮-->
             <a-button
               v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS"
-              type="link"
+              type="primary"
+              class="action-button pass-button"
               @click="handleReview(record, PIC_REVIEW_STATUS_ENUM.PASS)"
             >
               通过
             </a-button>
             <a-button
               v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT"
-              type="link"
+              type="primary"
               danger
+              class="action-button reject-button"
               @click="handleReview(record, PIC_REVIEW_STATUS_ENUM.REJECT)"
             >
               拒绝
@@ -152,11 +154,16 @@
               <EditOutlined />
               编辑
             </a-button>
-            <a-button type="primary" @click="doDelete(record.id)">
+            <a-button
+              type="primary"
+              danger
+              class="action-button delete-button"
+              @click="doDelete(record.id)"
+            >
               <DeleteOutlined />
               删除
             </a-button>
-          </a-space>
+          </div>
         </template>
       </template>
     </a-table>
@@ -787,6 +794,70 @@ const handleReview = async (record: API.Picture, reviewStatus: number) => {
   border-color: #40a9ff !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4) !important;
+}
+
+/* 操作按钮容器 */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* 通用操作按钮样式 */
+.action-button {
+  width: 100px;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 6px 16px;
+  height: 36px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* 通过按钮样式 */
+.pass-button {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+  border-color: #52c41a !important;
+}
+
+.pass-button:hover {
+  background: linear-gradient(135deg, #73d13d 0%, #52c41a 100%) !important;
+  border-color: #73d13d !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.4) !important;
+}
+
+/* 拒绝按钮样式 */
+.reject-button {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%) !important;
+  border-color: #ff4d4f !important;
+}
+
+.reject-button:hover {
+  background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+  border-color: #ff7875 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4) !important;
+}
+
+/* 删除按钮样式 */
+.delete-button {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%) !important;
+  border-color: #ff4d4f !important;
+}
+
+.delete-button:hover {
+  background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+  border-color: #ff7875 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4) !important;
 }
 
 /* 分页器样式优化 */
