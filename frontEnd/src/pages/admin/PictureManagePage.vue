@@ -511,6 +511,33 @@ const handleReview = async (record: API.Picture, reviewStatus: number) => {
   align-items: center;
   font-size: 14px;
   color: #2c3e50;
+  background: #fff;
+}
+
+/* 移除选择框内部的边框，只保留外部边框 */
+.search-input :deep(.ant-select-selector) {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* 保留选择框下拉菜单的边框 */
+.search-input :deep(.ant-select-dropdown) {
+  border: 1px solid #e8e8e8 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 隐藏选择框的清除按钮 */
+.search-input :deep(.ant-select-clear),
+.search-input :deep(.ant-select-clear-icon),
+.search-input :deep(.anticon-close-circle) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .search-input:hover {
