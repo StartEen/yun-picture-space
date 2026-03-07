@@ -1,165 +1,61 @@
 <template>
-  <div id="addPicturePage">
-    <h2 style="margin-bottom: 16px">
-      {{ route.query?.id ? '修改图片' : '创建图片' }}
-    </h2>
-
-    <!-- 选择上传方式 -->
-    <a-tabs v-model:activeKey="uploadType">
-      <a-tab-pane key="file" tab="文件上传">
-        <PictureUpload :picture="picture" :onSuccess="onSuccess" />
-      </a-tab-pane>
-      <a-tab-pane key="url" tab="URL 上传" force-render>
-        <UrlPictureUpload :picture="picture" :onSuccess="onSuccess" />
-      </a-tab-pane>
-    </a-tabs>
-
-
-    <a-form v-if="picture" layout="vertical" :model="pictureForm" @finish="handleSubmit">
-      <a-form-item label="名称" name="name">
-        <a-input v-model:value="pictureForm.name" placeholder="请输入名称" />
-      </a-form-item>
-      <a-form-item label="简介" name="introduction">
-        <a-textarea
-          v-model:value="pictureForm.introduction"
-          placeholder="请输入简介"
-          :rows="2"
-          autoSize
-          allowClear
-        />
-      </a-form-item>
-      <a-form-item label="分类" name="category">
-        <a-auto-complete
-          v-model:value="pictureForm.category"
-          :options="categoryOptions"
-          placeholder="请输入分类"
-          allowClear
-        />
-      </a-form-item>
-      <a-form-item label="标签" name="tags">
-        <a-select
-          v-model:value="pictureForm.tags"
-          :options="tagOptions"
-          mode="tags"
-          placeholder="请输入标签"
-          allowClear
-        />
-      </a-form-item>
-
-      <a-form-item>
-        <a-button type="primary" html-type="submit" style="width: 100%">创建</a-button>
-      </a-form-item>
-    </a-form>
+  <div class="url-picture-upload">
+    <a-input-group compact>
+      <a-input
+        v-model:value="fileUrl"
+        style="width: calc(100% - 120px)"
+        placeholder="请输入图片地址"
+      />
+      <a-button type="primary" style="width: 120px" :loading="loading" @click="handleUpload">
+        提交
+      </a-button>
+    </a-input-group>
+    <div class="img-wrapper">
+      <img v-if="picture?.url" :src="picture?.url" alt="avatar" />
+    </div>
   </div>
 </template>
-
 <script setup lang="ts">
-import PictureUpload from '@/components/picture/PictureUpload.vue'
-import { onMounted, reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import {
-  editPictureUsingPost,
-  getPictureVoByIdUsingGet,
-  listPictureTagCategoryUsingGet,
-} from '@/api/pictureController.ts'
+import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import UrlPictureUpload from '@/components/picture/UrlPictureUpload.vue'
+import { uploadPictureByUrlUsingPost } from '@/api/pictureController.ts'
 
-const picture = ref<API.PictureVO>()
-const pictureForm = reactive<API.PictureEditRequest>({})
-
-const onSuccess = (newPicture: API.PictureVO) => {
-  picture.value = newPicture
-  pictureForm.name = newPicture.name
+interface Props {
+  picture?: API.PictureVO
+  spaceId?: number
+  onSuccess?: (newPicture: API.PictureVO) => void
 }
 
-const router = useRouter()
-const uploadType = ref<'file' | 'url'>('file')
+const props = defineProps<Props>()
+const loading = ref<boolean>(false)
+const fileUrl = ref<String>()
 
 /**
- * 提交表单
- * @param values
+ * 上传
  */
-const handleSubmit = async (values: any) => {
-  const pictureId = picture.value.id
-  if (!pictureId) {
-    return
-  }
-  console.log('values:' + values)
-  const res = await editPictureUsingPost({
-    id: pictureId,
-    ...values,
-  })
-
-  if (res.data.code === 0 && res.data.data) {
-    message.success('创建成功')
-    // 跳转到图片详情页
-    router.push({
-      path: `/picture/${pictureId}`,
-    })
-  } else {
-    message.error('创建失败，' + res.data.message)
-  }
-}
-
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
-
-// 获取标签和分类选项
-const getTagCategoryOptions = async () => {
-  const res = await listPictureTagCategoryUsingGet()
-  if (res.data.code === 0 && res.data.data) {
-    // 转换成下拉选项组件接受的格式
-    tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => {
-      return {
-        value: data,
-        label: data,
-      }
-    })
-    categoryOptions.value = (res.data.data.categoryList ?? []).map((data: string) => {
-      return {
-        value: data,
-        label: data,
-      }
-    })
-  } else {
-    message.error('加载选项失败，' + res.data.message)
-  }
-}
-
-onMounted(() => {
-  getTagCategoryOptions()
-})
-
-const route = useRoute()
-
-// 获取老数据
-const getOldPicture = async () => {
-  // 获取数据
-  const id = route.query?.id
-  if (id) {
-    const res = await getPictureVoByIdUsingGet({
-      id: id,
-    })
-    if (res.data.code === 0 && res.data.data) {
-      const data = res.data.data
-      picture.value = data
-      pictureForm.name = data.name
-      pictureForm.introduction = data.introduction
-      pictureForm.category = data.category
-      pictureForm.tags = data.tags
+const handleUpload = async () => {
+  loading.value = true
+  try {
+    const params: API.PictureUploadRequest = {
+      fileUrl: fileUrl.value,
     }
+    if (props.picture) {
+      params.id = props.picture.id
+    }
+    const res = await uploadPictureByUrlUsingPost(params)
+
+    if (res.data.code === 0 && res.data.data) {
+      message.success('图片上传成功')
+      // 将上传成功的图片信息传递给父组件
+      props.onSuccess?.(res.data.data)
+    } else {
+      message.error('图片上传失败,' + res.data.message)
+    }
+  } catch (error) {
+    message.error('图片上传失败,' + error.data.message)
+  } finally {
+    loading.value = false
   }
 }
-
-onMounted(() => {
-  getOldPicture()
-})
 </script>
-
-<style scoped>
-#addPicturePage {
-  max-width: 720px;
-  margin: 0 auto;
-}
-</style>
+<style scoped lang="less"></style>

@@ -4,8 +4,17 @@
       {{ route.query?.id ? '编辑图片' : '创建图片' }}
     </h2>
 
-    <PictureUpload :picture="picture" :onSuccess="onSuccess" />
-
+    <!-- 选择上传方式 -->
+    <a-tabs v-model:activeKey="uploadType">
+      <a-tab-pane key="file" tab="文件上传">
+        <!-- 图片上传组件 -->
+        <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+      </a-tab-pane>
+      <a-tab-pane key="url" tab="URL 上传" force-render>
+        <!-- URL 图片上传组件 -->
+        <UrlPictureUpload :picture="picture" :onSuccess="onSuccess" />
+      </a-tab-pane>
+    </a-tabs>
     <!--标签化信息-->
     <a-form v-if="picture" layout="vertical" :model="pictureForm" @finish="handleSubmit">
       <a-form-item label="名称" name="name">
@@ -63,6 +72,8 @@ const onSuccess = (newPicture: API.PictureVO) => {
   picture.value = newPicture
   pictureForm.name = newPicture.name
 }
+
+const uploadType = ref<'file' | 'url'>('file')
 
 const router = useRouter()
 
