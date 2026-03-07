@@ -47,10 +47,16 @@
             </a-button>
           </a-form-item>
           <div class="search-right">
-            <a-button type="primary" href="/add_picture" target="_blank" class="create-button">
-              <AppstoreAddOutlined />
-              创建图片
-            </a-button>
+            <a-space>
+              <a-button type="primary" href="/add_picture" target="_blank" class="create-button">
+                <AppstoreAddOutlined />
+                创建图片
+              </a-button>
+              <a-button type="primary" href="/add_picture/bath" target="_blank" class="create-button1">
+                <PlusSquareOutlined />
+                批量抓取
+              </a-button>
+            </a-space>
           </div>
         </div>
       </a-form>
@@ -203,6 +209,7 @@ import {
   SearchOutlined,
   DeleteOutlined,
   AppstoreAddOutlined,
+  PlusSquareOutlined,
 } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
 import {
@@ -613,6 +620,35 @@ const handleReview = async (record: API.Picture, reviewStatus: number) => {
 }
 
 .create-button:active {
+  transform: translateY(0);
+}
+
+/* 创建图片按钮1*/
+.create-button1 {
+  height: 40px;
+  padding: 0 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(64, 150, 255, 0.4);
+  background: linear-gradient(45deg, #1890ff, #4096ff);
+  border: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.create-button1:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(64, 150, 255, 0.4);
+  background: linear-gradient(45deg, #1890ff, #4096ff);
+}
+
+.create-button1:active {
   transform: translateY(0);
 }
 

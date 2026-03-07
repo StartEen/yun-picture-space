@@ -42,6 +42,11 @@ const router = createRouter({
       name: '图片详情',
       component: () => import('@/pages/picture/PictureDetailPage.vue'),
       props: true,
+    },
+    {
+      path:'/add_picture/bath',
+      name: '批量创建图片',
+      component: () => import('@/pages/picture/AddPictureBathPage.vue'),
     }
 
   ],
