@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AccessEnum from "@/access/accessEnum.ts";
+import AccessEnum from '@/access/accessEnum.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,11 +44,15 @@ const router = createRouter({
       props: true,
     },
     {
-      path:'/add_picture/bath',
+      path: '/add_picture/bath',
       name: '批量创建图片',
       component: () => import('@/pages/picture/AddPictureBathPage.vue'),
-    }
-
+    },
+    {
+      path: '/admin/spaceManage',
+      name: '空间管理',
+      component: () => import('@/pages/admin/SpaceManagePage.vue'),
+    },
   ],
 })
 

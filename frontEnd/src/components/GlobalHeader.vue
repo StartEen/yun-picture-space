@@ -54,6 +54,7 @@ import {
   MoreOutlined,
   PictureOutlined,
   AppstoreAddOutlined,
+  CodeSandboxOutlined,
 } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -86,6 +87,12 @@ const originItems = [
     icon: () => h(PictureOutlined),
     label: '图片管理',
     title: '图片管理',
+  },
+  {
+    key: '/admin/spaceManage',
+    icon: () => h(CodeSandboxOutlined),
+    label: '空间管理',
+    title: '空间管理',
   },
   {
     key: '/about',
