@@ -53,6 +53,11 @@ const router = createRouter({
       name: '空间管理',
       component: () => import('@/pages/admin/SpaceManagePage.vue'),
     },
+    {
+      path: '/add_space',
+      name: '创建空间',
+      component: () => import('@/pages/space/AddSpacePage.vue'),
+    },
   ],
 })
 
