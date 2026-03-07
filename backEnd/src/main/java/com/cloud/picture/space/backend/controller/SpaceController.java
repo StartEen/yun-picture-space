@@ -1,6 +1,7 @@
 package com.cloud.picture.space.backend.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.annotation.AuthCheck;
 import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.DeleteRequest;
@@ -10,6 +11,7 @@ import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.manager.auth.SpaceUserAuthManager;
 import com.cloud.picture.space.backend.model.dto.space.SpaceAddRequest;
 import com.cloud.picture.space.backend.model.dto.space.SpaceEditRequest;
+import com.cloud.picture.space.backend.model.dto.space.SpaceQueryRequest;
 import com.cloud.picture.space.backend.model.dto.space.SpaceUpdateRequest;
 import com.cloud.picture.space.backend.model.entity.Space;
 import com.cloud.picture.space.backend.model.entity.User;
@@ -185,6 +187,30 @@ public class SpaceController {
     }
 
 
+    /**
+     * 【管理员功能】分页获取空间列表
+     */
+    @PostMapping("/list/page")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<Space>> listSpaceByPage(@RequestBody SpaceQueryRequest spaceQueryRequest) {
+        int current = spaceQueryRequest.getCurrent();
+        int pageSize = spaceQueryRequest.getPageSize();
+        Page<Space> page = spaceService.page(new Page<>(current, pageSize), spaceService.getQueryWrapper(spaceQueryRequest));
+        return ResultUtils.success(page);
+    }
+
+    /**
+     * 分页获取空间列表
+     */
+    @PostMapping("/list/page/vo")
+    public BaseResponse<Page<SpaceVo>> listSpaceVoByPage(@RequestBody SpaceQueryRequest spaceQueryRequest, HttpServletRequest request) {
+        long current = spaceQueryRequest.getCurrent();
+        long pageSize = spaceQueryRequest.getPageSize();
+        // 限制爬虫
+        ThrowUtils.throwIf(pageSize > 20, ErrorCode.PARAMS_ERROR);
+        Page<Space> spacePage = spaceService.page(new Page<>(current, pageSize), spaceService.getQueryWrapper(spaceQueryRequest));
+        return ResultUtils.success(spaceService.getSpaceVOPage(spacePage, request));
+    }
 
 
 }
