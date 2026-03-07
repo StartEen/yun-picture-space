@@ -13,7 +13,7 @@
           <div class="image-wrapper" @click="doClickPicture(picture)">
             <img
               :alt="picture.name"
-              :src="picture.url ?? picture.thumbnailUrl"
+              :src="picture.thumbnailUrl ?? picture.url"
               class="waterfall-image"
               loading="lazy"
               @load="onImageLoad(index)"
@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import {useRouter} from "vue-router";
+import { useRouter } from 'vue-router'
 
 interface Props {
   dataList: any[]
@@ -95,9 +95,6 @@ const doClickPicture = (picture: API.PictureVO) => {
     path: `/picture/${picture.id}`,
   })
 }
-
-
-
 </script>
 
 <style scoped>
@@ -146,7 +143,9 @@ const doClickPicture = (picture: API.PictureVO) => {
   overflow: hidden;
   background: #f5f5f5;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .image-card:hover {
@@ -179,7 +178,7 @@ const doClickPicture = (picture: API.PictureVO) => {
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.85) 0%,
-    rgba(0, 0, 0, 0.5) 30%,
+    rgba(0, 0, 0, 0.5) 3 0%,
     transparent 60%
   );
   opacity: 0;
