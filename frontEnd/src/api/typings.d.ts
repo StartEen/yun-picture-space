@@ -101,6 +101,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponsePageSpace_ = {
+    code?: number
+    data?: PageSpace_
+    message?: string
+  }
+
   type BaseResponsePageUserVo_ = {
     code?: number
     data?: PageUserVo_
@@ -234,6 +240,14 @@ declare namespace API {
     current?: number
     pages?: number
     records?: PictureVo[]
+    size?: number
+    total?: number
+  }
+
+  type PageSpace_ = {
+    current?: number
+    pages?: number
+    records?: Space[]
     size?: number
     total?: number
   }
@@ -430,6 +444,18 @@ declare namespace API {
     maxSize?: number
     text?: string
     value?: number
+  }
+
+  type SpaceQueryRequest = {
+    current?: number
+    id?: number
+    pageSize?: number
+    sortField?: string
+    sortOrder?: string
+    spaceLevel?: number
+    spaceName?: string
+    spaceType?: number
+    userId?: number
   }
 
   type SpaceRankAnalyzeRequest = {

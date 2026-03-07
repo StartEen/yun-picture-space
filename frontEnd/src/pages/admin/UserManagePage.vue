@@ -1,12 +1,7 @@
 <template>
   <div id="userManagePage">
     <div class="search-container">
-      <a-form
-        layout="inline"
-        :model="searchParams"
-        @finish="doSearch"
-        class="search-form"
-      >
+      <a-form layout="inline" :model="searchParams" @finish="doSearch" class="search-form">
         <div class="form-row">
           <a-form-item label="账号" class="search-item">
             <a-input
@@ -23,11 +18,7 @@
             />
           </a-form-item>
           <a-form-item class="search-item">
-            <a-button
-              type="primary"
-              html-type="submit"
-              class="search-button"
-            >
+            <a-button type="primary" html-type="submit" class="search-button">
               <template #icon>
                 <SearchOutlined />
               </template>
@@ -77,17 +68,26 @@
         <template v-else-if="column.key === 'action'">
           <div class="editable-row-operations">
             <span v-if="editableData[record.id]">
-              <a-button type="primary" size="small" @click="save(record.id)" class="action-button" style="margin-right: 15px">
+              <a-button
+                type="primary"
+                size="small"
+                @click="save(record.id)"
+                class="action-button"
+                style="margin-right: 15px"
+              >
                 保存
               </a-button>
               <a-popconfirm title="确定要取消吗？" @confirm="cancel(record.id)">
-                <a-button size="small" class="action-button">
-                  取消
-                </a-button>
+                <a-button size="small" class="action-button"> 取消 </a-button>
               </a-popconfirm>
             </span>
             <span v-else>
-              <a-button type="primary" @click="doEdit(record.id)" class="action-button" style="margin-right: 15px">
+              <a-button
+                type="primary"
+                @click="doEdit(record.id)"
+                class="action-button"
+                style="margin-right: 15px"
+              >
                 编辑
               </a-button>
               <a-button danger @click="doDelete(record.id)" class="action-button delete-btn">
@@ -102,20 +102,18 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive, ref, type UnwrapRef} from 'vue'
+import { computed, onMounted, reactive, ref, type UnwrapRef } from 'vue'
 import { SmileOutlined, DownOutlined, SearchOutlined } from '@ant-design/icons-vue'
 import { message, type TableColumnsType } from 'ant-design-vue'
 import {
   deleteUserUsingPost,
   listUserVoByPageUsingPost,
-  updateUserUsingPost
+  updateUserUsingPost,
 } from '@/api/userController.ts'
 import dayjs from 'dayjs' // 显式导入 dayjs
 import { cloneDeep } from 'lodash-es'
 
-
 const defaultAvatar = new URL('@/assets/user.png', import.meta.url).href
-
 
 const columns = [
   {
@@ -152,7 +150,6 @@ const columns = [
   },
 ]
 
-
 // 从后端获取数据
 // 数据
 const dataList = ref([])
@@ -167,7 +164,7 @@ const searchParams = reactive<API.UserQueryRequest>({
 // 获取数据
 const fetchData = async () => {
   const res = await listUserVoByPageUsingPost({
-    ...searchParams
+    ...searchParams,
   })
   if (res.data.data) {
     dataList.value = res.data.data.records ?? []
@@ -181,7 +178,6 @@ const fetchData = async () => {
 onMounted(() => {
   fetchData()
 })
-
 
 // 分页参数
 const pagination = computed(() => {
@@ -207,7 +203,6 @@ const doSearch = () => {
   searchParams.current = 1
   fetchData()
 }
-
 
 // 删除数据
 const doDelete = async (id: string) => {
@@ -249,7 +244,7 @@ const save = async (id: string) => {
     // 调用更新接口
     const updateData = {
       id: id,
-      ...editableData[id]
+      ...editableData[id],
     }
 
     const res = await updateUserUsingPost(updateData)
@@ -277,22 +272,17 @@ const cancel = (id: string) => {
   }
   delete editableData[id]
 }
-
-
 </script>
-
-
 
 <style scoped>
 #userManagePage {
   padding: 24px;
-/*  background: linear-gradient(to bottom right, #6bdfed 0%, #215ac6 100%);*/
+  /*  background: linear-gradient(to bottom right, #6bdfed 0%, #215ac6 100%);*/
   min-height: 80vh;
   border-radius: 20px;
   overflow: hidden;
   margin-bottom: 10px;
 }
-
 
 /* 搜索容器 */
 .search-container {
@@ -486,7 +476,6 @@ const cancel = (id: string) => {
 .data-table :deep(.ant-table-tbody > tr:hover) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
 }
 
 /* 表格单元格样式 */
@@ -500,7 +489,7 @@ const cancel = (id: string) => {
 
 /* 分页器样式 */
 .data-table :deep(.ant-pagination) {
-  margin: 5px 0 0 0;
+  margin: 25px 0 10px 0;
   text-align: center;
 }
 
@@ -641,7 +630,7 @@ const cancel = (id: string) => {
 }
 
 .data-table :deep(.ant-pagination-item-active) {
- /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
   border-color: transparent;
 }
 
@@ -714,6 +703,4 @@ const cancel = (id: string) => {
 .data-table :deep(.ant-spin-dot-item) {
   /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
 }
-
-
 </style>
