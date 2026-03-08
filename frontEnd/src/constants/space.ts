@@ -13,9 +13,10 @@ export const SPACE_LEVEL_MAP: Record<number, string> = {
 }
 
 //空间级别选项映射
-export const SPACE_LEVEL_OPTIONS = Object.entries(SPACE_LEVEL_MAP).map(([key, value]) => {
+export const SPACE_LEVEL_OPTIONS = Object.entries(SPACE_LEVEL_MAP).map((key) => {
+  const value = Number(key)
   return {
-    label: value,
-    value: Number(key),
+    label: SPACE_LEVEL_MAP[value],
+    value: value,
   }
 })
