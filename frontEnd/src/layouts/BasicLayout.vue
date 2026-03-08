@@ -7,9 +7,9 @@
       </a-layout-header>
 
       <!-- 主体区域 -->
-      <a-layout class="main-layout" :class="{ 'has-sidebar': loginUserStore.loginUser.id }">
+      <a-layout class="main-layout" :class="{ 'has-sidebar': shouldShowSidebar }">
         <!-- 固定侧边栏 -->
-        <GlobalSider v-if="loginUserStore.loginUser.id" class="sider" />
+        <GlobalSider v-if="shouldShowSidebar" class="sider" />
 
         <!-- 可滚动内容区 -->
         <a-layout-content class="content">
@@ -18,7 +18,7 @@
       </a-layout>
 
       <!-- 底部 -->
-      <a-layout-footer class="footer" :class="{ 'has-sidebar': loginUserStore.loginUser.id }">
+      <a-layout-footer class="footer" :class="{ 'has-sidebar': shouldShowSidebar }">
         自己做的页面
       </a-layout-footer>
     </a-layout>
@@ -26,11 +26,31 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import GlobalHeader from '@/components/GlobalHeader.vue'
 import GlobalSider from '@/components/GlobalSider.vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 
+const route = useRoute()
 const loginUserStore = useLoginUserStore()
+
+const shouldShowSidebar = computed(() => {
+  const path = route.path
+  console.log('Current path:', path)
+
+  // 管理页面不显示侧边栏
+  if (path.startsWith('/admin')) {
+    console.log('Admin page, hiding sidebar')
+    return false
+  }
+
+  // 其他页面在用户登录时显示侧边栏
+  const isLoggedIn = !!loginUserStore.loginUser.id
+  console.log('Is logged in:', isLoggedIn)
+
+  return isLoggedIn
+})
 </script>
 
 <style scoped>
