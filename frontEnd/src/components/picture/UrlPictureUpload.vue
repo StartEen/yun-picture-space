@@ -22,7 +22,6 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
@@ -36,7 +35,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const loading = ref<boolean>(false)
-const fileUrl = ref<string>()
+const fileUrl = ref<String>()
 
 /**
  * 上传
@@ -67,7 +66,7 @@ const handleUpload = async () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .url-picture-upload {
   display: flex;
   flex-direction: column;
@@ -81,13 +80,13 @@ const handleUpload = async () => {
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fadeInUp 0.6s ease-out;
-}
 
-.url-picture-upload:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.08),
-    0 6px 20px rgba(0, 0, 0, 0.05);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.08),
+      0 6px 20px rgba(0, 0, 0, 0.05);
+  }
 }
 
 @keyframes fadeInUp {
@@ -109,18 +108,18 @@ const handleUpload = async () => {
   font-size: 14px !important;
   color: #2c3e50 !important;
   height: 44px !important;
-}
 
-.url-input:hover {
-  border-color: #4096ff !important;
-  box-shadow: 0 0 0 2px rgba(64, 150, 255, 0.2) !important;
-}
+  &:hover {
+    border-color: #4096ff !important;
+    box-shadow: 0 0 0 2px rgba(64, 150, 255, 0.2) !important;
+  }
 
-.url-input:focus {
-  border-color: #4096ff !important;
-  box-shadow: 0 0 0 2px rgba(64, 150, 255, 0.2) !important;
-  outline: none !important;
-  font-weight: 500 !important;
+  &:focus {
+    border-color: #4096ff !important;
+    box-shadow: 0 0 0 2px rgba(64, 150, 255, 0.2) !important;
+    outline: none !important;
+    font-weight: 500 !important;
+  }
 }
 
 /* 上传按钮样式 */
@@ -134,22 +133,21 @@ const handleUpload = async () => {
   box-shadow: 0 4px 12px rgba(64, 150, 255, 0.3) !important;
   font-size: 14px !important;
   letter-spacing: 0.5px !important;
-}
 
-.upload-button:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(64, 150, 255, 0.4) !important;
-  background: linear-gradient(45deg, #1890ff, #4096ff) !important;
-}
+  &:hover {
+    box-shadow: 0 6px 16px rgba(64, 150, 255, 0.4) !important;
+    background: linear-gradient(45deg, #1890ff, #4096ff) !important;
+  }
 
-.upload-button:active {
-  transform: translateY(0) !important;
+  &:active {
+    transform: translateY(0) !important;
+  }
 }
 
 /* 图片预览容器 */
 .img-wrapper {
   width: 100%;
-  height: 400px;
+  min-height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -158,26 +156,26 @@ const handleUpload = async () => {
   border: 2px dashed #e9ecef;
   transition: all 0.3s ease;
   overflow: hidden;
-}
 
-.img-wrapper:hover {
-  border-color: #4096ff;
-  background: #f0f7ff;
+  &:hover {
+    border-color: #4096ff;
+    background: #f0f7ff;
+  }
 }
 
 /* 预览图片 */
 .preview-image {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 300px;
   object-fit: contain;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
-}
 
-.preview-image:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
 }
 
 /* 响应式设计 */
