@@ -1,12 +1,23 @@
 <template>
   <div id="basicLayout">
     <a-layout style="min-height: 100vh">
+      <!-- 固定顶部栏 -->
       <a-layout-header class="header">
         <GlobalHeader />
       </a-layout-header>
-      <a-layout-content class="content">
-        <router-view />
-      </a-layout-content>
+
+      <!-- 主体区域 -->
+      <a-layout class="main-layout">
+        <!-- 固定侧边栏 -->
+        <GlobalSider class="sider" />
+
+        <!-- 可滚动内容区 -->
+        <a-layout-content class="content">
+          <router-view />
+        </a-layout-content>
+      </a-layout>
+
+      <!-- 底部 -->
       <a-layout-footer class="footer"> 自己做的页面 </a-layout-footer>
     </a-layout>
   </div>
@@ -14,33 +25,83 @@
 
 <script setup lang="ts">
 import GlobalHeader from '@/components/GlobalHeader.vue'
+import GlobalSider from '@/components/GlobalSider.vue'
 </script>
+
 <style scoped>
 #basicLayout {
+  min-height: 100vh;
 }
 
+/* 固定顶部栏 */
 #basicLayout .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
   padding-inline: 20px;
-  margin-bottom: 16px;
   color: unset;
   background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  height: 64px;
+  line-height: 64px;
 }
 
+/* 主体布局 */
+.main-layout {
+  margin-top: 64px;
+  min-height: calc(100vh - 64px);
+}
+
+/* 固定侧边栏 */
+#basicLayout .sider {
+  position: fixed;
+  left: 0;
+  top: 64px;
+  bottom: 0;
+  width: 200px;
+  z-index: 999;
+  background: linear-gradient(to right, #fefefe, #fff);
+  padding-top: 20px;
+  border-right: 1px solid #eee;
+  overflow-y: auto;
+}
+
+/* 内容区域 - 留出侧边栏空间 */
+#basicLayout .content {
+  margin-left: 200px;
+  background: linear-gradient(to right, #fefefe, #fff);
+  padding: 20px;
+  min-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+/* 底部 - 不固定 */
 #basicLayout .footer {
   background: #efefef;
   padding: 16px;
-  position: fixed;
-  bottom: 0px;
-  left: 0;
-  right: 0;
   text-align: center;
-  z-index: 100;
+  margin-left: 200px;
+  margin-top: 20px;
 }
 
-#basicLayout .content {
-  /*渐变*/
-  background: linear-gradient(to right, #fefefe, #fff);
-  margin-bottom: 28px;
-  padding: 20px;
+/* 响应式 - 移动端侧边栏处理 */
+@media (max-width: 991px) {
+  #basicLayout .sider {
+    position: fixed;
+    top: 64px;
+    bottom: 0;
+    z-index: 1001;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+  }
+
+  #basicLayout .content {
+    margin-left: 0;
+  }
+
+  #basicLayout .footer {
+    margin-left: 0;
+  }
 }
 </style>
