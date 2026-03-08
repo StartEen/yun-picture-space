@@ -7,9 +7,9 @@
       </a-layout-header>
 
       <!-- 主体区域 -->
-      <a-layout class="main-layout">
+      <a-layout class="main-layout" :class="{ 'has-sidebar': loginUserStore.loginUser.id }">
         <!-- 固定侧边栏 -->
-        <GlobalSider class="sider" />
+        <GlobalSider v-if="loginUserStore.loginUser.id" class="sider" />
 
         <!-- 可滚动内容区 -->
         <a-layout-content class="content">
@@ -18,7 +18,9 @@
       </a-layout>
 
       <!-- 底部 -->
-      <a-layout-footer class="footer"> 自己做的页面 </a-layout-footer>
+      <a-layout-footer class="footer" :class="{ 'has-sidebar': loginUserStore.loginUser.id }">
+        自己做的页面
+      </a-layout-footer>
     </a-layout>
   </div>
 </template>
@@ -26,6 +28,9 @@
 <script setup lang="ts">
 import GlobalHeader from '@/components/GlobalHeader.vue'
 import GlobalSider from '@/components/GlobalSider.vue'
+import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+
+const loginUserStore = useLoginUserStore()
 </script>
 
 <style scoped>
@@ -68,13 +73,13 @@ import GlobalSider from '@/components/GlobalSider.vue'
   overflow-y: auto;
 }
 
-/* 内容区域 - 留出侧边栏空间 */
+/* 内容区域 */
 #basicLayout .content {
-  margin-left: 200px;
   background: linear-gradient(to right, #fefefe, #fff);
   padding: 20px;
   min-height: calc(100vh - 64px);
   overflow-y: auto;
+  margin-left: 0;
 }
 
 /* 底部 - 不固定 */
@@ -82,8 +87,17 @@ import GlobalSider from '@/components/GlobalSider.vue'
   background: #efefef;
   padding: 16px;
   text-align: center;
-  margin-left: 200px;
+  margin-left: 0;
   margin-top: 20px;
+}
+
+/* 有侧边栏时的样式 */
+.main-layout.has-sidebar .content {
+  margin-left: 200px;
+}
+
+.footer.has-sidebar {
+  margin-left: 200px;
 }
 
 /* 响应式 - 移动端侧边栏处理 */
@@ -96,11 +110,11 @@ import GlobalSider from '@/components/GlobalSider.vue'
     box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
   }
 
-  #basicLayout .content {
+  .main-layout.has-sidebar .content {
     margin-left: 0;
   }
 
-  #basicLayout .footer {
+  .footer.has-sidebar {
     margin-left: 0;
   }
 }
