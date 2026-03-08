@@ -1,10 +1,7 @@
 <template>
   <div id="addSpacePage">
     <!-- 页面头部 -->
-    <div class="page-header">
-      <h2>{{ route.query?.id ? '✏️ 修改空间' : '🚀 创建空间' }}</h2>
-      <p class="subtitle">{{ route.query?.id ? '编辑您的空间信息' : '开启您的云端存储之旅' }}</p>
-    </div>
+    <h2>{{ route.query?.id ? '修改空间' : '创建空间' }}</h2>
 
     <!-- 空间信息表单 -->
     <div class="form-section">
@@ -179,36 +176,22 @@ const getOldSpace = async () => {
 #addSpacePage {
   max-width: 800px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 0 24px;
   min-height: 80vh;
   border-radius: 16px;
 }
 
 /* 页面头部 */
-.page-header {
-  text-align: center;
-  margin-bottom: 32px;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
 
-.page-header h2 {
+h2 {
   font-size: 32px;
   font-weight: 700;
   color: #333;
-  margin-bottom: 8px;
-  background: linear-gradient(45deg, #3498db, #5dade2);
+  margin-bottom: 18px;
+  background: linear-gradient(45deg, #333, #333);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-.subtitle {
-  font-size: 16px;
-  color: #666;
-  margin: 0;
 }
 
 /* 区块头部 */
