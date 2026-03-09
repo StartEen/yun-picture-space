@@ -27,6 +27,16 @@
                     {{ tag }}
                   </span>
                 </div>
+                <div v-if="showOp" class="image-actions">
+                  <a-space @click="(e) => doEdit(picture, e)">
+                    <EditOutlined />
+                    编辑
+                  </a-space>
+                  <a-space @click="(e) => doDelete(picture, e)">
+                    <DeleteOutlined />
+                    删除
+                  </a-space>
+                </div>
               </div>
             </div>
           </div>
@@ -39,13 +49,22 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { deletePictureUsingPost } from '@/api/pictureController.ts'
+import { message } from 'ant-design-vue'
 
 interface Props {
-  dataList: any[]
-  loading: boolean
+  dataList?: API.PictureVO[]
+  loading?: boolean
+  showOp?: boolean
+  onReload?: () => void
 }
 
-defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  dataList: () => [],
+  loading: false,
+  showOp: false,
+})
 
 const hoveredIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
@@ -94,6 +113,37 @@ const doClickPicture = (picture: API.PictureVO) => {
   router.push({
     path: `/picture/${picture.id}`,
   })
+}
+
+// 编辑
+const doEdit = (picture, e) => {
+  // 阻止冒泡
+  e.stopPropagation()
+  // 跳转时一定要携带 spaceId
+  router.push({
+    path: '/add_picture',
+    query: {
+      id: picture.id,
+      spaceId: picture.spaceId,
+    },
+  })
+}
+
+// 删除数据
+const doDelete = async (picture, e) => {
+  // 阻止冒泡
+  e.stopPropagation()
+  const id = picture.id
+  if (!id) {
+    return
+  }
+  const res = await deletePictureUsingPost({ id })
+  if (res.data.code === 0) {
+    message.success('删除成功')
+    props.onReload?.()
+  } else {
+    message.error('删除失败')
+  }
 }
 </script>
 
@@ -234,6 +284,44 @@ const doClickPicture = (picture: API.PictureVO) => {
 .tag.category {
   background: rgba(24, 144, 255, 0.8);
   border-color: rgba(24, 144, 255, 0.9);
+}
+
+/* 操作按钮 */
+.image-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.image-actions :deep(.ant-space) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.image-actions :deep(.ant-space):first-child {
+  background: rgba(24, 144, 255, 0.9);
+  color: #fff;
+}
+
+.image-actions :deep(.ant-space):last-child {
+  background: rgba(255, 77, 77, 0.9);
+  color: #fff;
+}
+
+.image-actions :deep(.ant-space):first-child:hover {
+  background: rgba(24, 144, 255, 1);
+  transform: translateY(-1px);
+}
+
+.image-actions :deep(.ant-space):last-child:hover {
+  background: rgba(255, 77, 77, 1);
+  transform: translateY(-1px);
 }
 
 /* 加载状态 */

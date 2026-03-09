@@ -314,6 +314,7 @@ const pagination = computed(() => {
 const fetchData = async () => {
   const res = await listPictureByPageUsingPost({
     ...searchParams,
+    nullSpaceId: false,//图片管理是否需要显示私有空间图片：false：显示，true：不显示
   })
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
