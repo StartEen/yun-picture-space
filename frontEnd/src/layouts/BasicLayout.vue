@@ -112,11 +112,11 @@ const shouldShowSidebar = computed(() => {
 }
 
 /* 有侧边栏时的样式 */
-.main-layout.has-sidebar .content {
+#basicLayout .main-layout.has-sidebar .content {
   margin-left: 200px;
 }
 
-.footer.has-sidebar {
+#basicLayout .footer.has-sidebar {
   margin-left: 200px;
 }
 
