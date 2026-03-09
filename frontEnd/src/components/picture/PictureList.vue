@@ -329,6 +329,11 @@ const doSearch = (picture, e) => {
   border: 1px solid rgba(82, 196, 26, 0.9);
 }
 
+.image-actions :deep(.ant-space):nth-child(1):hover {
+  background: rgba(24, 144, 255, 1);
+  transform: translateY(-1px);
+}
+
 .image-actions :deep(.ant-space):nth-child(2):hover {
   background: rgba(82, 196, 26, 1);
   transform: translateY(-1px);
