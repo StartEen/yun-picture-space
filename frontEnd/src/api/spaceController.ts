@@ -100,6 +100,21 @@ export async function listSpaceByPageUsingPost(
   })
 }
 
+/** listSpaceVoByPage POST /api/space/list/page/vo */
+export async function listSpaceVoByPageUsingPost(
+  body: API.SpaceQueryRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponsePageSpaceVo_>('/api/space/list/page/vo', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** updateSpace POST /api/space/update */
 export async function updateSpaceUsingPost(
   body: API.SpaceUpdateRequest,

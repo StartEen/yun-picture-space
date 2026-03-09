@@ -107,6 +107,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponsePageSpaceVo_ = {
+    code?: number
+    data?: PageSpaceVo_
+    message?: string
+  }
+
   type BaseResponsePageUserVo_ = {
     code?: number
     data?: PageUserVo_
@@ -248,6 +254,14 @@ declare namespace API {
     current?: number
     pages?: number
     records?: Space[]
+    size?: number
+    total?: number
+  }
+
+  type PageSpaceVo_ = {
+    current?: number
+    pages?: number
+    records?: SpaceVo[]
     size?: number
     total?: number
   }

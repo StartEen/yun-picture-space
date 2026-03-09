@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
+import { listSpaceByPageUsingPost, listSpaceVoByPageUsingPost } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
 import { onMounted } from 'vue'
 
@@ -22,7 +22,7 @@ const checkUserSpace = async () => {
     return
   }
   //获取用户空间信息
-  const res = await listPictureVoByPageUsingPost({
+  const res = await listSpaceVoByPageUsingPost({
     userId: loginUser.id,
     current: 1,
     pageSize: 1,
