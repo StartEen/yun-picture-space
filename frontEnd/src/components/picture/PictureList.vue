@@ -28,6 +28,10 @@
                   </span>
                 </div>
                 <div v-if="showOp" class="image-actions">
+                  <a-space @click="(e) => doSearch(picture, e)">
+                    <SearchOutlined />
+                    以图搜图
+                  </a-space>
                   <a-space @click="(e) => doEdit(picture, e)">
                     <EditOutlined />
                     编辑
@@ -49,7 +53,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons-vue'
 import { deletePictureUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 
@@ -144,6 +148,11 @@ const doDelete = async (picture, e) => {
   } else {
     message.error('删除失败')
   }
+}
+
+const doSearch = (picture, e) => {
+  e.stopPropagation()
+  window.open(`/search_picture?pictureId=${picture.id}`)
 }
 </script>
 
