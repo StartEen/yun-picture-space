@@ -12,7 +12,7 @@
                 class="preview-image"
                 :preview="{
                   visible: fullImageVisible,
-                  onVisibleChange: (visible) => fullImageVisible = visible
+                  onVisibleChange: (visible) => (fullImageVisible = visible),
                 }"
               />
             </div>
@@ -51,6 +51,19 @@
                 <div class="info-item">
                   <span class="info-label">大小</span>
                   <span class="info-value">{{ formatSize(picture.picSize) }}</span>
+                </div>
+                <div class="info-item" v-if="picture.picColor">
+                  <span class="info-label">主色调</span>
+                  <div class="info-value color-info">
+                    <span class="color-value">{{ picture.picColor ?? '-' }}</span>
+                    <div
+                      v-if="picture.picColor"
+                      class="color-swatch"
+                      :style="{
+                        backgroundColor: toHexColor(picture.picColor),
+                      }"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -125,7 +138,7 @@ import {
   ShareAltOutlined,
 } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
-import { downloadImage, formatSize } from '@/utils'
+import { downloadImage, formatSize, toHexColor } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 
 interface Props {
@@ -133,7 +146,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const picture = ref<API.PictureVO>({})
+const picture = ref<API.PictureVo>({})
 const loading = ref(true)
 const fullImageVisible = ref(false)
 const shareModalRef = ref()
@@ -444,6 +457,27 @@ const openShareModal = () => {
   color: #333;
   font-weight: 500;
   word-break: break-word;
+}
+
+/* 颜色信息样式 */
+.color-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.color-swatch {
+  width: 40px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.color-swatch:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .tags-section {
