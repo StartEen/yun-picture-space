@@ -109,7 +109,7 @@
                   </template>
                   删除
                 </a-button>
-                <a-button size="large" class="share-button" @click="openShareModal">
+                <a-button size="large" class="share-button" @click="doShare">
                   <template #icon>
                     <ShareAltOutlined />
                   </template>
@@ -123,7 +123,7 @@
     </a-skeleton>
 
     <!-- 分享模态框 -->
-    <ShareModal ref="shareModalRef" />
+    <ShareModal ref="shareModalRef" :link="shareLink" />
   </div>
 </template>
 
@@ -140,6 +140,7 @@ import {
 import { useRouter } from 'vue-router'
 import { downloadImage, formatSize, toHexColor } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import ShareModal from "@/components/ShareModal.vue";
 
 interface Props {
   id: string | number
@@ -149,7 +150,6 @@ const props = defineProps<Props>()
 const picture = ref<API.PictureVo>({})
 const loading = ref(true)
 const fullImageVisible = ref(false)
-const shareModalRef = ref()
 
 // 获取图片详情
 const fetchPictureDetail = async () => {
@@ -248,6 +248,20 @@ const openShareModal = () => {
     shareModalRef.value.open()
   }
 }
+
+// ----- 分享操作 ----
+const shareModalRef = ref()
+// 分享链接
+const shareLink = ref<string>()
+// 分享
+const doShare = () => {
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.value.id}`
+  if (shareModalRef.value) {
+    shareModalRef.value.openModal()
+  }
+}
+
+
 </script>
 
 <style scoped>

@@ -28,6 +28,10 @@
                   </span>
                 </div>
                 <div v-if="showOp" class="image-actions">
+                  <a-space @click="(e) => doShare(picture, e)">
+                    <ShareAltOutlined />
+                    分享
+                  </a-space>
                   <a-space @click="(e) => doSearch(picture, e)">
                     <SearchOutlined />
                     以图搜图
@@ -46,6 +50,7 @@
           </div>
         </div>
       </div>
+      <ShareModal ref="shareModalRef" :link="shareLink" />
     </div>
   </div>
 </template>
@@ -53,12 +58,19 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons-vue'
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons-vue'
 import { deletePictureUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
+import ShareModal from "@/components/ShareModal.vue";
+
 
 interface Props {
-  dataList?: API.PictureVO[]
+  dataList?: API.PictureVo[]
   loading?: boolean
   showOp?: boolean
   onReload?: () => void
@@ -153,6 +165,20 @@ const doDelete = async (picture, e) => {
 const doSearch = (picture, e) => {
   e.stopPropagation()
   window.open(`/search_picture?pictureId=${picture.id}`)
+}
+
+// ----- 分享操作 ----
+const shareModalRef = ref()
+// 分享链接
+const shareLink = ref<string>()
+// 分享
+const doShare = (picture, e) => {
+  // 阻止冒泡
+  e.stopPropagation()
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.id}`
+  if (shareModalRef.value) {
+    shareModalRef.value.openModal()
+  }
 }
 </script>
 
@@ -318,25 +344,37 @@ const doSearch = (picture, e) => {
   color: #fff;
 }
 
-.image-actions :deep(.ant-space):last-child {
-  background: rgba(255, 77, 77, 0.9);
-  color: #fff;
+.image-actions :deep(.ant-space):nth-child(1):hover {
+  background: rgba(24, 144, 255, 1);
+  transform: translateY(-1px);
 }
+
+
 
 .image-actions :deep(.ant-space):nth-child(2) {
   background: rgba(82, 196, 26, 0.9);
   color: #fff;
   border: 1px solid rgba(82, 196, 26, 0.9);
 }
-
-.image-actions :deep(.ant-space):nth-child(1):hover {
-  background: rgba(24, 144, 255, 1);
-  transform: translateY(-1px);
-}
-
 .image-actions :deep(.ant-space):nth-child(2):hover {
   background: rgba(82, 196, 26, 1);
   transform: translateY(-1px);
+}
+
+.image-actions :deep(.ant-space):nth-child(3) {
+  background: rgba(82, 196, 26, 0.9);
+  color: #fff;
+  border: 1px solid rgba(82, 196, 26, 0.9);
+}
+.image-actions :deep(.ant-space):nth-child(3):hover {
+  background: rgba(82, 196, 26, 1);
+  transform: translateY(-1px);
+}
+
+
+.image-actions :deep(.ant-space):last-child {
+  background: rgba(255, 77, 77, 0.9);
+  color: #fff;
 }
 
 .image-actions :deep(.ant-space):last-child:hover {

@@ -1,3 +1,4 @@
 /backEnd/src/main/resources/application-local.yml
 /backEnd/target/
 /.idea/
+/.vscode/
