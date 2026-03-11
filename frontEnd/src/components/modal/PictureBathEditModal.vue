@@ -1,7 +1,7 @@
 <template>
   <div class="picture-bath-edit-modal">
     <a-modal v-model:visible="visible" title="批量编辑图片" :footer="false" @cancel="closeModal">
-      <a-typography-paragraph type="secondary">* 只对当前页面的图片生效</a-typography-paragraph>
+      <a-typography-paragraph type="secondary">* 共选择 {{ pictureList.length }} 张图片</a-typography-paragraph>
       <!-- 批量创建表单 -->
       <a-form name="formData" layout="vertical" :model="formData" @finish="handleSubmit">
         <a-form-item name="category" label="分类">

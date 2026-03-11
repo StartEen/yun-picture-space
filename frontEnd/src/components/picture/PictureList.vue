@@ -10,6 +10,14 @@
         @mouseleave="hoveredIndex = -1"
       >
         <div class="image-card">
+          <!-- 选择框 -->
+          <div v-if="selectable" class="image-select">
+            <a-checkbox
+              :checked="selectedIds.includes(picture.id)"
+              @change="(e) => handleSelect(picture.id, e.target.checked)"
+              @click.stop
+            />
+          </div>
           <div class="image-wrapper" @click="doClickPicture(picture)">
             <img
               :alt="picture.name"
@@ -66,25 +74,44 @@ import {
 } from '@ant-design/icons-vue'
 import { deletePictureUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import ShareModal from "@/components/modal/ShareModal.vue";
-
+import ShareModal from '@/components/modal/ShareModal.vue'
 
 interface Props {
   dataList?: API.PictureVo[]
   loading?: boolean
   showOp?: boolean
   onReload?: () => void
+  selectable?: boolean
+  selectedIds?: number[]
+  onSelectChange?: (selectedIds: number[]) => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
   dataList: () => [],
   loading: false,
   showOp: false,
+  selectable: false,
+  selectedIds: () => [],
 })
+
+const emit = defineEmits<{
+  (e: 'selectChange', selectedIds: number[]): void
+}>()
 
 const hoveredIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
 const columnWidth = ref(280)
+
+// 处理选择状态
+const handleSelect = (id: number, checked: boolean) => {
+  let newSelectedIds: number[]
+  if (checked) {
+    newSelectedIds = [...props.selectedIds, id]
+  } else {
+    newSelectedIds = props.selectedIds.filter((item) => item !== id)
+  }
+  emit('selectChange', newSelectedIds)
+}
 
 // 计算列宽
 const calculateColumnWidth = () => {
@@ -233,9 +260,23 @@ const doShare = (picture, e) => {
     box-shadow 0.3s ease;
 }
 
+/* 选择框样式 */
+.image-select {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  border-radius: 4px;
+  padding: 2px;
+  transition: all 0.2s ease;
+}
+
+.image-card:hover .image-select {
+  transform: scale(1.05);
+}
+
 .image-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
 }
 
 /* 图片容器 */
@@ -349,8 +390,6 @@ const doShare = (picture, e) => {
   transform: translateY(-1px);
 }
 
-
-
 .image-actions :deep(.ant-space):nth-child(2) {
   background: rgba(82, 196, 26, 0.9);
   color: #fff;
@@ -370,7 +409,6 @@ const doShare = (picture, e) => {
   background: rgba(82, 196, 26, 1);
   transform: translateY(-1px);
 }
-
 
 .image-actions :deep(.ant-space):last-child {
   background: rgba(255, 77, 77, 0.9);

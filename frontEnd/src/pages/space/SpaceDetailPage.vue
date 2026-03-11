@@ -7,7 +7,16 @@
         <a-button type="primary" :href="`/add_picture?spaceId=${id}`" target="_blank">
           + 创建图片
         </a-button>
-        <a-button :icon="h(EditOutlined)" @click="doBatchEdit"> 批量编辑 </a-button>
+        <div class="batch-actions">
+          <a-checkbox v-model:checked="selectAll" @change="handleSelectAll">全选</a-checkbox>
+          <a-button
+            :icon="h(EditOutlined)"
+            @click="doBatchEdit"
+            :disabled="selectedIds.length === 0"
+          >
+            批量编辑 ({{ selectedIds.length }})
+          </a-button>
+        </div>
         <a-tooltip
           :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
         >
@@ -31,19 +40,27 @@
 
     <div style="margin-bottom: 16px" />
     <!-- 图片列表 -->
-    <PictureList :dataList="dataList" :loading="loading" :showOp="true" :onReload="fetchData" />
+    <PictureList
+      :dataList="dataList"
+      :loading="loading"
+      :showOp="true"
+      :onReload="fetchData"
+      :selectable="true"
+      :selectedIds="selectedIds"
+      @selectChange="handleSelectChange"
+    />
   </div>
 
   <PictureBathEditModal
     ref="batchEditPictureModalRef"
-    :spaceId="id"
-    :pictureList="dataList"
+    :spaceId="Number(id)"
+    :pictureList="selectedPictures"
     :onSuccess="onBatchEditPictureSuccess"
   />
 </template>
 
 <script setup lang="ts">
-import { h, onMounted, reactive, ref } from 'vue'
+import { h, onMounted, reactive, ref, computed } from 'vue'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
 import {
@@ -63,7 +80,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const space = ref<API.SpaceVO>({})
+const space = ref<API.SpaceVo>({})
 
 // -------- 获取空间详情 --------
 const fetchSpaceDetail = async () => {
@@ -88,7 +105,7 @@ onMounted(() => {
 // --------- 获取图片列表 --------
 
 // 定义数据
-const dataList = ref<API.PictureVO[]>([])
+const dataList = ref<API.PictureVo[]>([])
 const total = ref(0)
 const loading = ref(true)
 
@@ -112,6 +129,8 @@ const fetchData = async () => {
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0
+    // 清空选择状态
+    selectedIds.value = []
   } else {
     message.error('获取数据失败，' + res.data.message)
   }
@@ -124,7 +143,7 @@ onMounted(() => {
 })
 
 // 分页参数
-const onPageChange = (page, pageSize) => {
+const onPageChange = (page: number, pageSize: number) => {
   searchParams.value.current = page
   searchParams.value.pageSize = pageSize
   fetchData()
@@ -150,10 +169,42 @@ const onColorChange = async (color: string) => {
     const data = res.data.data ?? []
     dataList.value = data
     total.value = data.length
+    // 清空选择状态
+    selectedIds.value = []
   } else {
     message.error('获取数据失败，' + res.data.message)
   }
 }
+
+// ---- 图片选择功能 -----
+const selectedIds = ref<number[]>([])
+const selectAll = ref(false)
+
+// 处理选择变更
+const handleSelectChange = (ids: number[]) => {
+  selectedIds.value = ids
+  // 更新全选状态
+  selectAll.value = ids.length > 0 && ids.length === dataList.value.length
+}
+
+// 处理全选
+const handleSelectAll = (e: any) => {
+  const checked = e.target.checked
+  if (checked) {
+    // 全选
+    selectedIds.value = dataList.value
+      .map((item: API.PictureVo) => item.id)
+      .filter(Boolean) as number[]
+  } else {
+    // 取消全选
+    selectedIds.value = []
+  }
+}
+
+// 选中的图片列表
+const selectedPictures = computed(() => {
+  return dataList.value.filter((item: API.PictureVo) => selectedIds.value.includes(item.id))
+})
 
 // ---- 批量编辑图片 -----
 const batchEditPictureModalRef = ref()
@@ -165,6 +216,10 @@ const onBatchEditPictureSuccess = () => {
 
 // 打开批量编辑图片弹窗
 const doBatchEdit = () => {
+  if (selectedIds.value.length === 0) {
+    message.warning('请先选择要编辑的图片')
+    return
+  }
   if (batchEditPictureModalRef.value) {
     batchEditPictureModalRef.value.openModal()
   }
@@ -195,6 +250,21 @@ const doBatchEdit = () => {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+#spaceDetailPage .batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+}
+
+#spaceDetailPage .batch-actions :deep(.ant-checkbox) {
+  font-size: 14px;
+  color: #666;
 }
 
 #spaceDetailPage .space-actions :deep(.ant-btn) {
