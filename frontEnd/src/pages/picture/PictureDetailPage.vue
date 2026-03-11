@@ -140,7 +140,7 @@ import {
 import { useRouter } from 'vue-router'
 import { downloadImage, formatSize, toHexColor } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import ShareModal from "@/components/ShareModal.vue";
+import ShareModal from "@/components/modal/ShareModal.vue";
 
 interface Props {
   id: string | number
