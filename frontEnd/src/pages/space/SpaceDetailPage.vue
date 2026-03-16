@@ -4,17 +4,33 @@
     <div class="space-header">
       <h2>{{ space.spaceName }}（私有空间）</h2>
       <div class="space-actions">
-        <a-button type="primary" :href="`/add_picture?spaceId=${id}`" target="_blank">
-          + 创建图片
+        <a-button
+          type="primary"
+          class="create-button"
+          :href="`/add_picture?spaceId=${id}`"
+          target="_blank"
+        >
+          <template #icon>
+            <PlusOutlined />
+          </template>
+          创建图片
         </a-button>
         <div class="batch-actions">
-          <a-checkbox v-model:checked="selectAll" @change="handleSelectAll">全选</a-checkbox>
+          <div class="select-all">
+            <a-checkbox v-model:checked="selectAll" @change="handleSelectAll">
+              <span>全选</span>
+            </a-checkbox>
+          </div>
           <a-button
+            class="batch-edit-button"
             :icon="h(EditOutlined)"
             @click="doBatchEdit"
             :disabled="selectedIds.length === 0"
           >
-            批量编辑 ({{ selectedIds.length }})
+            批量编辑
+            <span class="selected-count" v-if="selectedIds.length > 0"
+              >({{ selectedIds.length }})</span
+            >
           </a-button>
         </div>
         <a-tooltip
@@ -30,12 +46,15 @@
     </div>
     <div style="margin-bottom: 16px" />
 
-    <!-- 搜索表单 -->
-    <PictureSearchForm :onSearch="onSearch" />
-    <!--按颜色搜索-->
-    <div style="margin-top: 16px">
-      <span>按颜色搜索:</span>
-      <color-picker format="hex" @pureColorChange="onColorChange" />
+    <!-- 搜索区域 -->
+    <div class="search-container">
+      <!-- 搜索表单 -->
+      <PictureSearchForm :onSearch="onSearch" />
+      <!-- 按颜色搜索 -->
+      <div class="color-search">
+        <span>按颜色搜索:</span>
+        <color-picker format="hex" @pureColorChange="onColorChange" />
+      </div>
     </div>
 
     <div style="margin-bottom: 16px" />
@@ -73,7 +92,7 @@ import PictureSearchForm from '@/components/picture/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
 import 'vue3-colorpicker/style.css'
 import PictureBathEditModal from '@/components/modal/PictureBathEditModal.vue'
-import { EditOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue'
 
 interface Props {
   id: string | number
@@ -238,12 +257,22 @@ const doBatchEdit = () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+#spaceDetailPage .space-header:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 #spaceDetailPage .space-header h2 {
   font-size: 20px;
   font-weight: 600;
   margin: 0;
+  color: #333333;
 }
 
 #spaceDetailPage .space-actions {
@@ -256,21 +285,166 @@ const doBatchEdit = () => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 16px;
-  background: #f5f5f5;
+  padding: 12px 16px;
+  background: #fafafa;
   border-radius: 8px;
   border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+}
+
+#spaceDetailPage .batch-actions:hover {
+  background: #f0f0f0;
+  border-color: #d9d9d9;
 }
 
 #spaceDetailPage .batch-actions :deep(.ant-checkbox) {
   font-size: 14px;
-  color: #666;
+  color: #666666;
+  font-weight: 500;
 }
 
-#spaceDetailPage .space-actions :deep(.ant-btn) {
+/* 创建图片按钮 */
+#spaceDetailPage .space-actions :deep(.create-button) {
   border-radius: 8px;
-  padding: 0 24px;
+  padding: 10px 24px;
+  min-width: 140px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+  border: none;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+#spaceDetailPage .space-actions :deep(.create-button:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.4);
+  background: linear-gradient(135deg, #40a9ff 0%, #69c0ff 100%);
+}
+
+/* 批量编辑按钮 */
+#spaceDetailPage .space-actions :deep(.batch-edit-button) {
+  border-radius: 8px;
+  padding: 8px 20px;
   min-width: 120px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  border: 1px solid #d9d9d9;
+  background: #ffffff;
+  color: #333333;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* 按钮内部图标和文字对齐 */
+#spaceDetailPage .space-actions :deep(.ant-btn > span) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+#spaceDetailPage .space-actions :deep(.ant-btn-icon) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 搜索容器 */
+#spaceDetailPage .search-container {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-bottom: 24px;
+  transition: box-shadow 0.3s ease;
+}
+
+#spaceDetailPage .search-container:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* 颜色搜索 */
+#spaceDetailPage .color-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+#spaceDetailPage .color-search span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666666;
+}
+
+/* 搜索表单样式 */
+
+#spaceDetailPage .space-actions :deep(.batch-edit-button:hover:not(:disabled)) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+#spaceDetailPage .space-actions :deep(.batch-edit-button:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  border-color: #d9d9d9;
+  color: #bfbfbf;
+}
+
+/* 选中数量显示 */
+#spaceDetailPage .space-actions :deep(.selected-count) {
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #1890ff;
+  background: rgba(24, 144, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* 全选复选框 */
+#spaceDetailPage .space-actions :deep(.select-all) {
+  display: flex;
+  align-items: center;
+}
+
+#spaceDetailPage .space-actions :deep(.select-all .ant-checkbox) {
+  font-size: 14px;
+  color: #666666;
+  font-weight: 500;
+}
+
+#spaceDetailPage
+  .space-actions
+  :deep(.select-all .ant-checkbox-input:checked + .ant-checkbox-inner) {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+#spaceDetailPage .space-actions :deep(.ant-tooltip) {
+  font-size: 12px;
+}
+
+#spaceDetailPage .space-actions :deep(.ant-progress-circle) {
+  transition: transform 0.3s ease;
+}
+
+#spaceDetailPage .space-actions :deep(.ant-progress-circle:hover) {
+  transform: scale(1.05);
 }
 
 #spaceDetailPage .pagination-container {
