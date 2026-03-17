@@ -8,51 +8,72 @@
       保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
     </a-typography-paragraph>
 
-    <!-- 选择上传方式 -->
     <a-tabs v-model:activeKey="uploadType">
       <a-tab-pane key="file" tab="文件上传">
-        <!-- 图片上传组件 -->
         <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
       <a-tab-pane key="url" tab="URL 上传" force-render>
-        <!-- URL 图片上传组件 -->
         <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
     </a-tabs>
-    <!--标签化信息-->
+
+    <div v-if="picture" class="edit-action-bar">
+      <a-button class="edit-btn" :icon="h(EditOutlined)" @click="doEditPicture">
+        裁剪与编辑图片
+      </a-button>
+      <ImageCropper
+        ref="imageCropperRef"
+        :imageUrl="picture?.url"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onCropSuccess"
+      />
+    </div>
+
     <div v-if="picture" class="form-card">
+      <div class="form-title">图片信息</div>
       <a-form layout="vertical" :model="pictureForm" @finish="handleSubmit">
         <a-form-item label="名称" name="name">
-          <a-input v-model:value="pictureForm.name" placeholder="请输入名称" />
+          <a-input v-model:value="pictureForm.name" placeholder="请输入生动形象的名称" allowClear />
         </a-form-item>
+
         <a-form-item label="简介" name="introduction">
           <a-textarea
             v-model:value="pictureForm.introduction"
-            placeholder="请输入简介"
-            :rows="2"
-            autoSize
+            placeholder="讲述一下这张图片背后的故事..."
+            :auto-size="{ minRows: 1, maxRows: 5 }"
             allowClear
           />
         </a-form-item>
-        <a-form-item label="分类" name="category">
-          <a-auto-complete
-            v-model:value="pictureForm.category"
-            :options="categoryOptions"
-            placeholder="请输入分类"
-            allowClear
-          />
-        </a-form-item>
-        <a-form-item label="标签" name="tags">
-          <a-select
-            v-model:value="pictureForm.tags"
-            :options="tagOptions"
-            mode="tags"
-            placeholder="请输入标签"
-            allowClear
-          />
-        </a-form-item>
-        <a-form-item>
-          <a-button type="primary" html-type="submit">保存</a-button>
+
+        <a-row :gutter="16">
+          <a-col :xs="24" :sm="12">
+            <a-form-item label="分类" name="category">
+              <a-auto-complete
+                v-model:value="pictureForm.category"
+                :options="categoryOptions"
+                placeholder="选择或输入分类"
+                allowClear
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :xs="24" :sm="12">
+            <a-form-item label="标签" name="tags">
+              <a-select
+                v-model:value="pictureForm.tags"
+                :options="tagOptions"
+                mode="tags"
+                placeholder="添加相关标签"
+                allowClear
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+
+        <a-form-item class="submit-action">
+          <a-button type="primary" html-type="submit" class="submit-btn" size="large">
+            保存图片信息
+          </a-button>
         </a-form-item>
       </a-form>
     </div>
@@ -61,7 +82,7 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/picture/PictureUpload.vue'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   editPictureUsingPost,
@@ -70,11 +91,13 @@ import {
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import UrlPictureUpload from '@/components/picture/UrlPictureUpload.vue'
+import ImageCropper from '@/components/picture/ImageCropper.vue'
+import { EditOutlined } from '@ant-design/icons-vue'
 
-const picture = ref<API.PictureVO>()
+const picture = ref<API.PictureVo>()
 const pictureForm = reactive<API.PictureEditRequest>({})
 
-const onSuccess = (newPicture: API.PictureVO) => {
+const onSuccess = (newPicture: API.PictureVo) => {
   picture.value = newPicture
   pictureForm.name = newPicture.name
 }
@@ -88,7 +111,7 @@ const router = useRouter()
  * @param values
  */
 const handleSubmit = async (values: any) => {
-  const pictureId = picture.value.id
+  const pictureId = picture.value?.id
   if (!pictureId) {
     return
   }
@@ -99,13 +122,13 @@ const handleSubmit = async (values: any) => {
   })
 
   if (res.data.code === 0 && res.data.data) {
-    message.success('创建成功')
+    message.success('保存成功')
     // 跳转到图片详情页
     router.push({
       path: `/picture/${pictureId}`,
     })
   } else {
-    message.error('创建失败，' + res.data.message)
+    message.error('保存失败，' + res.data.message)
   }
 }
 
@@ -167,6 +190,19 @@ onMounted(() => {
 const spaceId = computed(() => {
   return route.query?.spaceId
 })
+
+// ----- 图片编辑器引用 ------
+const imageCropperRef = ref()
+
+// 编辑图片
+const doEditPicture = async () => {
+  imageCropperRef.value?.openModal()
+}
+
+// 编辑成功事件
+const onCropSuccess = (newPicture: API.PictureVo) => {
+  picture.value = newPicture
+}
 </script>
 
 <style scoped>
@@ -175,6 +211,11 @@ const spaceId = computed(() => {
   margin: 0 auto;
   padding: 24px 0;
   min-height: 80vh;
+}
+
+#addPicturePage .edit-bar {
+  text-align: center;
+  margin: 16px 0;
 }
 
 /* 页面标题 */
@@ -214,115 +255,228 @@ h2 {
   border-radius: 1.5px;
 }
 
-/* 表单卡片样式 */
+/* 裁剪编辑操作区 */
+.edit-action-bar {
+  text-align: center;
+  margin: 15px 0 24px 0;
+  animation: fadeUp 0.5s ease-out forwards;
+}
+
+.edit-btn {
+  border-radius: 20px;
+  height: 40px;
+  padding: 0 24px;
+  font-weight: 500;
+  color: #595959;
+  border-color: #d9d9d9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s;
+}
+.edit-btn:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+  background: #f0f7ff;
+}
+
+/* ======================================= */
+/* ====== 下方为重点优化的【图片信息】表单区 ====== */
+/* ======================================= */
+
+/* 表单卡片外层 */
 .form-card {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 24px;
-  transition: box-shadow 0.3s ease;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  padding: 32px;
+  margin-top: 24px;
+  border: 1px solid #f2f2f2;
+  transition: all 0.3s ease;
   animation: fadeIn 0.5s ease-out 0.2s both;
 }
 
 .form-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
-/* 表单样式 */
-.ant-form {
-  width: 100%;
-}
-
-.ant-form-item {
-  margin-bottom: 20px;
-}
-
-.ant-form-item-label > label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 8px;
-  display: block;
-}
-
-/* 输入框样式 */
-.ant-input,
-.ant-input-textarea,
-.ant-select,
-.ant-auto-complete {
-  border-radius: 8px;
-  border: 1px solid #e8e8e8;
-  transition: all 0.3s ease;
-}
-
-.ant-input:hover,
-.ant-input-textarea:hover,
-.ant-select:hover,
-.ant-auto-complete:hover {
-  border-color: #1890ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
-}
-
-.ant-input:focus,
-.ant-input-textarea:focus,
-.ant-select:focus,
-.ant-auto-complete:focus {
-  border-color: #1890ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-  outline: none;
-}
-
-/* 文本域样式 */
-.ant-input-textarea {
-  min-height: 100px;
-}
-
-/* 标签选择样式 */
-.ant-select-multiple .ant-select-selection-item {
-  border-radius: 12px;
-  font-size: 12px;
-  padding: 4px 12px;
-  margin-right: 8px;
-  margin-bottom: 8px;
-}
-
-/* 保存按钮样式 */
-.ant-btn-primary {
-  width: 100%;
-  border-radius: 8px;
-  padding: 12px;
+/* 表单标题 */
+.form-title {
+  font-size: 18px;
   font-weight: 600;
-  font-size: 16px;
-  transition: all 0.3s ease;
+  color: #1f1f1f;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: linear-gradient(45deg, #4096ff, #1890ff);
+}
+
+/* 标题左侧蓝色点缀线 */
+.form-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: #1890ff;
+  border-radius: 2px;
+  margin-right: 10px;
+}
+
+/* 表单项间距 */
+.ant-form-item {
+  margin-bottom: 24px;
+}
+
+/* 表单项 Label 样式 */
+:deep(.ant-form-item-label > label) {
+  font-size: 14px;
+  font-weight: 500;
+  color: #454545;
+}
+
+/* =========================================================
+   核心修复区：统一高度、清除框中框、彻底解决文字偏上问题
+   ========================================================= */
+
+/* 1. 统一所有外层基础样式 (包裹层、输入框、选择框) */
+:deep(.ant-input),
+:deep(.ant-input-affix-wrapper),
+:deep(.ant-select .ant-select-selector) {
+  border-radius: 8px !important;
+  background-color: #fafafa !important;
+  border: 1px solid #e8e8e8 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: none !important;
+}
+
+/* 2. 修复带有 allowClear 时的“框中框”问题 */
+:deep(.ant-input-affix-wrapper > input.ant-input),
+:deep(.ant-input-affix-wrapper > textarea.ant-input) {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* 3. 单行普通输入框高度与内边距 */
+:deep(.ant-input:not(textarea)),
+:deep(.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-textarea)) {
+  min-height: 42px !important;
+  padding: 6px 14px !important;
+  display: flex;
+  align-items: center;
+}
+
+/* 4. 重点修复：分类（AutoComplete）/ 单选下拉框 文字偏上问题 */
+:deep(.ant-select-single .ant-select-selector) {
+  min-height: 42px !important;
+  padding: 0 14px !important; /* 去除上下 padding，全靠内部 Flex 拉伸居中 */
+  display: flex;
+  align-items: center;
+}
+:deep(.ant-select-single .ant-select-selection-search) {
+  position: absolute;
+  inset: 0 14px !important; /* 让内部搜索区占满整行高度 */
+  display: flex;
+  align-items: center;
+}
+:deep(.ant-select-single .ant-select-selection-search-input) {
+  height: 100% !important; /* 输入框强制撑满高度，实现垂直居中 */
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+}
+:deep(.ant-select-single .ant-select-selection-item),
+:deep(.ant-select-single .ant-select-selection-placeholder) {
+  display: flex;
+  align-items: center;
+  line-height: normal !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 5. 统一多行文本域的内边距，并隐藏原生拖拽 */
+:deep(.ant-input-textarea),
+:deep(.ant-input-affix-wrapper-textarea) {
+  padding: 10px 14px !important;
+}
+:deep(.ant-input-textarea textarea) {
+  resize: none;
+}
+
+/* 6. 统一多选标签框 (Tags) 的高度和内部元素对齐 */
+:deep(.ant-select-multiple .ant-select-selector) {
+  min-height: 42px !important;
+  padding: 4px 8px !important;
+  display: flex;
+  align-items: center;
+}
+:deep(.ant-select-multiple .ant-select-selection-item) {
+  background: #f0f7ff;
+  border: 1px solid #cce4ff;
+  color: #1890ff;
+  border-radius: 6px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+/* 7. 统一所有的悬浮 (Hover) 和聚焦 (Focus) 状态 */
+:deep(.ant-input:focus),
+:deep(.ant-input:hover),
+:deep(.ant-input-affix-wrapper:focus-within),
+:deep(.ant-input-affix-wrapper:hover),
+:deep(.ant-select:not(.ant-select-disabled):hover .ant-select-selector),
+:deep(.ant-select-focused .ant-select-selector) {
+  background-color: #ffffff !important;
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+}
+
+/* ========================================================= */
+
+/* 提交按钮区域 */
+.submit-action {
+  margin-top: 36px;
+  margin-bottom: 0;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #1890ff 0%, #4096ff 100%);
   border: none;
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.ant-btn-primary:hover {
+.submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
-  background: linear-gradient(45deg, #1890ff, #4096ff);
+  box-shadow: 0 8px 24px rgba(24, 144, 255, 0.3);
 }
 
-.ant-btn-primary:active {
-  transform: translateY(0);
+.submit-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
 }
 
-/* 动画效果 */
+/* 动画定义 */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* 响应式设计 */
@@ -330,28 +484,12 @@ h2 {
   #addPicturePage {
     padding: 16px;
   }
-
   h2 {
     font-size: 20px;
     margin-bottom: 20px;
   }
-
   .form-card {
-    padding: 16px;
-  }
-
-  .ant-form-item {
-    margin-bottom: 16px;
-  }
-
-  .ant-tabs-tab {
-    font-size: 14px;
-    padding: 10px 16px;
-  }
-
-  .ant-btn-primary {
-    padding: 10px;
-    font-size: 14px;
+    padding: 20px 16px;
   }
 }
 
@@ -360,17 +498,14 @@ h2 {
   width: 8px;
   height: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
