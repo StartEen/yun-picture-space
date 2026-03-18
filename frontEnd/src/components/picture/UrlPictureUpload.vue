@@ -1,6 +1,6 @@
 <template>
-  <div id="url-picture-upload">
-    <div class="url-upload-container">
+  <div id="url-picture-upload-container">
+    <div class="url-upload-input-container">
       <a-input-search
         v-model:value="fileUrl"
         placeholder="请输入图片地址"
@@ -9,9 +9,7 @@
         @search="handleUpload"
       >
         <template #enterButton>
-          <a-button type="primary" size="large" :loading="loading">
-            提交
-          </a-button>
+          <a-button type="primary" size="large" :loading="loading"> 提交 </a-button>
         </template>
       </a-input-search>
     </div>
@@ -67,7 +65,7 @@ const handleUpload = async () => {
 </script>
 
 <style scoped>
-#url-picture-upload {
+#url-picture-upload-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -79,7 +77,7 @@ const handleUpload = async () => {
 }
 
 /* --- 输入容器（参考 HomePage 搜索框样式） --- */
-.url-upload-container {
+.url-upload-input-container {
   width: 100%;
 }
 
@@ -88,15 +86,18 @@ const handleUpload = async () => {
   width: 100%;
 }
 
-.url-input-search :deep(.ant-input-search-large .ant-input) {
-  border-radius: 8px 0 0 8px;
+.url-input-search :deep(.ant-input-group .ant-input) {
+  /* 加上 !important 确保右侧直角不被聚焦状态覆盖 */
+  border-radius: 8px 0 0 8px !important;
   padding-left: 16px;
 }
 
-.url-input-search :deep(.ant-input-search-large .ant-btn) {
-  border-radius: 0 8px 8px 0;
+.url-input-search :deep(.ant-input-group .ant-btn) {
+  border-radius: 0 8px 8px 0 !important;
   padding: 0 32px;
-  min-width: 150px;
+  min-width: 120px !important;
+  position: relative;
+  z-index: 2;
 }
 
 /* --- 图片预览容器 --- */
@@ -137,23 +138,25 @@ const handleUpload = async () => {
     max-width: 100%;
   }
 
-  .url-input-search :deep(.ant-input-search-large) {
+  .url-input-search :deep(.ant-input-group) {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
-  .url-input-search :deep(.ant-input-search-large .ant-input-group) {
+  .url-input-search :deep(.ant-input-group) {
     width: 100%;
   }
 
-  .url-input-search :deep(.ant-input-search-large .ant-input) {
-    border-radius: 8px;
+  .url-input-search :deep(.ant-input-group .ant-input) {
+    border-radius: 8px !important; /* 移动端恢复全圆角 */
   }
 
-  .url-input-search :deep(.ant-input-search-large .ant-btn) {
+  .url-input-search :deep(.ant-input-group .ant-btn) {
     width: 100%;
-    border-radius: 8px;
+    min-width: 100% !important; /* 移动端占满宽度 */
+    border-radius: 8px !important; /* 移动端恢复全圆角 */
+    margin-left: 0 !important; /* 【修改3】在移动端上下堆叠时，必须重置负边距 */
   }
 
   .img-wrapper {
