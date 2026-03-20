@@ -9,6 +9,10 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cloud.picture.space.backend.api.aliYunAi.api.AliYunAPI;
+import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYunAi.model.CreatePictureOutPaintingTaskRequest;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
@@ -36,6 +40,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,6 +92,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     @Resource
     private ThreadPoolExecutor customExecutor;
+
+    @Resource
+    private AliYunAPI aliYunAPI;
 
 
     /**
@@ -824,6 +832,24 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         if (StrUtil.isBlank(category) && CollUtil.isEmpty(tags)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "分类和标签不能同时为空");
         }
+    }
+
+
+    @Override
+    public CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser) {
+        Long pictureId = createPictureOutPaintingTaskRequest.getPictureId();
+        Picture picture = Optional.ofNullable(this.getById(pictureId)).orElseThrow(
+                () -> new BusinessException(ErrorCode.PARAMS_ERROR, "图片id不能为空")
+        );
+        // 校验权限
+        checkPictureAuth(loginUser, picture);
+        // 构造请求参数
+        CreateOutPaintingTaskRequest taskRequest = new CreateOutPaintingTaskRequest();
+        CreateOutPaintingTaskRequest.Input input = new CreateOutPaintingTaskRequest.Input();
+        input.setImageUrl(picture.getUrl());
+        taskRequest.setInput(input);
+        BeanUtil.copyProperties(createPictureOutPaintingTaskRequest, taskRequest);
+        return aliYunAPI.createOutPaintingTask(taskRequest);
     }
 
 }

@@ -2,6 +2,9 @@ package com.cloud.picture.space.backend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYunAi.model.CreatePictureOutPaintingTaskRequest;
 import com.cloud.picture.space.backend.model.dto.picture.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -157,6 +160,16 @@ public interface PictureService extends IService<Picture> {
      * @param loginUserId 登录用户id
      */
     void batchEditPictureMetadata(PictureEditByBatchRequest request, Long spaceId, Long loginUserId);
+
+
+    /**
+     * 创建图片绘画任务
+     *
+     * @param createPictureOutPaintingTaskRequest 创建图片绘画任务请求体
+     * @param loginUser                           登录用户
+     * @return 创建的图片绘画任务信息
+     */
+    CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 
 
 }

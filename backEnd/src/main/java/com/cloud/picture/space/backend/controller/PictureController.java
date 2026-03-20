@@ -7,6 +7,11 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.annotation.AuthCheck;
+import com.cloud.picture.space.backend.api.aliYunAi.api.AliYunAPI;
+import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYunAi.model.CreatePictureOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYunAi.model.GetOutPaintingTaskResponse;
 import com.cloud.picture.space.backend.api.imageSearch.model.ImageSearchResult;
 import com.cloud.picture.space.backend.api.imageSearch.sub.ImageSearchApiFacade;
 import com.cloud.picture.space.backend.common.BaseResponse;
@@ -67,10 +72,15 @@ public class PictureController {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-    @Autowired
+
+    @Resource
     private SpaceService spaceService;
-    @Autowired
+
+    @Resource
     private SpaceUserAuthManager spaceUserAuthManager;
+
+    @Resource
+    private AliYunAPI aliYunAPI;
 
     /**
      * 上传图片(可重新上传)
@@ -197,7 +207,7 @@ public class PictureController {
 
         // 获取权限列表
         User loginUser = userService.getLoginUser(request);
-        List<String> permissionList = spaceUserAuthManager.getPermissionList(space,loginUser);
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
         PictureVo pictureVo = pictureService.getPictureVo(picture, request);
         pictureVo.setPermissionList(permissionList);
 
@@ -454,9 +464,27 @@ public class PictureController {
 
 
     /**
-     *AI 扩图
-     * 需要添加权限：@SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_EDIT)
+     * AI 扩图
      */
+    @PostMapping("/out_painting/create_task")
+    public BaseResponse<CreateOutPaintingTaskResponse> createPictureOutPaintingTask(
+            @RequestBody CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(createPictureOutPaintingTaskRequest == null ||
+                createPictureOutPaintingTaskRequest.getPictureId() == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        CreateOutPaintingTaskResponse response = pictureService.createPictureOutPaintingTask(createPictureOutPaintingTaskRequest, loginUser);
+        return ResultUtils.success(response);
+    }
 
+    /**
+     * 查询AI扩图任务
+     */
+    @PostMapping("/out_painting/get_task")
+    public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId) {
+        ThrowUtils.throwIf(StringUtil.isNotBlank(taskId), ErrorCode.PARAMS_ERROR);
+        GetOutPaintingTaskResponse response = aliYunAPI.getOutPaintingTask(taskId);
+        return ResultUtils.success(response);
+    }
 
 }

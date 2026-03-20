@@ -69,9 +69,6 @@ spring:
 
 
 
-
-
-
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
@@ -84,7 +81,6 @@ mybatis-plus:
     enable-sql-runner: true
 
 # 接口文档配置
-
 knife4j:
   enable: true
   # 配置文档的标题、描述、作者、版本等信息
@@ -111,6 +107,16 @@ knife4j:
 #    secretKey: xxxxxxx
 #    region: xxxxxxx
 #    bucket: xxxxxxx
+
+
+# 阿里云AI配置
+aliYunAi:
+  # 阿里百炼云自己的apiKey
+  #apiKey: xxxxxx
+  # 调用大模型地址（创建任务地址）
+  visitURL: https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation
+
+
 
 thread-pool:
   core-pool-size: 10
