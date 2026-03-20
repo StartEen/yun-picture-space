@@ -49,7 +49,7 @@ public class AliYunAPI {
         // 发送请求
         HttpRequest httpRequest = HttpRequest.post(CREATE_OUT_PAINTING_TASK).header(Header.AUTHORIZATION, "Bearer " + apiKey)
                 // 开启异步处理
-                .header("X-DashScope-Async", "enable").header(Header.CONTENT_TYPE, ContentType.JSON.getValue()).body(JSONUtil.toJsonStr(createOutPaintingTaskRequest));
+                .header(Header.CONTENT_TYPE, ContentType.JSON.getValue()).body(JSONUtil.toJsonStr(createOutPaintingTaskRequest));
         try (HttpResponse httpResponse = httpRequest.execute()) {
             if (!httpResponse.isOk()) {
                 log.error("请求失败,异常信息：{}", httpResponse.body());

@@ -849,6 +849,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         input.setImageUrl(picture.getUrl());
         taskRequest.setInput(input);
         BeanUtil.copyProperties(createPictureOutPaintingTaskRequest, taskRequest);
+        log.info("创建图片外画任务请求参数：{}", taskRequest);
         return aliYunAPI.createOutPaintingTask(taskRequest);
     }
 
