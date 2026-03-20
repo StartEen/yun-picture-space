@@ -217,7 +217,7 @@ declare namespace API {
     id?: number
   }
 
-  type getPictureOutPaintingTaskUsingPOSTParams = {
+  type getPictureOutPaintingTaskUsingGETParams = {
     /** taskId */
     taskId?: string
   }

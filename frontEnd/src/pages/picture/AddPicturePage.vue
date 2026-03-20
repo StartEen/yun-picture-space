@@ -21,12 +21,26 @@
       <a-button class="edit-btn" :icon="h(EditOutlined)" @click="doEditPicture">
         裁剪与编辑图片
       </a-button>
+      <a-button
+        class="edit-btn"
+        type="primary"
+        :icon="h(FullscreenOutlined)"
+        @click="doImagePainting"
+      >
+        AI 扩图功能
+      </a-button>
       <ImageCropper
         ref="imageCropperRef"
         :imageUrl="picture?.url"
         :picture="picture"
         :spaceId="spaceId"
         :onSuccess="onCropSuccess"
+      />
+      <ImageOutPainting
+        ref="imageOutPaintingRef"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onImageOutPaintingSuccess"
       />
     </div>
 
@@ -92,7 +106,8 @@ import {
 import { message } from 'ant-design-vue'
 import UrlPictureUpload from '@/components/picture/UrlPictureUpload.vue'
 import ImageCropper from '@/components/picture/ImageCropper.vue'
-import { EditOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
+import ImageOutPainting from '@/components/picture/ImageOutPainting.vue'
 
 const picture = ref<API.PictureVo>()
 const pictureForm = reactive<API.PictureEditRequest>({})
@@ -201,6 +216,20 @@ const doEditPicture = async () => {
 
 // 编辑成功事件
 const onCropSuccess = (newPicture: API.PictureVo) => {
+  picture.value = newPicture
+}
+
+//------AI 扩图功能--------
+const imageOutPaintingRef = ref()
+
+//AI 扩图
+const doImagePainting = () => {
+  if (imageCropperRef.value) {
+    imageOutPaintingRef.value.openModal()
+  }
+}
+// 编辑成功事件
+const onImageOutPaintingSuccess = (newPicture: API.PictureVo) => {
   picture.value = newPicture
 }
 </script>
@@ -465,18 +494,36 @@ h2 {
 
 /* 动画定义 */
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-15px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 响应式设计 */
