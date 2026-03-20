@@ -482,7 +482,7 @@ public class PictureController {
      */
     @PostMapping("/out_painting/get_task")
     public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId) {
-        ThrowUtils.throwIf(StringUtil.isNotBlank(taskId), ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(StringUtil.isBlank(taskId), ErrorCode.PARAMS_ERROR);
         GetOutPaintingTaskResponse response = aliYunAPI.getOutPaintingTask(taskId);
         return ResultUtils.success(response);
     }
