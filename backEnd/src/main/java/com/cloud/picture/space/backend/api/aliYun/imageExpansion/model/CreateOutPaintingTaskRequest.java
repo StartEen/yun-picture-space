@@ -1,8 +1,7 @@
-package com.cloud.picture.space.backend.api.aliYunAi.model;
+package com.cloud.picture.space.backend.api.aliYun.imageExpansion.model;
 
 
 import cn.hutool.core.annotation.Alias;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 

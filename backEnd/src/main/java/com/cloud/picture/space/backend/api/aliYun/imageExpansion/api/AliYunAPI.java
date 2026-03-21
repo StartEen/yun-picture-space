@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.aliYunAi.api;
+package com.cloud.picture.space.backend.api.aliYun.imageExpansion.api;
 
 
 import cn.hutool.core.util.StrUtil;
@@ -7,9 +7,9 @@ import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
-import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskRequest;
-import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskResponse;
-import com.cloud.picture.space.backend.api.aliYunAi.model.GetOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.GetOutPaintingTaskResponse;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;

@@ -1,17 +1,15 @@
 package com.cloud.picture.space.backend.controller;
 
 
-import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.annotation.AuthCheck;
-import com.cloud.picture.space.backend.api.aliYunAi.api.AliYunAPI;
-import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskRequest;
-import com.cloud.picture.space.backend.api.aliYunAi.model.CreateOutPaintingTaskResponse;
-import com.cloud.picture.space.backend.api.aliYunAi.model.CreatePictureOutPaintingTaskRequest;
-import com.cloud.picture.space.backend.api.aliYunAi.model.GetOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.imageExpansion.api.AliYunAPI;
+import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreatePictureOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.GetOutPaintingTaskResponse;
 import com.cloud.picture.space.backend.api.imageSearch.model.ImageSearchResult;
 import com.cloud.picture.space.backend.api.imageSearch.sub.ImageSearchApiFacade;
 import com.cloud.picture.space.backend.common.BaseResponse;
@@ -22,7 +20,6 @@ import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
 import com.cloud.picture.space.backend.manager.auth.SaSpaceCheckPermission;
 import com.cloud.picture.space.backend.manager.auth.SpaceUserAuthManager;
-import com.cloud.picture.space.backend.manager.auth.StpKit;
 import com.cloud.picture.space.backend.manager.auth.model.SpaceUserPermissionConstant;
 import com.cloud.picture.space.backend.model.dto.picture.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
@@ -40,7 +37,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.util.StringUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.DigestUtils;

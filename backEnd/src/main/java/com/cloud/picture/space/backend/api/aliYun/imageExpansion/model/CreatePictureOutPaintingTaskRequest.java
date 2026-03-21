@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.aliYunAi.model;
+package com.cloud.picture.space.backend.api.aliYun.imageExpansion.model;
 
 
 import lombok.Data;
