@@ -46,6 +46,14 @@ public class AliYunAPI {
         if (createOutPaintingTaskRequest == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "扩图参数为空");
         }
+
+        String imageUrl = createOutPaintingTaskRequest.getInput().getImageUrl();
+
+        // 前置检查
+        if (!ImageUrlValidator.validateImageAccessibility(imageUrl)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "图片地址不可访问，请确保已开启公共读权限");
+        }
+
         // 发送请求
         HttpRequest httpRequest = HttpRequest.post(CREATE_OUT_PAINTING_TASK).header(Header.AUTHORIZATION, "Bearer " + apiKey)
                 // 开启异步处理
