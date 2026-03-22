@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreatePictureOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.volcano.model.CreateGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.volcano.model.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.model.dto.picture.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -170,5 +172,12 @@ public interface PictureService extends IService<Picture> {
      */
     CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 
-
+    /**
+     * 创建图片生成任务
+     *
+     * @param createGeneratePictureRequest 创建图片生成任务请求体
+     * @param loginUser                    登录用户
+     * @return 创建的图片生成任务信息
+     */
+    GeneratePictureTaskResponse createPictureOutGenerateTask(CreateGeneratePictureRequest createGeneratePictureRequest, User loginUser);
 }

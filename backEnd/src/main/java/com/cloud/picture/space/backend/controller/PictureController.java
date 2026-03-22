@@ -3,6 +3,7 @@ package com.cloud.picture.space.backend.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.annotation.AuthCheck;
@@ -12,6 +13,8 @@ import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreatePic
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.GetOutPaintingTaskResponse;
 import com.cloud.picture.space.backend.api.imageSearch.model.ImageSearchResult;
 import com.cloud.picture.space.backend.api.imageSearch.sub.ImageSearchApiFacade;
+import com.cloud.picture.space.backend.api.volcano.model.CreateGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.volcano.model.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.DeleteRequest;
 import com.cloud.picture.space.backend.common.ResultUtils;
@@ -35,6 +38,7 @@ import com.cloud.picture.space.backend.service.UserService;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.apache.poi.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -482,5 +486,21 @@ public class PictureController {
         GetOutPaintingTaskResponse response = aliYunAPI.getOutPaintingTask(taskId);
         return ResultUtils.success(response);
     }
+
+    /**
+     * AI 文生图
+     */
+    @PostMapping("/out_generate/create_picture")
+    public BaseResponse<GeneratePictureTaskResponse> createPictureOutGenerateTask(
+            @RequestBody CreateGeneratePictureRequest createGeneratePictureRequest,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(createGeneratePictureRequest == null ||
+                        StrUtil.isBlank(createGeneratePictureRequest.getPrompt()),
+                ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        GeneratePictureTaskResponse response = pictureService.createPictureOutGenerateTask(createGeneratePictureRequest, loginUser);
+        return ResultUtils.success(response);
+    }
+
 
 }

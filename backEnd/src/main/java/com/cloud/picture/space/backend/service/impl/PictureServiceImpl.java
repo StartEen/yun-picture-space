@@ -13,6 +13,10 @@ import com.cloud.picture.space.backend.api.aliYun.imageExpansion.api.AliYunAPI;
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreatePictureOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.volcano.api.DouBaoAPI;
+import com.cloud.picture.space.backend.api.volcano.model.CreateGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.volcano.model.GeneratePictureTaskRequest;
+import com.cloud.picture.space.backend.api.volcano.model.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
@@ -40,6 +44,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,6 +99,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     @Resource
     private AliYunAPI aliYunAPI;
+
+    @Resource
+    private DouBaoAPI douBaoAPI;
 
 
     /**
@@ -850,6 +858,21 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         BeanUtil.copyProperties(createPictureOutPaintingTaskRequest, taskRequest);
         log.info("创建图片外画任务请求参数：{}", taskRequest);
         return aliYunAPI.createOutPaintingTask(taskRequest);
+    }
+
+    @Override
+    public GeneratePictureTaskResponse createPictureOutGenerateTask(CreateGeneratePictureRequest createGeneratePictureRequest, User loginUser) {
+        String prompt = createGeneratePictureRequest.getPrompt();
+        ThrowUtils.throwIf(StrUtil.isBlank(prompt), ErrorCode.PARAMS_ERROR, "请输入描述");
+
+        //构建请求参数
+        GeneratePictureTaskRequest taskRequest = new GeneratePictureTaskRequest();
+        GeneratePictureTaskRequest.OptimizePromptOptions optimizePromptOptions = new GeneratePictureTaskRequest.OptimizePromptOptions();
+        taskRequest.setPrompt(prompt);
+        optimizePromptOptions.setMode("standard");
+        BeanUtil.copyProperties(createGeneratePictureRequest, taskRequest);
+        log.info("创建图片外生任务请求参数：{}", taskRequest);
+        return douBaoAPI.createGeneratePictureTask(taskRequest);
     }
 
 }

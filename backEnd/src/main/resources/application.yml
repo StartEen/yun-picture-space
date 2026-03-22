@@ -116,6 +116,12 @@ aliYunAi:
   # 调用大模型地址（创建任务地址）
   visitURL: https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation
 
+# 豆包火山方舟AI
+volcano:
+#  apiKey: xxxxxxx
+  visitURL: https://ark.cn-beijing.volces.com/api/v3/images/generations
+
+
 
 
 thread-pool:
