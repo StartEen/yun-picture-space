@@ -168,6 +168,14 @@
         </dependency>
 
 
+        <!-- 字节跳动火山引擎AI SDK-->
+        <dependency>
+            <groupId>com.volcengine</groupId>
+            <artifactId>volcengine-java-sdk-ark-runtime</artifactId>
+            <version>0.2.48</version>
+        </dependency>
+
+
     </dependencies>
     <dependencyManagement>
         <dependencies>
