@@ -119,6 +119,9 @@ aliYunAi:
 # 豆包火山方舟AI
 volcano:
 #  apiKey: xxxxxxx
+  #提示词扩充API地址
+  visitPromptURL: https://ark.cn-beijing.volces.com/api/v3
+  #文生图API地址
   visitURL: https://ark.cn-beijing.volces.com/api/v3/images/generations
 
 

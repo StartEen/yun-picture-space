@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.volcano.model;
+package com.cloud.picture.space.backend.api.volcano.model.generatePicture;
 
 
 import lombok.Data;

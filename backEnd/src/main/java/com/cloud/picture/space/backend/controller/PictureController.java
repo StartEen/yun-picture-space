@@ -13,8 +13,8 @@ import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreatePic
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.GetOutPaintingTaskResponse;
 import com.cloud.picture.space.backend.api.imageSearch.model.ImageSearchResult;
 import com.cloud.picture.space.backend.api.imageSearch.sub.ImageSearchApiFacade;
-import com.cloud.picture.space.backend.api.volcano.model.CreateGeneratePictureRequest;
-import com.cloud.picture.space.backend.api.volcano.model.GeneratePictureTaskResponse;
+import com.cloud.picture.space.backend.api.volcano.model.generatePicture.CreateGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.DeleteRequest;
 import com.cloud.picture.space.backend.common.ResultUtils;
@@ -38,7 +38,6 @@ import com.cloud.picture.space.backend.service.UserService;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.apache.poi.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;

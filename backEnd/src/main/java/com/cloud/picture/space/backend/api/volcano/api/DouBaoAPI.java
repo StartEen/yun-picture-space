@@ -8,8 +8,8 @@ import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
-import com.cloud.picture.space.backend.api.volcano.model.GeneratePictureTaskRequest;
-import com.cloud.picture.space.backend.api.volcano.model.GeneratePictureTaskResponse;
+import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskRequest;
+import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
@@ -30,13 +30,23 @@ public class DouBaoAPI {
     @Value("${volcano.apiKey}")
     private String apiKey;
 
-    // 创建任务地址
+    // 创建文生图任务地址
     @Value("${volcano.visitURL}")
     private String CREATE_GENERATE_PICTURE_TASK;
 
+    @Value("${volcano.visitPromptURL}")
+    private String CREATE_GENERATE_PROMPT_TASK;
 
+
+    /**
+     * 创建文生图任务
+     *
+     * @param generatePictureTaskRequest 文生图参数
+     * @return GeneratePictureTaskResponse 文生图响应类
+     * @Description: TODO 创建文生图任务
+     */
     public GeneratePictureTaskResponse createGeneratePictureTask
-            (GeneratePictureTaskRequest generatePictureTaskRequest) {
+    (GeneratePictureTaskRequest generatePictureTaskRequest) {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(generatePictureTaskRequest),
                 ErrorCode.OPERATION_ERROR, "文生图参数为空");
 
