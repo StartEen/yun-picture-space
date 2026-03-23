@@ -14,9 +14,9 @@ import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOut
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreatePictureOutPaintingTaskRequest;
 import com.cloud.picture.space.backend.api.volcano.api.DouBaoAPI;
-import com.cloud.picture.space.backend.api.volcano.model.generatePicture.CreateGeneratePictureRequest;
-import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskRequest;
-import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskResponse;
+import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.CreateGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskRequest;
+import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.PromptExpansionEnum;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;

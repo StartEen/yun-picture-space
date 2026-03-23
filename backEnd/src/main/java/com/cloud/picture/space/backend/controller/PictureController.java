@@ -13,8 +13,8 @@ import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreatePic
 import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.GetOutPaintingTaskResponse;
 import com.cloud.picture.space.backend.api.imageSearch.model.ImageSearchResult;
 import com.cloud.picture.space.backend.api.imageSearch.sub.ImageSearchApiFacade;
-import com.cloud.picture.space.backend.api.volcano.model.generatePicture.CreateGeneratePictureRequest;
-import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskResponse;
+import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.CreateGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.DeleteRequest;
 import com.cloud.picture.space.backend.common.ResultUtils;

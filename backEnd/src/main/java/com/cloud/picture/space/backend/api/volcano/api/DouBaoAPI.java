@@ -8,8 +8,8 @@ import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
-import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskRequest;
-import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskResponse;
+import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskRequest;
+import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.GeneratePromptTaskRequest;
 import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.GeneratePromptTaskResponse;
 import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.PromptExpansionEnum;
@@ -19,8 +19,6 @@ import com.cloud.picture.space.backend.exception.ThrowUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * @Author: StartEnd

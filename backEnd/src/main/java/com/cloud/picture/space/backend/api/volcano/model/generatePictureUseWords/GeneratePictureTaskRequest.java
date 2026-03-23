@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.volcano.model.generatePicture;
+package com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords;
 
 
 import cn.hutool.core.annotation.Alias;
