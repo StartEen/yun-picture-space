@@ -286,7 +286,7 @@ public class PictureController {
     @GetMapping("/tag_category")
     public BaseResponse<PictureTagCategory> listPictureTagCategory() {
         PictureTagCategory pictureTagCategory = new PictureTagCategory();
-        List<String> tagList = Arrays.asList("热门", "搞笑", "生活", "高清", "艺术", "校园", "背景", "游戏", "创意");
+        List<String> tagList = Arrays.asList("热门", "搞笑", "生活", "高清", "艺术", "校园", "背景", "游戏", "创意","AI创作");
         List<String> categoryList = Arrays.asList("模版", "电商", "UI", "UX", "平面", "摄影", "插画");
         pictureTagCategory.setTagList(tagList);
         pictureTagCategory.setCategoryList(categoryList);
@@ -490,7 +490,7 @@ public class PictureController {
      * AI 文生图
      */
     @PostMapping("/out_generate/create_picture")
-    public BaseResponse<GeneratePictureTaskResponse> createPictureOutGenerateTask(
+    public BaseResponse<GeneratePictureTaskResponse> generatePictureUseWordTask(
             @RequestBody CreateGeneratePictureRequest createGeneratePictureRequest,
             HttpServletRequest request) {
         ThrowUtils.throwIf(createGeneratePictureRequest == null ||
@@ -500,6 +500,16 @@ public class PictureController {
         GeneratePictureTaskResponse response = pictureService.createPictureOutGenerateTask(createGeneratePictureRequest, loginUser);
         return ResultUtils.success(response);
     }
+
+    /**
+     * AI 以图生图
+     */
+    // @PostMapping("/out_generate/create_picture_by_picture")
+    // public BaseResponse<GeneratePictureTaskResponse> generatePictureUsePictureTask(
+    //         @RequestBody CreateGeneratePictureByPictureRequest createGeneratePictureByPictureRequest,
+    //         HttpServletRequest request) {
+    //     return ResultUtils.success();
+    // }
 
 
 }
