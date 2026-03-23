@@ -12,6 +12,7 @@ import com.cloud.picture.space.backend.api.volcano.model.generatePicture.Generat
 import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.GeneratePromptTaskRequest;
 import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.GeneratePromptTaskResponse;
+import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.PromptExpansionEnum;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
@@ -85,19 +86,21 @@ public class DouBaoAPI {
      * @param userRawInput 用户输入的简单中文描述（例如："一只戴墨镜的猫"）
      * @return 扩写后的全英文专业提示词
      */
-    public String generateExpandedPrompt(String userRawInput) {
+    public String generateExpandedPrompt(PromptExpansionEnum promptExpansionEnum,String userRawInput) {
 
-        // 1. 严格的 Prompt 模板（约束大模型只输出英文逗号分隔的标签）
-        String promptTemplate = "你是一个专业的 AI 绘画提示词工程师，精通 Midjourney 和 Stable Diffusion。" +
-                "请将用户的简单中文描述，扩写为高质量、细节丰富的英文提示词。" +
-                "【扩写规则】" +
-                "1. 结构包含：主体描述, 环境背景, 光影氛围, 艺术风格, 渲染参数（如 2k, highly detailed, unreal engine 5）。" +
-                "2. 直接输出英文提示词，单词或短语之间用英文逗号分隔。" +
-                "3. 绝对不要输出任何多余的解释、翻译、或者“好的”等寒暄语。只输出最终的英文内容！" +
-                "用户原始描述：%s";
+        // // 1. 严格的 Prompt 模板（约束大模型只输出英文逗号分隔的标签）
+        // String promptTemplate = "你是一个专业的 AI 绘画提示词工程师，精通 Midjourney 和 Stable Diffusion。" +
+        //         "请将用户的简单中文描述，扩写为高质量、细节丰富的英文提示词。" +
+        //         "【扩写规则】" +
+        //         "1. 结构包含：主体描述, 环境背景, 光影氛围, 艺术风格, 渲染参数（如 2k, highly detailed, unreal engine 5）。" +
+        //         "2. 直接输出英文提示词，单词或短语之间用英文逗号分隔。" +
+        //         "3. 绝对不要输出任何多余的解释、翻译、或者“好的”等寒暄语。只输出最终的英文内容！" +
+        //         "用户原始描述：%s";
 
+        String promptTemplate = promptExpansionEnum.getValue();
         String finalPrompt = String.format(promptTemplate, userRawInput);
 
+        log.info("调用豆包模型扩写文生图提示词,请求参数：{}", finalPrompt);
 
         // 2. 组装请求对象
         GeneratePromptTaskRequest request = new GeneratePromptTaskRequest();

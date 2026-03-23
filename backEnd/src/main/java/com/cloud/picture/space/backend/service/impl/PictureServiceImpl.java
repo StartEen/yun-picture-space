@@ -17,6 +17,7 @@ import com.cloud.picture.space.backend.api.volcano.api.DouBaoAPI;
 import com.cloud.picture.space.backend.api.volcano.model.generatePicture.CreateGeneratePictureRequest;
 import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskRequest;
 import com.cloud.picture.space.backend.api.volcano.model.generatePicture.GeneratePictureTaskResponse;
+import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.PromptExpansionEnum;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
@@ -864,14 +865,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         String prompt = createGeneratePictureRequest.getPrompt();
         ThrowUtils.throwIf(StrUtil.isBlank(prompt), ErrorCode.PARAMS_ERROR, "请输入描述");
 
-        //对提示词进行操作
+        // 对提示词进行操作
         // 如果提示词长度没有超过50，则进行截取,超过300进行截取抛出异常
         ThrowUtils.throwIf(prompt.length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
         if (prompt.length() < 50) {
             // 进行截取对提示词进行扩写操作
-            prompt= douBaoAPI.generateExpandedPrompt(prompt);
+            prompt = douBaoAPI.generateExpandedPrompt(PromptExpansionEnum.EXPAND_PROMPT_USE_WORDS_TO_IMAGE, prompt);
         }
-        //构建请求参数
+        // 构建请求参数
         GeneratePictureTaskRequest taskRequest = new GeneratePictureTaskRequest();
         GeneratePictureTaskRequest.OptimizePromptOptions optimizePromptOptions = new GeneratePictureTaskRequest.OptimizePromptOptions();
         taskRequest.setPrompt(prompt);

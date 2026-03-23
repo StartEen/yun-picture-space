@@ -487,7 +487,7 @@ public class PictureController {
     }
 
     /**
-     * AI 文生图
+     * AI 文生图（火山方舟引擎）
      */
     @PostMapping("/out_generate/create_picture")
     public BaseResponse<GeneratePictureTaskResponse> generatePictureUseWordTask(
@@ -502,7 +502,7 @@ public class PictureController {
     }
 
     /**
-     * AI 以图生图
+     * AI 以图生图 （阿里百炼云）
      */
     // @PostMapping("/out_generate/create_picture_by_picture")
     // public BaseResponse<GeneratePictureTaskResponse> generatePictureUsePictureTask(
@@ -510,6 +510,12 @@ public class PictureController {
     //         HttpServletRequest request) {
     //     return ResultUtils.success();
     // }
+
+    /**
+     * AI p图
+     */
+
+
 
 
 }
