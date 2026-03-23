@@ -864,11 +864,24 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         String prompt = createGeneratePictureRequest.getPrompt();
         ThrowUtils.throwIf(StrUtil.isBlank(prompt), ErrorCode.PARAMS_ERROR, "请输入描述");
 
+        //对提示词进行操作
+        // 如果提示词长度没有超过50，则进行截取,超过300进行截取抛出异常
+        ThrowUtils.throwIf(prompt.length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
+        if (prompt.length() < 50) {
+            // 进行截取对提示词进行扩写操作
+            prompt= douBaoAPI.generateExpandedPrompt(prompt);
+        }
         //构建请求参数
         GeneratePictureTaskRequest taskRequest = new GeneratePictureTaskRequest();
         GeneratePictureTaskRequest.OptimizePromptOptions optimizePromptOptions = new GeneratePictureTaskRequest.OptimizePromptOptions();
         taskRequest.setPrompt(prompt);
         optimizePromptOptions.setMode("standard");
+
+        // 添加工具配置以启用联网搜索
+        GeneratePictureTaskRequest.Tools tools = new GeneratePictureTaskRequest.Tools();
+        tools.setType("web_search");
+        taskRequest.setTools(Arrays.asList(tools));
+
         BeanUtil.copyProperties(createGeneratePictureRequest, taskRequest);
         log.info("创建图片外生任务请求参数：{}", taskRequest);
         return douBaoAPI.createGeneratePictureTask(taskRequest);

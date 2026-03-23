@@ -7,13 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Author: StartEnd
  * @CreateTime: 2026-03-21  10:37
  * @Description: TODO 文字图片生成请求类
  * <p>
- * 豆包AI Seedream-4.5图像生成请求类
+ * 豆包AI doubao-seedream-5-0图像生成请求类
  */
 
 @Data
@@ -25,8 +26,7 @@ public class GeneratePictureTaskRequest implements Serializable {
      * 模型名称
      * 必填，示例值：doubao-seedream-4-5-251128
      */
-
-    private String model = "doubao-seedream-4-5-251128";
+    private String model = "doubao-seedream-5-0-260128";
 
     /**
      * 图像生成提示词
@@ -105,7 +105,22 @@ public class GeneratePictureTaskRequest implements Serializable {
          * - standard: 标准模式，生成内容的质量更高，耗时较长（默认值）
          * - fast: 快速模式，生成内容的耗时更短，质量一般；doubao-seedream-4.5 当前不支持
          */
+        @Alias("mode")
         private String mode = "standard";
     }
+
+    @Alias("tools")
+    private List<Tools> tools;
+
+    @Data
+    public static class Tools implements Serializable {
+
+        /**
+         * 工具类型
+         */
+        @Alias("type")
+        private String type = "web_search";
+    }
+
 
 }
