@@ -2,8 +2,8 @@ package com.cloud.picture.space.backend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateOutPaintingTaskResponse;
-import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.CreateGeneratePictureRequest;
 import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.model.dto.picture.*;
@@ -170,7 +170,7 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser                           登录用户
      * @return 创建的图片绘画任务信息
      */
-    CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
+    CreateEditPictureTaskResponse createPictureEditTask(CreatePictureEditPictureTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 
     /**
      * 创建图片生成任务

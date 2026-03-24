@@ -10,9 +10,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cloud.picture.space.backend.api.aliYun.api.AliYunAPI;
-import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateOutPaintingTaskRequest;
-import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateOutPaintingTaskResponse;
-import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.volcano.api.DouBaoAPI;
 import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.CreateGeneratePictureRequest;
 import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskRequest;
@@ -843,21 +843,27 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
 
     @Override
-    public CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser) {
-        Long pictureId = createPictureOutPaintingTaskRequest.getPictureId();
+    public CreateEditPictureTaskResponse createPictureEditTask(CreatePictureEditPictureTaskRequest createPictureEditPictureTaskRequest, User loginUser) {
+        Long pictureId = createPictureEditPictureTaskRequest.getPictureId();
         Picture picture = Optional.ofNullable(this.getById(pictureId)).orElseThrow(
                 () -> new BusinessException(ErrorCode.PARAMS_ERROR, "图片id不能为空")
         );
         // 校验权限
         checkPictureAuth(loginUser, picture);
         // 构造请求参数
-        CreateOutPaintingTaskRequest taskRequest = new CreateOutPaintingTaskRequest();
-        CreateOutPaintingTaskRequest.Input input = new CreateOutPaintingTaskRequest.Input();
-        input.setImageUrl(picture.getUrl());
+        CreateEditPictureTaskRequest taskRequest = new CreateEditPictureTaskRequest();
+        CreateEditPictureTaskRequest.Input input = new CreateEditPictureTaskRequest.Input();
+        CreateEditPictureTaskRequest.Message message = new CreateEditPictureTaskRequest.Message();
+        CreateEditPictureTaskRequest.ContentItem contentUrlItem = new CreateEditPictureTaskRequest.ContentItem();
+        contentUrlItem.setImage(picture.getUrl());
+        CreateEditPictureTaskRequest.ContentItem contentTextItem = new CreateEditPictureTaskRequest.ContentItem();
+        contentTextItem.setText(createPictureEditPictureTaskRequest.getText());
+        message.setContent(Arrays.asList(contentUrlItem, contentTextItem));
         taskRequest.setInput(input);
-        BeanUtil.copyProperties(createPictureOutPaintingTaskRequest, taskRequest);
-        log.info("创建图片外画任务请求参数：{}", taskRequest);
-        return aliYunAPI.createOutPaintingTask(taskRequest);
+
+        BeanUtil.copyProperties(createPictureEditPictureTaskRequest, taskRequest);
+        log.info("创建图片P图任务请求参数：{}", taskRequest);
+        return aliYunAPI.createAliAIPictureTask(taskRequest);
     }
 
     @Override

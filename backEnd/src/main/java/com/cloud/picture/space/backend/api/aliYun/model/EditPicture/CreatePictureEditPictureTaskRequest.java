@@ -8,10 +8,10 @@ import java.io.Serializable;
 /**
  * @Author: StartEnd
  * @CreateTime: 2026-03-20  11:27
- * @Description: TODO AI 扩图请求类
+ * @Description: TODO AI P图请求体
  */
 @Data
-public class CreatePictureOutPaintingTaskRequest implements Serializable {
+public class CreatePictureEditPictureTaskRequest implements Serializable {
 
     /**
      * 图片ID
@@ -19,9 +19,9 @@ public class CreatePictureOutPaintingTaskRequest implements Serializable {
     private Long pictureId;
 
     /**
-     * 扩图参数
+     * 文字描述
      */
-    private CreateOutPaintingTaskRequest.Parameters parameters;
+    private String text;
 
     private static final long serialVersionUID = 1L;
 }

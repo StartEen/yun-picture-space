@@ -8,8 +8,8 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.annotation.AuthCheck;
 import com.cloud.picture.space.backend.api.aliYun.api.AliYunAPI;
-import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateOutPaintingTaskResponse;
-import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.getTaskInfo.GetAITaskResponse;
 import com.cloud.picture.space.backend.api.imageSearch.model.ImageSearchResult;
 import com.cloud.picture.space.backend.api.imageSearch.sub.ImageSearchApiFacade;
@@ -463,30 +463,6 @@ public class PictureController {
 
 
     /**
-     * AI 扩图
-     */
-    @PostMapping("/out_painting/create_task")
-    public BaseResponse<CreateOutPaintingTaskResponse> createPictureOutPaintingTask(
-            @RequestBody CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest,
-            HttpServletRequest request) {
-        ThrowUtils.throwIf(createPictureOutPaintingTaskRequest == null ||
-                createPictureOutPaintingTaskRequest.getPictureId() == null, ErrorCode.PARAMS_ERROR);
-        User loginUser = userService.getLoginUser(request);
-        CreateOutPaintingTaskResponse response = pictureService.createPictureOutPaintingTask(createPictureOutPaintingTaskRequest, loginUser);
-        return ResultUtils.success(response);
-    }
-
-    /**
-     * 查询AI扩图任务
-     */
-    @GetMapping("/out_painting/get_task")
-    public BaseResponse<GetAITaskResponse> getPictureOutPaintingTask(String taskId) {
-        ThrowUtils.throwIf(StringUtil.isBlank(taskId), ErrorCode.PARAMS_ERROR);
-        GetAITaskResponse response = aliYunAPI.getOutPaintingTask(taskId);
-        return ResultUtils.success(response);
-    }
-
-    /**
      * AI 文生图（火山方舟引擎）
      */
     @PostMapping("/out_generate/create_picture")
@@ -500,6 +476,32 @@ public class PictureController {
         GeneratePictureTaskResponse response = pictureService.createPictureOutGenerateTask(createGeneratePictureRequest, loginUser);
         return ResultUtils.success(response);
     }
+
+
+    /**
+     * AI P图
+     */
+    @PostMapping("/out_Edit/create_task")
+    public BaseResponse<CreateEditPictureTaskResponse> createEditPictureTask(
+            @RequestBody CreatePictureEditPictureTaskRequest createPictureEditPictureTaskRequest,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(createPictureEditPictureTaskRequest == null ||
+                createPictureEditPictureTaskRequest.getPictureId() == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        CreateEditPictureTaskResponse response = pictureService.createPictureEditTask(createPictureEditPictureTaskRequest, loginUser);
+        return ResultUtils.success(response);
+    }
+
+    /**
+     * 查询 AI扩图任务
+     */
+    @GetMapping("/out_aliAI/get_task")
+    public BaseResponse<GetAITaskResponse> getAliYunAITask(String taskId) {
+        ThrowUtils.throwIf(StringUtil.isBlank(taskId), ErrorCode.PARAMS_ERROR);
+        GetAITaskResponse response = aliYunAPI.getOutPaintingTask(taskId);
+        return ResultUtils.success(response);
+    }
+
 
     /**
      * AI 以图生图 （阿里百炼云）
