@@ -164,7 +164,7 @@ public interface PictureService extends IService<Picture> {
 
 
     /**
-     * 创建图片绘画任务
+     * 创建图片绘画任务（P图）
      *
      * @param createPictureOutPaintingTaskRequest 创建图片绘画任务请求体
      * @param loginUser                           登录用户
@@ -180,4 +180,13 @@ public interface PictureService extends IService<Picture> {
      * @return 创建的图片生成任务信息
      */
     GeneratePictureTaskResponse createPictureOutGenerateTask(CreateGeneratePictureRequest createGeneratePictureRequest, User loginUser);
+
+    /**
+     * 获取图片生成任务结果
+     *
+     * @param taskId 图片生成任务id
+     * @return 图片生成任务结果
+     */
+
+
 }

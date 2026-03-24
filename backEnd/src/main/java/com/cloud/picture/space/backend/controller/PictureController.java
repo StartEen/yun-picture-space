@@ -479,7 +479,7 @@ public class PictureController {
 
 
     /**
-     * AI P图
+     * AI P图 (阿里百炼云）
      */
     @PostMapping("/out_Edit/create_task")
     public BaseResponse<CreateEditPictureTaskResponse> createEditPictureTask(
@@ -504,7 +504,7 @@ public class PictureController {
 
 
     /**
-     * AI 以图生图 （阿里百炼云）
+     * AI 以图生图 (阿里百炼云）
      */
     // @PostMapping("/out_generate/create_picture_by_picture")
     // public BaseResponse<GeneratePictureTaskResponse> generatePictureUsePictureTask(
@@ -513,9 +513,6 @@ public class PictureController {
     //     return ResultUtils.success();
     // }
 
-    /**
-     * AI p图
-     */
 
 
 

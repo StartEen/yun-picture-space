@@ -857,12 +857,21 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         CreateEditPictureTaskRequest.ContentItem contentUrlItem = new CreateEditPictureTaskRequest.ContentItem();
         contentUrlItem.setImage(picture.getUrl());
         CreateEditPictureTaskRequest.ContentItem contentTextItem = new CreateEditPictureTaskRequest.ContentItem();
-        contentTextItem.setText(createPictureEditPictureTaskRequest.getText());
+
+        // 对提示词进行操作
+        // 如果提示词长度没有超过50，则进行截取,超过300进行截取抛出异常
+        String text = createPictureEditPictureTaskRequest.getText();
+        ThrowUtils.throwIf(text.length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
+        if (text.length() > 50) {
+            text = douBaoAPI.generateExpandedPrompt(PromptExpansionEnum.EXPAND_PROMPT_USE_EDIT_IMAGE, text);
+        }
+        contentTextItem.setText(text);
+
         message.setContent(Arrays.asList(contentUrlItem, contentTextItem));
         taskRequest.setInput(input);
-
         BeanUtil.copyProperties(createPictureEditPictureTaskRequest, taskRequest);
         log.info("创建图片P图任务请求参数：{}", taskRequest);
+
         return aliYunAPI.createAliAIPictureTask(taskRequest);
     }
 
@@ -893,6 +902,15 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         log.info("创建图片外生任务请求参数：{}", taskRequest);
         return douBaoAPI.createGeneratePictureTask(taskRequest);
     }
+
+
+
+
+
+
+
+
+
 
 }
 
