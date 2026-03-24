@@ -2,6 +2,7 @@ package com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePictu
 
 
 import cn.hutool.core.annotation.Alias;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskRequest;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,7 +18,7 @@ public class CreateGeneratePictureByPictureTaskRequest implements Serializable {
 
     /**
      * 模型名称
-     * 必填，示例值：qwen-image-2.0-pro
+     * 固定值：qwen-image-2.0-pro
      */
     private String model = "qwen-image-2.0-pro";
 
@@ -39,31 +40,46 @@ public class CreateGeneratePictureByPictureTaskRequest implements Serializable {
 
         /**
          * 请求内容数组
-         * 包含 1-3 张图像和单个编辑指令
+         * 仅支持单轮对话，有且只有一个对象
          */
-        private List<ContentItem> messages;
+        private List<Message> messages;
     }
 
     /**
-     * 消息内容项类（支持图片和文本）
+     * 消息类
+     */
+    @Data
+    public static class Message implements Serializable {
+
+        /**
+         * 消息发送者角色
+         * 必须设置为 "user"
+         */
+        private String role = "user";
+
+        /**
+         * 消息内容数组
+         * 包含 1-3 张图像和单个编辑指令
+         */
+        private List<ContentItem> content;
+    }
+
+    /**
+     * 内容项类
      */
     @Data
     public static class ContentItem implements Serializable {
 
         /**
-         * 图像 URL 或 Base64 编码数据
-         * 格式：data:image/jpeg;base64,GDU7MtCZz...
-         * 支持 1-3 张图像
+         * 图像 URL 或 Base64 数据
+         * 格式：{"image": "..."}
          */
-        @Alias("image")
         private String image;
 
         /**
-         * 正向提示词
-         * 用于描述期望生成的图像内容、风格和构图
-         * 支持中英文，长度不超过 800 个字符
+         * 编辑指令文本
+         * 格式：{"text": "..."}
          */
-        @Alias("text")
         private String text;
     }
 
@@ -76,7 +92,7 @@ public class CreateGeneratePictureByPictureTaskRequest implements Serializable {
         /**
          * 输出图像的数量
          * 默认值：1
-         * qwen-image-2.0-pro 可选择输出 1-6 张图片
+         * qwen-image-2.0 系列可选择输出 1-6 张图片
          */
         private Integer n = 1;
 
@@ -86,7 +102,7 @@ public class CreateGeneratePictureByPictureTaskRequest implements Serializable {
          * 支持中英文，长度上限 500 个字符
          */
         @Alias("negative_prompt")
-        private String negativePrompt = "低分辨率，错误，最差质量，低质量，残缺，多余的手指，比例不良";
+        private String negativePrompt = "";
 
         /**
          * 是否开启提示词扩展
@@ -107,6 +123,6 @@ public class CreateGeneratePictureByPictureTaskRequest implements Serializable {
          * 图像总像素需在 512*512 至 2048*2048 之间
          * 默认总像素数接近 1024*1024
          */
-        private String size = "1024*1024";
+        private String size = "1080*1920";
     }
 }

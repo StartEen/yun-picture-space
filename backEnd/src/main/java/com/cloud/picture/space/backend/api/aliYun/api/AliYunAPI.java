@@ -9,6 +9,9 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreateGeneratePictureByPictureTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreateGeneratePictureByPictureTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreatePictureGeneratePictureRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.getTaskInfo.GetAITaskResponse;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
@@ -75,11 +78,6 @@ public class AliYunAPI {
     }
 
 
-
-
-
-
-
     /**
      * 查询任务状态
      *
@@ -99,5 +97,36 @@ public class AliYunAPI {
             return JSONUtil.toBean(httpResponse.body(), GetAITaskResponse.class);
         }
     }
+
+
+    /**
+     * 创建图生图任务
+     */
+    public CreateGeneratePictureByPictureTaskResponse createPictureGeneratePictureTask(CreateGeneratePictureByPictureTaskRequest createGeneratePictureByPictureTaskRequest) {
+        if (createGeneratePictureByPictureTaskRequest == null) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "图生图参数为空");
+        }
+
+        // 发送请求
+        HttpRequest httpRequest = HttpRequest.post(CREATE_OUT_PAINTING_TASK).header(Header.AUTHORIZATION, "Bearer " + apiKey)
+                // 开启异步处理
+                .header(Header.CONTENT_TYPE, ContentType.JSON.getValue()).body(JSONUtil.toJsonStr(createGeneratePictureByPictureTaskRequest));
+        try (HttpResponse httpResponse = httpRequest.execute()) {
+            if (!httpResponse.isOk()){
+                log.error("请求失败,异常信息：{}", httpResponse.body());
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "请求失败,图生图任务失败");
+            }
+            CreateGeneratePictureByPictureTaskResponse response = JSONUtil.toBean(httpResponse.body(), CreateGeneratePictureByPictureTaskResponse.class);
+            String errorCode = response.getCode();
+            if (StrUtil.isNotBlank(errorCode)) {
+                String errorMessage = response.getMessage();
+                log.error("图生图接口响应异常,异常信息：{}", errorMessage);
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "图生图接口响应异常");
+            }
+            return response;
+        }
+    }
+
+
 }
 

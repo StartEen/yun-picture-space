@@ -2,6 +2,7 @@ package com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePictu
 
 
 import cn.hutool.core.annotation.Alias;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,30 +19,32 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateGeneratePictureByPictureTaskResponse implements Serializable {
-
     /**
      * 请求唯一标识
+     * 用于请求明细溯源和问题排查
      */
     @Alias("request_id")
     private String requestId;
 
     /**
-     * 输出结果对象
+     * 任务输出信息
      */
-    private Output output;
+    private CreateEditPictureTaskResponse.Output output;
 
     /**
-     * 用量信息
+     * 资源使用量统计
      */
-    private Usage usage;
+    private CreateEditPictureTaskResponse.Usage usage;
 
     /**
-     * 错误码（成功时为 null）
+     * 错误码
+     * 请求失败时返回，成功时不返回
      */
     private String code;
 
     /**
-     * 错误信息（成功时为 null）
+     * 错误详细信息
+     * 请求失败时返回，成功时不返回
      */
     private String message;
 
@@ -52,71 +55,92 @@ public class CreateGeneratePictureByPictureTaskResponse implements Serializable 
     private Integer statusCode;
 
     /**
-     * 输出结果类
+     * 任务输出信息类
      */
     @Data
     public static class Output implements Serializable {
 
         /**
          * 任务 ID
+         * 查询有效期 24 小时
          */
         @Alias("task_id")
         private String taskId;
 
         /**
          * 任务状态
-         * PENDING：等待中
-         * RUNNING：运行中
-         * SUCCEEDED：成功
-         * FAILED：失败
+         * 枚举值：
+         * - PENDING: 任务排队中
+         * - RUNNING: 任务处理中
+         * - SUCCEEDED: 任务执行成功
+         * - FAILED: 任务执行失败
+         * - CANCELED: 任务已取消
+         * - UNKNOWN: 任务不存在或状态未知
          */
         @Alias("task_status")
         private String taskStatus;
 
         /**
-         * 生成的内容数组（包含图片 URL）
+         * 任务结果列表
+         * 包含生成的图像 URL 或错误信息
          */
-        private List<Content> content;
+        private List<CreateEditPictureTaskResponse.ResultItem> results;
 
         /**
-         * 提交时间
+         * 任务指标统计
+         */
+        @Alias("task_metrics")
+        private CreateEditPictureTaskResponse.TaskMetrics taskMetrics;
+
+        /**
+         * 任务提交时间
+         * 格式：YYYY-MM-DD HH:mm:ss.SSS
          */
         @Alias("submit_time")
         private String submitTime;
 
         /**
-         * 计划时间
+         * 任务执行时间
+         * 格式：YYYY-MM-DD HH:mm:ss.SSS
          */
         @Alias("scheduled_time")
         private String scheduledTime;
 
         /**
-         * 结束时间
+         * 任务完成时间
+         * 格式：YYYY-MM-DD HH:mm:ss.SSS
          */
         @Alias("end_time")
         private String endTime;
-
-        /**
-         * 任务指标
-         */
-        @Alias("task_metrics")
-        private TaskMetrics taskMetrics;
     }
 
     /**
-     * 生成内容类（单张图片信息）
+     * 任务结果项类
      */
     @Data
-    public static class Content implements Serializable {
+    public static class ResultItem implements Serializable {
 
         /**
-         * 图片 URL
+         * 生成图像的 URL
+         * 有效期 24 小时，需及时下载保存
          */
-        private String image;
+        private String url;
+
+        /**
+         * 错误码
+         * 图像生成失败时返回
+         */
+        private String code;
+
+        /**
+         * 错误详细信息
+         * 图像生成失败时返回
+         */
+        private String message;
     }
 
     /**
-     * 任务指标类
+     * 任务指标统计类
      */
     @Data
     public static class TaskMetrics implements Serializable {
@@ -127,24 +151,24 @@ public class CreateGeneratePictureByPictureTaskResponse implements Serializable 
         private Integer total;
 
         /**
-         * 成功任务数
+         * 成功的任务数
          */
         private Integer succeeded;
 
         /**
-         * 失败任务数
+         * 失败的任务数
          */
         private Integer failed;
     }
 
     /**
-     * 用量信息类
+     * 资源使用量统计类
      */
     @Data
     public static class Usage implements Serializable {
 
         /**
-         * 生成的图片数量
+         * 生成的图像数量
          */
         @Alias("image_count")
         private Integer imageCount;
