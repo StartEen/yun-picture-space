@@ -152,13 +152,28 @@ export async function listPictureVoByPageWithRedisAndCaffeineUsingPost(
   })
 }
 
-/** createPictureOutPaintingTask POST /api/picture/out_painting/create_task */
-export async function createPictureOutPaintingTaskUsingPost(
-  body: API.CreatePictureOutPaintingTaskRequest,
+/** getAliYunAITask GET /api/picture/out_aliAI/get_task */
+export async function getAliYunAiTaskUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getAliYunAITaskUsingGETParams,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseCreateOutPaintingTaskResponse_>(
-    '/api/picture/out_painting/create_task',
+  return request<API.BaseResponseGetAITaskResponse_>('/api/picture/out_aliAI/get_task', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  })
+}
+
+/** createEditPictureTask POST /api/picture/out_Edit/create_task */
+export async function createEditPictureTaskUsingPost(
+  body: API.CreatePictureEditPictureTaskRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseCreateEditPictureTaskResponse_>(
+    '/api/picture/out_Edit/create_task',
     {
       method: 'POST',
       headers: {
@@ -170,19 +185,19 @@ export async function createPictureOutPaintingTaskUsingPost(
   )
 }
 
-/** getPictureOutPaintingTask GET /api/picture/out_painting/get_task */
-export async function getPictureOutPaintingTaskUsingGet(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getPictureOutPaintingTaskUsingGETParams,
+/** generatePictureUseWordTask POST /api/picture/out_generate/create_picture */
+export async function generatePictureUseWordTaskUsingPost(
+  body: API.CreateGeneratePictureRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseGetOutPaintingTaskResponse_>(
-    '/api/picture/out_painting/get_task',
+  return request<API.BaseResponseGeneratePictureTaskResponse_>(
+    '/api/picture/out_generate/create_picture',
     {
-      method: 'GET',
-      params: {
-        ...params,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      data: body,
       ...(options || {}),
     }
   )

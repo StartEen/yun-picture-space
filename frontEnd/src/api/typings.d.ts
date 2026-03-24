@@ -11,15 +11,21 @@ declare namespace API {
     message?: string
   }
 
-  type BaseResponseCreateOutPaintingTaskResponse_ = {
+  type BaseResponseCreateEditPictureTaskResponse_ = {
     code?: number
-    data?: CreateOutPaintingTaskResponse
+    data?: CreateEditPictureTaskResponse
     message?: string
   }
 
-  type BaseResponseGetOutPaintingTaskResponse_ = {
+  type BaseResponseGeneratePictureTaskResponse_ = {
     code?: number
-    data?: GetOutPaintingTaskResponse
+    data?: GeneratePictureTaskResponse
+    message?: string
+  }
+
+  type BaseResponseGetAITaskResponse_ = {
+    code?: number
+    data?: GetAITaskResponse
     message?: string
   }
 
@@ -191,35 +197,55 @@ declare namespace API {
     message?: string
   }
 
-  type CreateOutPaintingTaskResponse = {
+  type CreateEditPictureTaskResponse = {
     code?: string
     message?: string
     output?: Output
     requestId?: string
+    statusCode?: number
+    usage?: Usage
   }
 
-  type CreatePictureOutPaintingTaskRequest = {
-    parameters?: Parameters
+  type CreateGeneratePictureRequest = {
+    prompt?: string
+  }
+
+  type CreatePictureEditPictureTaskRequest = {
     pictureId?: number
+    text?: string
   }
 
   type DeleteRequest = {
     id?: number
   }
 
-  type GetOutPaintingTaskResponse = {
+  type ErrorDetail = {
+    code?: string
+    message?: string
+  }
+
+  type GeneratePictureTaskResponse = {
+    created?: number
+    data?: ImageData[]
+    error?: ErrorDetail
+    model?: string
+    tools?: Tool[]
+    usage?: Usage1
+  }
+
+  type GetAITaskResponse = {
     output?: Output1
     requestId?: string
+  }
+
+  type getAliYunAITaskUsingGETParams = {
+    /** taskId */
+    taskId?: string
   }
 
   type getPictureByIdUsingGETParams = {
     /** id */
     id?: number
-  }
-
-  type getPictureOutPaintingTaskUsingGETParams = {
-    /** taskId */
-    taskId?: string
   }
 
   type getPictureVoByIdUsingGETParams = {
@@ -247,6 +273,13 @@ declare namespace API {
     id?: number
   }
 
+  type ImageData = {
+    b64_json?: string
+    error?: ErrorDetail
+    size?: string
+    url?: string
+  }
+
   type ImageSearchResult = {
     fromUrl?: string
     thumbUrl?: string
@@ -269,7 +302,12 @@ declare namespace API {
   }
 
   type Output = {
+    endTime?: string
+    results?: ResultItem[]
+    scheduledTime?: string
+    submitTime?: string
     taskId?: string
+    taskMetrics?: TaskMetrics
     taskStatus?: string
   }
 
@@ -281,7 +319,7 @@ declare namespace API {
     scheduledTime?: string
     submitTime?: string
     taskId?: string
-    taskMetrics?: TaskMetrics
+    taskMetrics?: TaskMetrics1
     taskStatus?: string
   }
 
@@ -323,20 +361,6 @@ declare namespace API {
     records?: UserVo[]
     size?: number
     total?: number
-  }
-
-  type Parameters = {
-    addWatermark?: boolean
-    angle?: number
-    bestQuality?: boolean
-    bottomOffset?: number
-    leftOffset?: number
-    limitImageSize?: boolean
-    outputRatio?: string
-    rightOffset?: number
-    topOffset?: number
-    xScale?: number
-    yScale?: number
   }
 
   type Picture = {
@@ -468,6 +492,12 @@ declare namespace API {
     firstSubject?: string
     secondSubject?: string
     thirdSubject?: string
+  }
+
+  type ResultItem = {
+    code?: string
+    message?: string
+    url?: string
   }
 
   type SearchPictureByColorRequest = {
@@ -654,9 +684,23 @@ declare namespace API {
     total?: number
   }
 
+  type TaskMetrics1 = {
+    failed?: number
+    succeeded?: number
+    total?: number
+  }
+
   type testDownloadFileUsingGETParams = {
     /** filePath */
     filePath?: string
+  }
+
+  type Tool = {
+    type?: string
+  }
+
+  type ToolUsage = {
+    web_search?: number
   }
 
   type uploadPictureUsingPOSTParams = {
@@ -664,6 +708,17 @@ declare namespace API {
     id?: number
     picName?: string
     spaceId?: number
+  }
+
+  type Usage = {
+    imageCount?: number
+  }
+
+  type Usage1 = {
+    generated_images?: number
+    output_tokens?: number
+    tool_usage?: ToolUsage
+    total_tokens?: number
   }
 
   type User = {
