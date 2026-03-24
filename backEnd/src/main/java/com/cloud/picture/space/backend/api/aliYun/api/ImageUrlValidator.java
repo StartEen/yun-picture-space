@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.aliYun.imageExpansion.api;
+package com.cloud.picture.space.backend.api.aliYun.api;
 
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;

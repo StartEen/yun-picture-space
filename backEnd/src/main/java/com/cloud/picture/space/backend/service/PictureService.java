@@ -2,8 +2,8 @@ package com.cloud.picture.space.backend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskResponse;
-import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreatePictureOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureOutPaintingTaskRequest;
 import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.CreateGeneratePictureRequest;
 import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.model.dto.picture.*;

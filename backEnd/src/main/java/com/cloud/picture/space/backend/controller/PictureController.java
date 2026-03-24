@@ -7,10 +7,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.annotation.AuthCheck;
-import com.cloud.picture.space.backend.api.aliYun.imageExpansion.api.AliYunAPI;
-import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskResponse;
-import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreatePictureOutPaintingTaskRequest;
-import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.GetOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.api.AliYunAPI;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.getTaskInfo.GetAITaskResponse;
 import com.cloud.picture.space.backend.api.imageSearch.model.ImageSearchResult;
 import com.cloud.picture.space.backend.api.imageSearch.sub.ImageSearchApiFacade;
 import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.CreateGeneratePictureRequest;
@@ -480,9 +480,9 @@ public class PictureController {
      * 查询AI扩图任务
      */
     @GetMapping("/out_painting/get_task")
-    public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId) {
+    public BaseResponse<GetAITaskResponse> getPictureOutPaintingTask(String taskId) {
         ThrowUtils.throwIf(StringUtil.isBlank(taskId), ErrorCode.PARAMS_ERROR);
-        GetOutPaintingTaskResponse response = aliYunAPI.getOutPaintingTask(taskId);
+        GetAITaskResponse response = aliYunAPI.getOutPaintingTask(taskId);
         return ResultUtils.success(response);
     }
 

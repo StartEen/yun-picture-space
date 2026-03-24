@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.aliYun.imageExpansion.model;
+package com.cloud.picture.space.backend.api.aliYun.model.EditPicture;
 
 
 import lombok.AllArgsConstructor;

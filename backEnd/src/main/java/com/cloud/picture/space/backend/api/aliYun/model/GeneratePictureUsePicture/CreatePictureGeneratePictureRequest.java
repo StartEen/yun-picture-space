@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.aliYun.imageGenerateUsePicture.model;
+package com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture;
 
 
 import lombok.Data;

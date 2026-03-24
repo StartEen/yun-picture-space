@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.aliYun.imageExpansion.api;
+package com.cloud.picture.space.backend.api.aliYun.api;
 
 
 import cn.hutool.core.util.StrUtil;
@@ -7,9 +7,9 @@ import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
-import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskRequest;
-import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.CreateOutPaintingTaskResponse;
-import com.cloud.picture.space.backend.api.aliYun.imageExpansion.model.GetOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateOutPaintingTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateOutPaintingTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.getTaskInfo.GetAITaskResponse;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +81,7 @@ public class AliYunAPI {
      * @param taskId 任务ID
      * @return GetOutPaintingTaskResponse 查询任务结果
      */
-    public GetOutPaintingTaskResponse getOutPaintingTask(String taskId) {
+    public GetAITaskResponse getOutPaintingTask(String taskId) {
         if (StrUtil.isBlank(taskId)) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务ID为空");
         }
@@ -91,7 +91,7 @@ public class AliYunAPI {
                 log.error("请求失败,异常信息：{}", httpResponse.body());
                 throw new BusinessException(ErrorCode.OPERATION_ERROR, "请求失败,查询任务失败");
             }
-            return JSONUtil.toBean(httpResponse.body(), GetOutPaintingTaskResponse.class);
+            return JSONUtil.toBean(httpResponse.body(), GetAITaskResponse.class);
         }
     }
 }

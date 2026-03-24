@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.aliYun.imageExpansion.model;
+package com.cloud.picture.space.backend.api.aliYun.model.getTaskInfo;
 
 
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetOutPaintingTaskResponse implements Serializable {
+public class GetAITaskResponse implements Serializable {
 
     /**
      * 请求唯一标识
