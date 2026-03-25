@@ -18,8 +18,9 @@ public class CreateEditPictureTaskRequest implements Serializable {
     /**
      * 模型名称
      * 固定值：qwen-image-2.0
+     * 可替换模型名称：qwen-image-2.0-2026-03-03
      */
-    private String model = "qwen-image-2.0";
+    private String model = "qwen-image-2.0-2026-03-03";
 
     /**
      * 输入参数对象
