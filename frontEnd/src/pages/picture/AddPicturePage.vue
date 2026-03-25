@@ -27,7 +27,7 @@
         :icon="h(FullscreenOutlined)"
         @click="doImagePainting"
       >
-        AI 扩图功能
+        AI 一键P图
       </a-button>
       <ImageCropper
         ref="imageCropperRef"
@@ -36,7 +36,7 @@
         :spaceId="spaceId"
         :onSuccess="onCropSuccess"
       />
-      <ImageOutPainting
+      <ImageAiEdit
         ref="imageOutPaintingRef"
         :picture="picture"
         :spaceId="spaceId"
@@ -107,7 +107,7 @@ import { message } from 'ant-design-vue'
 import UrlPictureUpload from '@/components/picture/UrlPictureUpload.vue'
 import ImageCropper from '@/components/picture/ImageCropper.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
-import ImageOutPainting from '@/components/picture/ImageOutPainting.vue'
+import ImageAiEdit from '@/components/picture/ImageAIEdit.vue'
 
 const picture = ref<API.PictureVo>()
 const pictureForm = reactive<API.PictureEditRequest>({})

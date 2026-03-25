@@ -197,12 +197,20 @@ declare namespace API {
     message?: string
   }
 
+  type Choice = {
+    finishReason?: string
+    message?: Message
+  }
+
+  type Content = {
+    image?: string
+  }
+
   type CreateEditPictureTaskResponse = {
     code?: string
     message?: string
     output?: Output
     requestId?: string
-    statusCode?: number
     usage?: Usage
   }
 
@@ -301,14 +309,13 @@ declare namespace API {
     vipNumber?: number
   }
 
+  type Message = {
+    content?: Content[]
+    role?: string
+  }
+
   type Output = {
-    endTime?: string
-    results?: ResultItem[]
-    scheduledTime?: string
-    submitTime?: string
-    taskId?: string
-    taskMetrics?: TaskMetrics
-    taskStatus?: string
+    choices?: Choice[]
   }
 
   type Output1 = {
@@ -319,7 +326,7 @@ declare namespace API {
     scheduledTime?: string
     submitTime?: string
     taskId?: string
-    taskMetrics?: TaskMetrics1
+    taskMetrics?: TaskMetrics
     taskStatus?: string
   }
 
@@ -492,12 +499,6 @@ declare namespace API {
     firstSubject?: string
     secondSubject?: string
     thirdSubject?: string
-  }
-
-  type ResultItem = {
-    code?: string
-    message?: string
-    url?: string
   }
 
   type SearchPictureByColorRequest = {
@@ -684,12 +685,6 @@ declare namespace API {
     total?: number
   }
 
-  type TaskMetrics1 = {
-    failed?: number
-    succeeded?: number
-    total?: number
-  }
-
   type testDownloadFileUsingGETParams = {
     /** filePath */
     filePath?: string
@@ -711,7 +706,9 @@ declare namespace API {
   }
 
   type Usage = {
+    height?: number
     imageCount?: number
+    width?: number
   }
 
   type Usage1 = {
