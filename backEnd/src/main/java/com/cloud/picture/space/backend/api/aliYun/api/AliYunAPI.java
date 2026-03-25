@@ -66,6 +66,7 @@ public class AliYunAPI {
                 log.error("请求失败,异常信息：{}", httpResponse.body());
                 throw new BusinessException(ErrorCode.OPERATION_ERROR, "请求失败,AI P图任务失败");
             }
+            log.info("AI P 图接口原始响应：{}", httpResponse.body());
             CreateEditPictureTaskResponse response = JSONUtil.toBean(httpResponse.body(), CreateEditPictureTaskResponse.class);
             String errorCode = response.getCode();
             if (StrUtil.isNotBlank(errorCode)) {

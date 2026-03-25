@@ -29,12 +29,12 @@ public class CreateGeneratePictureByPictureTaskResponse implements Serializable 
     /**
      * 任务输出信息
      */
-    private CreateEditPictureTaskResponse.Output output;
+    private Output output;
 
     /**
      * 资源使用量统计
      */
-    private CreateEditPictureTaskResponse.Usage usage;
+    private Usage usage;
 
     /**
      * 错误码
@@ -48,11 +48,6 @@ public class CreateGeneratePictureByPictureTaskResponse implements Serializable 
      */
     private String message;
 
-    /**
-     * HTTP 状态码
-     */
-    @Alias("status_code")
-    private Integer statusCode;
 
     /**
      * 任务输出信息类
@@ -61,105 +56,61 @@ public class CreateGeneratePictureByPictureTaskResponse implements Serializable 
     public static class Output implements Serializable {
 
         /**
-         * 任务 ID
-         * 查询有效期 24 小时
+         * 模型生成的内容列表
+         * 可以包含一个或多个 choices 对象
          */
-        @Alias("task_id")
-        private String taskId;
+        private List<Choice> choices;
 
-        /**
-         * 任务状态
-         * 枚举值：
-         * - PENDING: 任务排队中
-         * - RUNNING: 任务处理中
-         * - SUCCEEDED: 任务执行成功
-         * - FAILED: 任务执行失败
-         * - CANCELED: 任务已取消
-         * - UNKNOWN: 任务不存在或状态未知
-         */
-        @Alias("task_status")
-        private String taskStatus;
-
-        /**
-         * 任务结果列表
-         * 包含生成的图像 URL 或错误信息
-         */
-        private List<CreateEditPictureTaskResponse.ResultItem> results;
-
-        /**
-         * 任务指标统计
-         */
-        @Alias("task_metrics")
-        private CreateEditPictureTaskResponse.TaskMetrics taskMetrics;
-
-        /**
-         * 任务提交时间
-         * 格式：YYYY-MM-DD HH:mm:ss.SSS
-         */
-        @Alias("submit_time")
-        private String submitTime;
-
-        /**
-         * 任务执行时间
-         * 格式：YYYY-MM-DD HH:mm:ss.SSS
-         */
-        @Alias("scheduled_time")
-        private String scheduledTime;
-
-        /**
-         * 任务完成时间
-         * 格式：YYYY-MM-DD HH:mm:ss.SSS
-         */
-        @Alias("end_time")
-        private String endTime;
     }
 
     /**
-     * 任务结果项类
+     * 选择项类
      */
     @Data
-    public static class ResultItem implements Serializable {
+    public static class Choice implements Serializable {
 
         /**
-         * 生成图像的 URL
-         * 有效期 24 小时，需及时下载保存
+         * 自然停止时输出为 stop
          */
-        private String url;
+        @Alias("finish_reason")
+        private String finishReason;
 
         /**
-         * 错误码
-         * 图像生成失败时返回
+         * 输出的消息
          */
-        private String code;
-
-        /**
-         * 错误详细信息
-         * 图像生成失败时返回
-         */
-        private String message;
+        private Message message;
     }
 
     /**
-     * 任务指标统计类
+     * 消息类
      */
     @Data
-    public static class TaskMetrics implements Serializable {
+    public static class Message implements Serializable {
 
         /**
-         * 总任务数
+         * 消息的角色，固定为 assistant
          */
-        private Integer total;
+        private String role;
 
         /**
-         * 成功的任务数
+         * 消息内容列表
          */
-        private Integer succeeded;
-
-        /**
-         * 失败的任务数
-         */
-        private Integer failed;
+        private List<Content> content;
     }
+
+    /**
+     * 内容项类
+     */
+    @Data
+    public static class Content implements Serializable {
+
+        /**
+         * 模型生成图片的 URL 地址
+         * 有效期 24 小时，请及时下载并保存图像
+         */
+        private String image;
+    }
+
 
     /**
      * 资源使用量统计类
@@ -168,9 +119,19 @@ public class CreateGeneratePictureByPictureTaskResponse implements Serializable 
     public static class Usage implements Serializable {
 
         /**
-         * 生成的图像数量
+         * 模型生成图片的数量
          */
         @Alias("image_count")
         private Integer imageCount;
+
+        /**
+         * 模型生成图片的宽度，单位像素
+         */
+        private Integer width;
+
+        /**
+         * 模型生成图片的高度，单位像素
+         */
+        private Integer height;
     }
 }

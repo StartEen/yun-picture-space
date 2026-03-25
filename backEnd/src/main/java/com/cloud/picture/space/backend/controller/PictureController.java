@@ -489,6 +489,7 @@ public class PictureController {
                 createPictureEditPictureTaskRequest.getPictureId() == null, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
         CreateEditPictureTaskResponse response = pictureService.createPictureEditTask(createPictureEditPictureTaskRequest, loginUser);
+        log.info("创建图片编辑任务成功,返回结果：{}", response);
         return ResultUtils.success(response);
     }
 

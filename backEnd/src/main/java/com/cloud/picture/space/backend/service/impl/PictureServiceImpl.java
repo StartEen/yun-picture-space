@@ -841,7 +841,13 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         }
     }
 
-
+    /**
+     * 创建图片编辑任务
+     *
+     * @param createPictureEditPictureTaskRequest 创建图片编辑任务请求
+     * @param loginUser                           登录用户
+     * @return 创建图片编辑任务响应
+     */
     @Override
     public CreateEditPictureTaskResponse createPictureEditTask(CreatePictureEditPictureTaskRequest createPictureEditPictureTaskRequest, User loginUser) {
         Long pictureId = createPictureEditPictureTaskRequest.getPictureId();
@@ -862,12 +868,13 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         // 如果提示词长度没有超过50，则进行截取,超过300进行截取抛出异常
         String text = createPictureEditPictureTaskRequest.getText();
         ThrowUtils.throwIf(text.length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
-        if (text.length() > 50) {
+        if (text.length() < 50) {
             text = douBaoAPI.generateExpandedPrompt(PromptExpansionEnum.EXPAND_PROMPT_USE_EDIT_IMAGE, text);
         }
         contentTextItem.setText(text);
 
         message.setContent(Arrays.asList(contentUrlItem, contentTextItem));
+        input.setMessages(Arrays.asList(message));
         taskRequest.setInput(input);
         BeanUtil.copyProperties(createPictureEditPictureTaskRequest, taskRequest);
         log.info("创建图片P图任务请求参数：{}", taskRequest);
@@ -875,6 +882,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         return aliYunAPI.createAliAIPictureTask(taskRequest);
     }
 
+
+    /**
+     * 创建以图生图任务
+     *
+     * @param createGeneratePictureRequest 创建以图生图任务请求
+     * @param loginUser                     登录用户
+     * @return 创建以图生图任务响应
+     */
     @Override
     public GeneratePictureTaskResponse createPictureOutGenerateTask(CreateGeneratePictureRequest createGeneratePictureRequest, User loginUser) {
         String prompt = createGeneratePictureRequest.getPrompt();
