@@ -61,6 +61,7 @@ import {
   PictureOutlined,
   AppstoreAddOutlined,
   CodeSandboxOutlined,
+  FullscreenOutlined,
 } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -81,6 +82,12 @@ const originItems = [
     icon: () => h(AppstoreAddOutlined),
     label: '创建图片',
     title: '创建图片',
+  },
+  {
+    key: '/ai_create',
+    icon: () => h(FullscreenOutlined),
+    label: 'AI图片创作',
+    title: 'AI图片创作',
   },
   {
     key: '/admin/userManage',

@@ -73,7 +73,12 @@ const router = createRouter({
       path: '/search_picture',
       name: '图片搜索',
       component: () => import('@/pages/picture/SearchPicturePage.vue'),
-    }
+    },
+    {
+      path: '/ai_create',
+      name: 'AI 图片创作',
+      component: () => import('@/pages/picture/AddPictureAIPage.vue'),
+    },
   ],
 })
 
