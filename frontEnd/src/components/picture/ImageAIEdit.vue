@@ -246,18 +246,39 @@ onUnmounted(() => {
   clearPollingTimer()
 })
 
+// 上传图片
 const uploadLoading = ref<boolean>(false)
 const handleUpload = async () => {
+  if (!resultImageUrl.value) {
+    message.error('没有可上传的图片')
+    return
+  }
+  
   uploadLoading.value = true
   try {
-    const param: API.PictureUploadRequest = {
-      fileUrl: resultImageUrl.value,
+    // 1. 从URL下载图片
+    const response = await fetch(resultImageUrl.value)
+    if (!response.ok) {
+      throw new Error('图片下载失败')
+    }
+    
+    // 2. 将响应转换为Blob
+    const blob = await response.blob()
+    
+    // 3. 创建File对象
+    const fileName = `ai_edit_${Date.now()}.png`
+    const file = new File([blob], fileName, { type: blob.type })
+    
+    // 4. 准备上传参数
+    const params: API.uploadPictureUsingPOSTParams = {
       spaceId: props.spaceId,
     }
     if (props.picture) {
-      param.id = props.picture.id
+      params.id = props.picture.id
     }
-    const res = await uploadPictureByUrlUsingPost(param)
+    
+    // 5. 上传图片
+    const res = await uploadPictureUsingPost(params, {}, file)
     if (res.data.code === 0 && res.data.data) {
       message.success('应用结果成功')
       // 将上传成功的图片信息传递给父组件
@@ -267,8 +288,9 @@ const handleUpload = async () => {
     } else {
       message.error('应用结果上传失败,' + res.data.message)
     }
-  } catch (error) {
-    message.error('应用结果上传失败')
+  } catch (error: any) {
+    console.error('上传失败', error)
+    message.error('应用结果上传失败: ' + (error?.message || '未知错误'))
   } finally {
     uploadLoading.value = false
   }
