@@ -106,7 +106,7 @@ import { message } from 'ant-design-vue'
 import UrlPictureUpload from '@/components/picture/UrlPictureUpload.vue'
 import ImageCropper from '@/components/picture/ImageCropper.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
-import ImageAiEdit from '@/components/picture/ImageAIEdit.vue'
+import ImageAiEdit from '@/components/aiWorkspace/ImageAIEdit.vue'
 
 const picture = ref<API.PictureVo>()
 const pictureForm = reactive<API.PictureEditRequest>({})
