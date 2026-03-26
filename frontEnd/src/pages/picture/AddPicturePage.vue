@@ -22,8 +22,7 @@
         裁剪与编辑图片
       </a-button>
       <a-button
-        class="edit-btn"
-        type="primary"
+        class="edit-btn ai-edit-btn"
         :icon="h(FullscreenOutlined)"
         @click="doImagePainting"
       >
@@ -300,11 +299,28 @@ h2 {
   border-color: #d9d9d9;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   transition: all 0.3s;
+  margin-right: 12px;
 }
 .edit-btn:hover {
   color: #1890ff;
   border-color: #1890ff;
   background: #f0f7ff;
+}
+
+/* AI 一键P图按钮样式 */
+.ai-edit-btn {
+  background: linear-gradient(135deg, #1890ff 0%, #4096ff 100%);
+  color: white;
+  border-color: #1890ff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+}
+
+.ai-edit-btn:hover {
+  background: linear-gradient(135deg, #4096ff 0%, #69b1ff 100%);
+  color: white;
+  border-color: #4096ff;
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 /* ======================================= */
