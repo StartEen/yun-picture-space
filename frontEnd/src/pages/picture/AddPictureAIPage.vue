@@ -11,6 +11,7 @@
     <a-tabs v-model:activeKey="uploadType">
       <a-tab-pane key="file" tab="文生图（火山引擎）">
 <!--        <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />-->
+        <GeneratePictureByPrompt :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
       <a-tab-pane key="url" tab="图生图（千问引擎）" force-render>
 <!--        <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />-->
@@ -107,6 +108,7 @@ import UrlPictureUpload from '@/components/picture/UrlPictureUpload.vue'
 import ImageCropper from '@/components/picture/ImageCropper.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 import ImageAiEdit from '@/components/aiWorkspace/ImageAIEdit.vue'
+import GeneratePictureByPrompt from "@/components/aiWorkspace/GeneratePictureByPrompt.vue";
 
 const picture = ref<API.PictureVo>()
 const pictureForm = reactive<API.PictureEditRequest>({})

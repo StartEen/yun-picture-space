@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    class="image-out-painting"
+    class="image-ai-edit"
     v-model:visible="visible"
     title="AI 一键 P 图"
     :footer="false"
@@ -35,7 +35,6 @@
         </a-spin>
       </a-col>
     </a-row>
-
     <a-row :gutter="24" style="margin-top: 24px">
       <a-col :span="24">
         <div class="section-title">AI 编辑指令</div>
@@ -64,7 +63,6 @@
         </a-button>
       </a-flex>
     </div>
-
   </a-modal>
 </template>
 
@@ -73,7 +71,6 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import {
   createEditPictureTaskUsingPost,
   getAliYunAiTaskUsingGet,
-  uploadPictureByUrlUsingPost,
   uploadPictureUsingPost,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
@@ -253,7 +250,7 @@ const handleUpload = async () => {
     message.error('没有可上传的图片')
     return
   }
-  
+
   uploadLoading.value = true
   try {
     // 1. 从URL下载图片
@@ -261,14 +258,14 @@ const handleUpload = async () => {
     if (!response.ok) {
       throw new Error('图片下载失败')
     }
-    
+
     // 2. 将响应转换为Blob
     const blob = await response.blob()
-    
+
     // 3. 创建File对象
     const fileName = `ai_edit_${Date.now()}.png`
     const file = new File([blob], fileName, { type: blob.type })
-    
+
     // 4. 准备上传参数
     const params: API.uploadPictureUsingPOSTParams = {
       spaceId: props.spaceId,
@@ -276,7 +273,7 @@ const handleUpload = async () => {
     if (props.picture) {
       params.id = props.picture.id
     }
-    
+
     // 5. 上传图片
     const res = await uploadPictureUsingPost(params, {}, file)
     if (res.data.code === 0 && res.data.data) {
@@ -299,7 +296,7 @@ const handleUpload = async () => {
 
 <style scoped>
 /* 弹窗容器 */
-.image-out-painting {
+.image-ai-edit {
   border-radius: 12px;
   overflow: hidden;
   padding: 0 !important;
@@ -454,7 +451,7 @@ const handleUpload = async () => {
 
 /* 响应式布局 */
 @media (max-width: 768px) {
-  .image-out-painting {
+  .image-ai-edit {
     width: 95% !important;
     margin: 0 auto;
   }
