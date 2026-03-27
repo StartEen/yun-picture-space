@@ -474,8 +474,22 @@ public class PictureController {
                 ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
         GeneratePictureTaskResponse response = pictureService.createPictureOutGenerateTask(createGeneratePictureRequest, loginUser);
+        log.info("创建图片生成任务成功,返回结果：{}", response);
         return ResultUtils.success(response);
     }
+
+    // /**
+    //  * 上传图片通过URL(可重新上传)
+    //  */
+    // @PostMapping("/upload/url")
+    // @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_UPLOAD)
+    // public BaseResponse<PictureVo> uploadPictureByUrl(@RequestBody PictureUploadRequest pictureUploadRequest, HttpServletRequest request) {
+    //     User loginUser = userService.getLoginUser(request);
+    //     String fileUrl = pictureUploadRequest.getFileUrl();
+    //     PictureVo pictureVo = pictureService.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
+    //     return ResultUtils.success(pictureVo);
+    // }
+
 
 
     /**

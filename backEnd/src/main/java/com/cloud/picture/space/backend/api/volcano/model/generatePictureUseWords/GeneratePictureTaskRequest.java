@@ -40,7 +40,7 @@ public class GeneratePictureTaskRequest implements Serializable {
      * 2K: 2048x2048, 1K: 1024x1024, 720P: 1280x720
      */
     @Alias("size")
-    private String size = "2K";
+    private String size = "2848x1600";
 
     /**
      * 是否启用序列化图像生成

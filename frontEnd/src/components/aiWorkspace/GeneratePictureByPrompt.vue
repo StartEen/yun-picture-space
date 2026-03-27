@@ -2,8 +2,8 @@
   <div id="generate-picture-Prompt">
     <a-row :gutter="24">
       <a-col :span="24">
-        <div class="section-title">P 图结果</div>
-        <a-spin :spinning="!!taskId" tip="AI 正在施展魔法中，请稍候...">
+        <div class="section-title">最终生成结果</div>
+        <a-spin :spinning="generatingLoading" tip="AI 正在施展魔法中，请稍候...">
           <div class="image-preview-card">
             <a-image
               v-if="resultImageUrl"
@@ -18,7 +18,7 @@
     </a-row>
     <a-row :gutter="24" style="margin-top: 24px">
       <a-col :span="24">
-        <div class="section-title">AI 编辑指令</div>
+        <div class="section-title">AI 指令输入</div>
         <a-textarea
           class="custom-textarea"
           placeholder="例如：一只橘色的猫咪坐在窗台上，阳光透过窗户洒在它身上，温暖的光影效果，超写实风格..."
@@ -27,11 +27,10 @@
         />
       </a-col>
     </a-row>
-
-    <div style="margin-top: 32px">
+    <div style="margin-top: 16px">
       <a-flex gap="16" justify="flex-end">
-        <a-button type="primary" :loading="!!taskId" @click="createTask">
-          {{ taskId ? '生成中...' : '生成图片' }}
+        <a-button type="primary" :loading="generatingLoading" @click="createTask">
+          {{ generatingLoading ? '生成中...' : '生成图片' }}
         </a-button>
         <a-button
           type="primary"
@@ -47,9 +46,13 @@
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, ref } from 'vue'
+import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { createEditPictureTaskUsingPost, getAliYunAiTaskUsingGet } from '@/api/pictureController.ts'
+import {
+  generatePictureUseWordTaskUsingPost,
+  uploadPictureByUrlUsingPost,
+  uploadPictureUsingPost,
+} from '@/api/pictureController.ts'
 
 interface Props {
   picture?: API.PictureVo
@@ -62,7 +65,7 @@ const props = defineProps<Props>()
 // 定义变量，存储图片结果
 const resultImageUrl = ref<string>()
 
-const taskId = ref<string | undefined>()
+const generatingLoading = ref<boolean>(false)
 
 //定义变量存储提示词
 const prompt = ref<string>()
@@ -83,126 +86,112 @@ const handleImagePreview = (url: string | undefined) => {
  * 创建任务
  */
 const createTask = async () => {
-  if (!props.picture?.id) {
-    return
-  }
+  generatingLoading.value = true
   if (!prompt.value || prompt.value.trim() === '') {
     message.error('请输入文字描述')
-    return
-  }
-  // 设置 taskId 为一个临时值，让按钮显示加载状态
-  taskId.value = 'creating'
-
-  const res = await createEditPictureTaskUsingPost({
-    pictureId: props.picture.id,
-    text: prompt.value,
-  })
-  if (res.data.code === 0 && res.data.data) {
-    message.success('创建任务成功')
-
-    // 处理响应数据
-    const output = res.data.data.output
-    if (output?.choices && output.choices.length > 0) {
-      const choice = output.choices[0]
-      if (choice?.message?.content && choice.message.content.length > 0) {
-        const content = choice.message.content[0]
-        if (content?.image) {
-          // 清理图片URL中的空格和反引号
-          let imageUrl = content.image.trim()
-          if (imageUrl.startsWith('`') && imageUrl.endsWith('`')) {
-            imageUrl = imageUrl.substring(1, imageUrl.length - 1).trim()
-          }
-          resultImageUrl.value = imageUrl
-          message.success('图片生成成功')
-          // 不需要轮询，直接显示结果
-          clearPollingTimer()
-          return
-        }
-      }
-    }
-
-    // 尝试获取任务ID进行轮询
-    console.log((res.data.data.output as any)?.taskId)
-    taskId.value = (res.data.data.output as any)?.taskId
-    if (taskId.value) {
-      //开启轮询
-      startPolling()
-    } else {
-      message.error('任务创建成功，但未获取到任务ID')
-      taskId.value = undefined
-    }
-  } else {
-    message.error('创建任务失败,' + res.data.message)
-    taskId.value = undefined
-  }
-}
-
-//注册轮询定时器
-let pollingTimer: number | null = null
-
-//开始轮询
-const startPolling = () => {
-  if (!taskId.value) {
+    generatingLoading.value = false
     return
   }
 
-  pollingTimer = window.setInterval(async () => {
-    try {
-      const res = await getAliYunAiTaskUsingGet({
-        taskId: taskId.value,
-      })
-      if (res.data.code === 0 && res.data.data) {
-        const taskResult = res.data.data.output
-        if (taskResult?.taskStatus === 'SUCCESS') {
-          message.success('任务成功')
-          resultImageUrl.value = taskResult.outputImageUrl
-          //清理轮询
-          clearPollingTimer()
-        } else if (taskResult?.taskStatus === 'FAILED') {
-          message.error('任务失败')
-          //清理轮询
-          clearPollingTimer()
-        } else if (
-          taskResult?.taskStatus === 'PROCESSING' ||
-          taskResult?.taskStatus === 'PENDING'
-        ) {
-          // 任务正在处理中，继续轮询
-          console.log('任务正在处理中...')
-        } else {
-          // 其他状态，停止轮询并显示错误
-          message.error('任务状态异常: ' + taskResult?.taskStatus)
-          clearPollingTimer()
-        }
+  try {
+    // 调用文生图接口
+    const res = await generatePictureUseWordTaskUsingPost({
+      prompt: prompt.value,
+    })
+
+    if (res.data.code === 0 && res.data.data) {
+      message.success('图片生成成功')
+
+      // 处理文生图接口返回的数据结构
+      const imageData = res.data.data.data
+      if (imageData && imageData.length > 0 && imageData[0].url) {
+        resultImageUrl.value = imageData[0].url
       } else {
-        // API返回成功但数据为空
-        message.error('获取任务状态失败: 数据为空')
-        clearPollingTimer()
+        message.error('图片生成失败：未返回图片数据')
       }
-    } catch (error: any) {
-      console.log('P图任务轮询失败', error)
-      message.error('P图任务轮询失败,' + (error?.message || '未知错误'))
-      //清理轮询
-      clearPollingTimer()
+
+      // 恢复加载状态
+      generatingLoading.value = false
+    } else {
+      message.error('图片生成失败：' + (res.data.message || '未知错误'))
+      generatingLoading.value = false
     }
-  }, 3000)
-}
-const clearPollingTimer = () => {
-  if (pollingTimer) {
-    clearInterval(pollingTimer)
-    pollingTimer = null
+  } catch (error: any) {
+    console.error('图片生成失败', error)
+    message.error('图片生成失败：' + (error?.message || '未知错误'))
+    generatingLoading.value = false
   }
-  // 无论是否有轮询，都将taskId设置为undefined
-  taskId.value = undefined
 }
 
-//组件卸载时清理定时器
-onUnmounted(() => {
-  clearPollingTimer()
-})
+const uploadLoading = ref<boolean>(false)
 
 // 上传图片
-const uploadLoading = ref<boolean>(false)
-const handleUpload = async () => {}
+const handleUpload = async () => {
+  if (!resultImageUrl.value) {
+    message.error('没有可上传的图片')
+    return
+  }
+
+  uploadLoading.value = true
+  try {
+    // 1. 创建 Image 对象并设置 crossOrigin
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+
+    // 2. 等待图片加载完成
+    await new Promise((resolve, reject) => {
+      img.onload = resolve
+      img.onerror = reject
+      img.src = resultImageUrl.value
+    })
+
+    // 3. 创建 Canvas 并绘制图片
+    const canvas = document.createElement('canvas')
+    canvas.width = img.naturalWidth
+    canvas.height = img.naturalHeight
+    const ctx = canvas.getContext('2d')
+    ctx?.drawImage(img, 0, 0)
+
+    // 4. 将 Canvas 转换为 Blob
+    const blob = await new Promise<Blob>((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob!)
+      }, 'image/png')
+    })
+
+    // 5. 创建 File 对象
+    const fileName = `ai_generate_${Date.now()}.png`
+    const file = new File([blob], fileName, { type: 'image/png' })
+
+    // 6. 准备上传参数
+    const params = {
+      spaceId: props.spaceId,
+    }
+    if (props.picture?.id) {
+      params.id = props.picture.id
+    }
+
+    // 5. 上传图片
+    const res = await uploadPictureUsingPost(params, {}, file)
+
+    // 处理响应
+    if (res.data.code === 0 && res.data.data) {
+      message.success('图片上传成功')
+      // 将上传成功的图片信息传递给父组件
+      props.onSuccess?.(res.data.data)
+      // 清空当前状态，准备下一次生成
+      resultImageUrl.value = undefined
+      prompt.value = undefined
+    } else {
+      message.error('图片上传失败，' + (res.data.message || '未知错误'))
+    }
+  } catch (error: any) {
+    console.error('图片上传失败', error)
+    message.error('图片上传失败：' + (error?.message || '未知错误'))
+  } finally {
+    uploadLoading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -217,7 +206,6 @@ const handleUpload = async () => {}
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fadeInUp 0.6s ease-out;
 }
-
 
 #generate-picture-Prompt:hover {
   transform: translateY(-2px);
@@ -236,8 +224,6 @@ const handleUpload = async () => {}
     transform: translateY(0);
   }
 }
-
-
 
 /* 标题样式 */
 .section-title {

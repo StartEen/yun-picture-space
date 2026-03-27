@@ -86,14 +86,6 @@ public class DouBaoAPI {
      */
     public String generateExpandedPrompt(PromptExpansionEnum promptExpansionEnum,String userRawInput) {
 
-        // // 1. 严格的 Prompt 模板（约束大模型只输出英文逗号分隔的标签）
-        // String promptTemplate = "你是一个专业的 AI 绘画提示词工程师，精通 Midjourney 和 Stable Diffusion。" +
-        //         "请将用户的简单中文描述，扩写为高质量、细节丰富的英文提示词。" +
-        //         "【扩写规则】" +
-        //         "1. 结构包含：主体描述, 环境背景, 光影氛围, 艺术风格, 渲染参数（如 2k, highly detailed, unreal engine 5）。" +
-        //         "2. 直接输出英文提示词，单词或短语之间用英文逗号分隔。" +
-        //         "3. 绝对不要输出任何多余的解释、翻译、或者“好的”等寒暄语。只输出最终的英文内容！" +
-        //         "用户原始描述：%s";
 
         String promptTemplate = promptExpansionEnum.getValue();
         String finalPrompt = String.format(promptTemplate, userRawInput);
@@ -149,6 +141,7 @@ public class DouBaoAPI {
             // 8. 安全提取并返回最终的文本结果
             if (taskResponse.getChoices() != null && !taskResponse.getChoices().isEmpty()) {
                 String resultText = taskResponse.getChoices().get(0).getMessage().getContent();
+                log.info("调用豆包模型扩写文生图提示词,响应结果：{}", resultText);
                 return resultText != null ? resultText.trim() : "";
             }
             return "未获取到有效的扩写结果";

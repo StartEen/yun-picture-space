@@ -2,9 +2,12 @@ package com.cloud.picture.space.backend.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.*;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpStatus;
+import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -53,6 +56,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -884,10 +888,10 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
 
     /**
-     * 创建以图生图任务
+     * 创建以文生图任务
      *
-     * @param createGeneratePictureRequest 创建以图生图任务请求
-     * @param loginUser                     登录用户
+     * @param createGeneratePictureRequest 创建以文生图任务请求
+     * @param loginUser                    登录用户
      * @return 创建以图生图任务响应
      */
     @Override
@@ -902,6 +906,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             // 进行截取对提示词进行扩写操作
             prompt = douBaoAPI.generateExpandedPrompt(PromptExpansionEnum.EXPAND_PROMPT_USE_WORDS_TO_IMAGE, prompt);
         }
+        log.info("prompt请求参数：{}", prompt);
         // 构建请求参数
         GeneratePictureTaskRequest taskRequest = new GeneratePictureTaskRequest();
         GeneratePictureTaskRequest.OptimizePromptOptions optimizePromptOptions = new GeneratePictureTaskRequest.OptimizePromptOptions();
@@ -917,14 +922,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         log.info("创建图片外生任务请求参数：{}", taskRequest);
         return douBaoAPI.createGeneratePictureTask(taskRequest);
     }
-
-
-
-
-
-
-
-
 
 
 }
