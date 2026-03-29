@@ -11,6 +11,8 @@ import com.cloud.picture.space.backend.api.aliYun.api.AliYunAPI;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreatePictureGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.GeneratePictureByPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.CreateGeneratePictureUsePromptRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
@@ -47,6 +49,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -917,43 +920,29 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         return  aliYunAPI.createPictureGeneratePictureByPromptTask(taskRequest);
     }
 
-    //
-    // /**
-    //  * 创建以文生图任务
-    //  *
-    //  * @param createGeneratePictureRequest 创建以文生图任务请求
-    //  * @param loginUser                    登录用户
-    //  * @return 创建以图生图任务响应
-    //  */
-    // @Override
-    // public GeneratePictureTaskResponse createPictureOutGenerateTask(CreateGeneratePictureRequest createGeneratePictureRequest, User loginUser) {
-    //     String prompt = createGeneratePictureRequest.getPrompt();
-    //     ThrowUtils.throwIf(StrUtil.isBlank(prompt), ErrorCode.PARAMS_ERROR, "请输入描述");
-    //
-    //     // 对提示词进行操作
-    //     // 如果提示词长度没有超过50，则进行截取,超过300进行截取抛出异常
-    //     ThrowUtils.throwIf(prompt.length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
-    //     if (prompt.length() < 50) {
-    //         // 进行截取对提示词进行扩写操作
-    //         prompt = douBaoAPI.generateExpandedPrompt(PromptExpansionEnum.EXPAND_PROMPT_USE_WORDS_TO_IMAGE, prompt);
-    //     }
-    //     log.info("prompt请求参数：{}", prompt);
-    //     // 构建请求参数
-    //     GeneratePictureTaskRequest taskRequest = new GeneratePictureTaskRequest();
-    //     GeneratePictureTaskRequest.OptimizePromptOptions optimizePromptOptions = new GeneratePictureTaskRequest.OptimizePromptOptions();
-    //     taskRequest.setPrompt(prompt);
-    //     optimizePromptOptions.setMode("standard");
-    //
-    //     // 添加工具配置以启用联网搜索
-    //     GeneratePictureTaskRequest.Tools tools = new GeneratePictureTaskRequest.Tools();
-    //     tools.setType("web_search");
-    //     taskRequest.setTools(Arrays.asList(tools));
-    //
-    //     BeanUtil.copyProperties(createGeneratePictureRequest, taskRequest);
-    //     log.info("创建图片外生任务请求参数：{}", taskRequest);
-    //     return douBaoAPI.createGeneratePictureTask(taskRequest);
-    // }
 
+
+
+    /**
+     * 创建以图生图任务
+     *
+     * @param createPictureGeneratePictureRequest 创建以图生图任务请求
+     * @param multipartFile                       图片文件
+     * @param loginUser                           登录用户
+     * @return 创建以图生图任务响应
+     */
+    @Override
+    public GeneratePictureByPictureTaskResponse generatePictureUsePictureTask(CreatePictureGeneratePictureRequest createPictureGeneratePictureRequest, MultipartFile multipartFile, User loginUser) {
+        //校验参数
+        ThrowUtils.throwIf(multipartFile == null, ErrorCode.PARAMS_ERROR, "请上传图片");
+        ThrowUtils.throwIf(StrUtil.isBlank(createPictureGeneratePictureRequest.getText()), ErrorCode.PARAMS_ERROR, "请输入描述");
+        ThrowUtils.throwIf(createPictureGeneratePictureRequest.getText().length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
+        log.info("创建以图生图任务请求参数：{}", createPictureGeneratePictureRequest);
+
+
+
+        return null;
+    }
 
 }
 

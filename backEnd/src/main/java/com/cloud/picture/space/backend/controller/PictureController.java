@@ -512,10 +512,14 @@ public class PictureController {
     @PostMapping("/out_generate/create_picture_by_picture")
     public BaseResponse<GeneratePictureByPictureTaskResponse> generatePictureUsePictureTask(
             @RequestBody CreatePictureGeneratePictureRequest createPictureGeneratePictureRequest,
-            @RequestPart("file") MultipartFile multipartFile) {
-
-
-        return null;
+            @RequestPart("file") MultipartFile multipartFile,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(createPictureGeneratePictureRequest == null ||
+                        createPictureGeneratePictureRequest.getText() == null,
+                ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        GeneratePictureByPictureTaskResponse response = pictureService.generatePictureUsePictureTask(createPictureGeneratePictureRequest, multipartFile, loginUser);
+        return ResultUtils.success(response);
     }
 
 

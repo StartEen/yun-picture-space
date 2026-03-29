@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreatePictureGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.GeneratePictureByPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.CreateGeneratePictureUsePromptRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
 import com.cloud.picture.space.backend.model.dto.picture.*;
@@ -11,6 +13,7 @@ import com.cloud.picture.space.backend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cloud.picture.space.backend.model.entity.User;
 import com.cloud.picture.space.backend.model.vo.picture.PictureVo;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -183,11 +186,15 @@ public interface PictureService extends IService<Picture> {
     GeneratePictureUsePromptTaskResponse generatePictureUseWordTask(CreateGeneratePictureUsePromptRequest createGeneratePictureUsePromptRequest, User loginUser);
 
     /**
-     * 获取图片生成任务结果
+     * 创建图片生成任务（图生图）
      *
-     * @param taskId 图片生成任务id
-     * @return 图片生成任务结果
+     * @param createPictureGeneratePictureRequest 创建图片生成任务请求体
+     * @param multipartFile                       图片文件
+     * @param loginUser                           登录用户
+     * @return 创建的图片生成任务信息
      */
+    GeneratePictureByPictureTaskResponse generatePictureUsePictureTask(CreatePictureGeneratePictureRequest createPictureGeneratePictureRequest, MultipartFile multipartFile, User loginUser);
+
 
 
 
