@@ -1,7 +1,7 @@
 package com.cloud.picture.space.backend;
 
 import com.cloud.picture.space.backend.api.volcano.api.DouBaoAPI;
-import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.PromptExpansionEnum;
+import com.cloud.picture.space.backend.api.volcano.generatePromptModel.PromptExpansionEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

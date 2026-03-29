@@ -2,12 +2,7 @@ package com.cloud.picture.space.backend.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.*;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpStatus;
-import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,11 +11,11 @@ import com.cloud.picture.space.backend.api.aliYun.api.AliYunAPI;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.CreateGeneratePictureUsePromptRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
 import com.cloud.picture.space.backend.api.volcano.api.DouBaoAPI;
-import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.CreateGeneratePictureRequest;
-import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskRequest;
-import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskResponse;
-import com.cloud.picture.space.backend.api.volcano.model.generatePrompt.PromptExpansionEnum;
+import com.cloud.picture.space.backend.api.volcano.generatePromptModel.PromptExpansionEnum;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
@@ -56,7 +51,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -890,38 +884,75 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     /**
      * 创建以文生图任务
      *
-     * @param createGeneratePictureRequest 创建以文生图任务请求
+     * @param createGeneratePictureUsePromptRequest 创建以文生图任务请求
      * @param loginUser                    登录用户
      * @return 创建以图生图任务响应
      */
     @Override
-    public GeneratePictureTaskResponse createPictureOutGenerateTask(CreateGeneratePictureRequest createGeneratePictureRequest, User loginUser) {
-        String prompt = createGeneratePictureRequest.getPrompt();
-        ThrowUtils.throwIf(StrUtil.isBlank(prompt), ErrorCode.PARAMS_ERROR, "请输入描述");
+    public GeneratePictureUsePromptTaskResponse generatePictureUseWordTask(
+            CreateGeneratePictureUsePromptRequest createGeneratePictureUsePromptRequest,
+            User loginUser) {
+        String text = createGeneratePictureUsePromptRequest.getText();
+        ThrowUtils.throwIf(StrUtil.isBlank(text), ErrorCode.PARAMS_ERROR, "请输入描述");
 
-        // 对提示词进行操作
+        //对提示词进行操作
         // 如果提示词长度没有超过50，则进行截取,超过300进行截取抛出异常
-        ThrowUtils.throwIf(prompt.length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
-        if (prompt.length() < 50) {
-            // 进行截取对提示词进行扩写操作
-            prompt = douBaoAPI.generateExpandedPrompt(PromptExpansionEnum.EXPAND_PROMPT_USE_WORDS_TO_IMAGE, prompt);
+        ThrowUtils.throwIf(text.length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
+        if (text.length() < 50){
+            text = douBaoAPI.generateExpandedPrompt(PromptExpansionEnum.EXPAND_PROMPT_USE_WORDS_TO_IMAGE, text);
         }
-        log.info("prompt请求参数：{}", prompt);
-        // 构建请求参数
-        GeneratePictureTaskRequest taskRequest = new GeneratePictureTaskRequest();
-        GeneratePictureTaskRequest.OptimizePromptOptions optimizePromptOptions = new GeneratePictureTaskRequest.OptimizePromptOptions();
-        taskRequest.setPrompt(prompt);
-        optimizePromptOptions.setMode("standard");
+        log.info("创建以文生图任务请求参数：{}", text);
+        // 构造请求参数
+        GeneratePictureUsePromptTaskRequest taskRequest = new GeneratePictureUsePromptTaskRequest();
+        GeneratePictureUsePromptTaskRequest.Input input = new GeneratePictureUsePromptTaskRequest.Input();
+        GeneratePictureUsePromptTaskRequest.Message message = new GeneratePictureUsePromptTaskRequest.Message();
+        GeneratePictureUsePromptTaskRequest.ContentItem contentTextItem = new GeneratePictureUsePromptTaskRequest.ContentItem();
 
-        // 添加工具配置以启用联网搜索
-        GeneratePictureTaskRequest.Tools tools = new GeneratePictureTaskRequest.Tools();
-        tools.setType("web_search");
-        taskRequest.setTools(Arrays.asList(tools));
+        contentTextItem.setText(text);
 
-        BeanUtil.copyProperties(createGeneratePictureRequest, taskRequest);
-        log.info("创建图片外生任务请求参数：{}", taskRequest);
-        return douBaoAPI.createGeneratePictureTask(taskRequest);
+        input.setMessages(Arrays.asList(message));
+        taskRequest.setInput(input);
+        BeanUtil.copyProperties(createGeneratePictureUsePromptRequest, taskRequest);
+        log.info("创建图片P图任务请求参数：{}", taskRequest);
+        return  aliYunAPI.createPictureGeneratePictureByPromptTask(taskRequest);
     }
+
+    //
+    // /**
+    //  * 创建以文生图任务
+    //  *
+    //  * @param createGeneratePictureRequest 创建以文生图任务请求
+    //  * @param loginUser                    登录用户
+    //  * @return 创建以图生图任务响应
+    //  */
+    // @Override
+    // public GeneratePictureTaskResponse createPictureOutGenerateTask(CreateGeneratePictureRequest createGeneratePictureRequest, User loginUser) {
+    //     String prompt = createGeneratePictureRequest.getPrompt();
+    //     ThrowUtils.throwIf(StrUtil.isBlank(prompt), ErrorCode.PARAMS_ERROR, "请输入描述");
+    //
+    //     // 对提示词进行操作
+    //     // 如果提示词长度没有超过50，则进行截取,超过300进行截取抛出异常
+    //     ThrowUtils.throwIf(prompt.length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
+    //     if (prompt.length() < 50) {
+    //         // 进行截取对提示词进行扩写操作
+    //         prompt = douBaoAPI.generateExpandedPrompt(PromptExpansionEnum.EXPAND_PROMPT_USE_WORDS_TO_IMAGE, prompt);
+    //     }
+    //     log.info("prompt请求参数：{}", prompt);
+    //     // 构建请求参数
+    //     GeneratePictureTaskRequest taskRequest = new GeneratePictureTaskRequest();
+    //     GeneratePictureTaskRequest.OptimizePromptOptions optimizePromptOptions = new GeneratePictureTaskRequest.OptimizePromptOptions();
+    //     taskRequest.setPrompt(prompt);
+    //     optimizePromptOptions.setMode("standard");
+    //
+    //     // 添加工具配置以启用联网搜索
+    //     GeneratePictureTaskRequest.Tools tools = new GeneratePictureTaskRequest.Tools();
+    //     tools.setType("web_search");
+    //     taskRequest.setTools(Arrays.asList(tools));
+    //
+    //     BeanUtil.copyProperties(createGeneratePictureRequest, taskRequest);
+    //     log.info("创建图片外生任务请求参数：{}", taskRequest);
+    //     return douBaoAPI.createGeneratePictureTask(taskRequest);
+    // }
 
 
 }

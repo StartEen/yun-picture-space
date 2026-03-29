@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.api.volcano.model.generatePrompt;
+package com.cloud.picture.space.backend.api.volcano.generatePromptModel;
 
 import cn.hutool.core.annotation.Alias;
 import lombok.AllArgsConstructor;

@@ -10,11 +10,11 @@ import com.cloud.picture.space.backend.annotation.AuthCheck;
 import com.cloud.picture.space.backend.api.aliYun.api.AliYunAPI;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.CreateGeneratePictureUsePromptRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.getTaskInfo.GetAITaskResponse;
 import com.cloud.picture.space.backend.api.imageSearch.model.ImageSearchResult;
 import com.cloud.picture.space.backend.api.imageSearch.sub.ImageSearchApiFacade;
-import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.CreateGeneratePictureRequest;
-import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.common.BaseResponse;
 import com.cloud.picture.space.backend.common.DeleteRequest;
 import com.cloud.picture.space.backend.common.ResultUtils;
@@ -462,34 +462,6 @@ public class PictureController {
     }
 
 
-    /**
-     * AI 文生图（火山方舟引擎）
-     */
-    @PostMapping("/out_generate/create_picture")
-    public BaseResponse<GeneratePictureTaskResponse> generatePictureUseWordTask(
-            @RequestBody CreateGeneratePictureRequest createGeneratePictureRequest,
-            HttpServletRequest request) {
-        ThrowUtils.throwIf(createGeneratePictureRequest == null ||
-                        StrUtil.isBlank(createGeneratePictureRequest.getPrompt()),
-                ErrorCode.PARAMS_ERROR);
-        User loginUser = userService.getLoginUser(request);
-        GeneratePictureTaskResponse response = pictureService.createPictureOutGenerateTask(createGeneratePictureRequest, loginUser);
-        log.info("创建图片生成任务成功,返回结果：{}", response);
-        return ResultUtils.success(response);
-    }
-
-    // /**
-    //  * 上传图片通过URL(可重新上传)
-    //  */
-    // @PostMapping("/upload/url")
-    // @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_UPLOAD)
-    // public BaseResponse<PictureVo> uploadPictureByUrl(@RequestBody PictureUploadRequest pictureUploadRequest, HttpServletRequest request) {
-    //     User loginUser = userService.getLoginUser(request);
-    //     String fileUrl = pictureUploadRequest.getFileUrl();
-    //     PictureVo pictureVo = pictureService.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
-    //     return ResultUtils.success(pictureVo);
-    // }
-
 
 
     /**
@@ -516,6 +488,24 @@ public class PictureController {
         GetAITaskResponse response = aliYunAPI.getOutPaintingTask(taskId);
         return ResultUtils.success(response);
     }
+
+    /**
+     * AI 文生图（阿里云qwen-image-2.0）
+     */
+    @PostMapping("/out_generate/create_picture")
+    public BaseResponse<GeneratePictureUsePromptTaskResponse> generatePictureUseWordTask(
+            @RequestBody CreateGeneratePictureUsePromptRequest createGeneratePictureUsePromptRequest,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(createGeneratePictureUsePromptRequest == null ||
+                        StrUtil.isBlank(createGeneratePictureUsePromptRequest.getText()),
+                ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        GeneratePictureUsePromptTaskResponse response = pictureService.generatePictureUseWordTask(createGeneratePictureUsePromptRequest, loginUser);
+        log.info("AI 文生图接口原始响应：{}", response);
+        return ResultUtils.success(response);
+    }
+
+
 
 
     /**

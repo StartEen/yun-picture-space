@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @Description: TODO AI 文生图请求体 - qwen-image-2.0 模型
  */
 @Data
-public class createGeneratePictureUsePromptRequest implements Serializable {
+public class CreateGeneratePictureUsePromptRequest implements Serializable {
 
     /**
      * 文字描述
@@ -19,7 +19,5 @@ public class createGeneratePictureUsePromptRequest implements Serializable {
     private String text;
 
     private static final long serialVersionUID = 1L;
-
-
 
 }

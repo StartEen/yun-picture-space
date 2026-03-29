@@ -12,6 +12,8 @@ import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPi
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreateGeneratePictureByPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreateGeneratePictureByPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreatePictureGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.getTaskInfo.GetAITaskResponse;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
@@ -101,9 +103,38 @@ public class AliYunAPI {
 
 
     /**
+     * 创建文生图任务
+     */
+    public GeneratePictureUsePromptTaskResponse createPictureGeneratePictureByPromptTask(
+            GeneratePictureUsePromptTaskRequest generatePictureUsePromptTaskRequest) {
+        if (generatePictureUsePromptTaskRequest == null) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "文生图参数为空");
+        }
+        HttpRequest httpRequest = HttpRequest.post(CREATE_OUT_PAINTING_TASK).header(Header.AUTHORIZATION, "Bearer " + apiKey)
+                // 开启异步处理
+                .header(Header.CONTENT_TYPE, ContentType.JSON.getValue()).body(JSONUtil.toJsonStr(generatePictureUsePromptTaskRequest));
+        try (HttpResponse httpResponse = httpRequest.execute()) {
+            if (!httpResponse.isOk()) {
+                log.error("请求失败,异常信息：{}", httpResponse.body());
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "请求失败,文生图任务失败");
+            }
+            log.info("AI 文生图接口原始响应：{}", httpResponse.body());
+            GeneratePictureUsePromptTaskResponse response = JSONUtil.toBean(httpResponse.body(), GeneratePictureUsePromptTaskResponse.class);
+            String errorCode = response.getCode();
+            if (StrUtil.isNotBlank(errorCode)) {
+                String errorMessage = response.getMessage();
+                log.error("AI 文生图接口响应异常,异常信息：{}", errorMessage);
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "AI 文生图接口响应异常");
+            }
+            return response;
+        }
+    }
+
+    /**
      * 创建图生图任务
      */
-    public CreateGeneratePictureByPictureTaskResponse createPictureGeneratePictureTask(CreateGeneratePictureByPictureTaskRequest createGeneratePictureByPictureTaskRequest) {
+    public CreateGeneratePictureByPictureTaskResponse createPictureGeneratePictureTask(
+            GeneratePictureUsePromptTaskRequest createGeneratePictureByPictureTaskRequest) {
         if (createGeneratePictureByPictureTaskRequest == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "图生图参数为空");
         }
@@ -113,7 +144,7 @@ public class AliYunAPI {
                 // 开启异步处理
                 .header(Header.CONTENT_TYPE, ContentType.JSON.getValue()).body(JSONUtil.toJsonStr(createGeneratePictureByPictureTaskRequest));
         try (HttpResponse httpResponse = httpRequest.execute()) {
-            if (!httpResponse.isOk()){
+            if (!httpResponse.isOk()) {
                 log.error("请求失败,异常信息：{}", httpResponse.body());
                 throw new BusinessException(ErrorCode.OPERATION_ERROR, "请求失败,图生图任务失败");
             }
