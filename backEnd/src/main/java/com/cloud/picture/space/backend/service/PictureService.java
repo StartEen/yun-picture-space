@@ -6,8 +6,6 @@ import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPi
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.CreateGeneratePictureUsePromptRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
-import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.CreateGeneratePictureRequest;
-import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.model.dto.picture.*;
 import com.cloud.picture.space.backend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;

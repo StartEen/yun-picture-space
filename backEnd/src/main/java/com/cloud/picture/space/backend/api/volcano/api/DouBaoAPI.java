@@ -8,8 +8,6 @@ import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
-import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskRequest;
-import com.cloud.picture.space.backend.api.volcano.model.generatePictureUseWords.GeneratePictureTaskResponse;
 import com.cloud.picture.space.backend.api.volcano.generatePromptModel.GeneratePromptTaskRequest;
 import com.cloud.picture.space.backend.api.volcano.generatePromptModel.GeneratePromptTaskResponse;
 import com.cloud.picture.space.backend.api.volcano.generatePromptModel.PromptExpansionEnum;
