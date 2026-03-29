@@ -9,6 +9,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.GeneratePictureByPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.GeneratePictureByPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
@@ -131,16 +132,16 @@ public class AliYunAPI {
     /**
      * 创建图生图任务
      */
-    public GeneratePictureByPictureTaskResponse createPictureGeneratePictureTask(
-            GeneratePictureUsePromptTaskRequest createGeneratePictureByPictureTaskRequest) {
-        if (createGeneratePictureByPictureTaskRequest == null) {
+    public GeneratePictureByPictureTaskResponse createPictureGeneratePictureByPictureTask(
+            GeneratePictureByPictureTaskRequest generatePictureByPictureTaskRequest) {
+        if (generatePictureByPictureTaskRequest == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "图生图参数为空");
         }
 
         // 发送请求
         HttpRequest httpRequest = HttpRequest.post(CREATE_OUT_PAINTING_TASK).header(Header.AUTHORIZATION, "Bearer " + apiKey)
                 // 开启异步处理
-                .header(Header.CONTENT_TYPE, ContentType.JSON.getValue()).body(JSONUtil.toJsonStr(createGeneratePictureByPictureTaskRequest));
+                .header(Header.CONTENT_TYPE, ContentType.JSON.getValue()).body(JSONUtil.toJsonStr(generatePictureByPictureTaskRequest));
         try (HttpResponse httpResponse = httpRequest.execute()) {
             if (!httpResponse.isOk()) {
                 log.error("请求失败,异常信息：{}", httpResponse.body());
