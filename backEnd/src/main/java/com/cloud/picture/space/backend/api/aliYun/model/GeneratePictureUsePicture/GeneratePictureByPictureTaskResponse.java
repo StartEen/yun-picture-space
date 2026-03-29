@@ -2,7 +2,8 @@ package com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePictu
 
 
 import cn.hutool.core.annotation.Alias;
-import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateGeneratePictureByPictureTaskResponse implements Serializable {
+public class GeneratePictureByPictureTaskResponse implements Serializable {
     /**
      * 请求唯一标识
      * 用于请求明细溯源和问题排查
@@ -134,4 +135,5 @@ public class CreateGeneratePictureByPictureTaskResponse implements Serializable 
          */
         private Integer height;
     }
+
 }

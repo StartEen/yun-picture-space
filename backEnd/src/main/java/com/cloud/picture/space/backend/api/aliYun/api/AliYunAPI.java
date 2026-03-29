@@ -9,9 +9,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
-import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreateGeneratePictureByPictureTaskRequest;
-import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreateGeneratePictureByPictureTaskResponse;
-import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreatePictureGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.GeneratePictureByPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.getTaskInfo.GetAITaskResponse;
@@ -133,7 +131,7 @@ public class AliYunAPI {
     /**
      * 创建图生图任务
      */
-    public CreateGeneratePictureByPictureTaskResponse createPictureGeneratePictureTask(
+    public GeneratePictureByPictureTaskResponse createPictureGeneratePictureTask(
             GeneratePictureUsePromptTaskRequest createGeneratePictureByPictureTaskRequest) {
         if (createGeneratePictureByPictureTaskRequest == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "图生图参数为空");
@@ -148,7 +146,7 @@ public class AliYunAPI {
                 log.error("请求失败,异常信息：{}", httpResponse.body());
                 throw new BusinessException(ErrorCode.OPERATION_ERROR, "请求失败,图生图任务失败");
             }
-            CreateGeneratePictureByPictureTaskResponse response = JSONUtil.toBean(httpResponse.body(), CreateGeneratePictureByPictureTaskResponse.class);
+            GeneratePictureByPictureTaskResponse response = JSONUtil.toBean(httpResponse.body(), GeneratePictureByPictureTaskResponse.class);
             String errorCode = response.getCode();
             if (StrUtil.isNotBlank(errorCode)) {
                 String errorMessage = response.getMessage();

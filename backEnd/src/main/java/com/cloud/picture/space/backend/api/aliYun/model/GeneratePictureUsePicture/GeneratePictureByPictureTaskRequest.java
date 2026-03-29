@@ -2,7 +2,7 @@ package com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePictu
 
 
 import cn.hutool.core.annotation.Alias;
-import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskRequest;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,7 +14,7 @@ import java.util.List;
  * @Description: 通义千问图像编辑请求体 - qwen-image-2.0-pro 模型
  */
 @Data
-public class CreateGeneratePictureByPictureTaskRequest implements Serializable {
+public class GeneratePictureByPictureTaskRequest implements Serializable {
 
     /**
      * 模型名称

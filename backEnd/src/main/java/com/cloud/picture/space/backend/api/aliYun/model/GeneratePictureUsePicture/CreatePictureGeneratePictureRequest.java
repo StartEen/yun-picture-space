@@ -16,7 +16,7 @@ public class CreatePictureGeneratePictureRequest implements Serializable {
     /**
      * 文字描述（提示词）
      */
-    private String prompt;
+    private String text;
 
     /**
      *  图片（Base 64）
