@@ -10,6 +10,8 @@ import com.cloud.picture.space.backend.annotation.AuthCheck;
 import com.cloud.picture.space.backend.api.aliYun.api.AliYunAPI;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreatePictureGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.GeneratePictureByPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.CreateGeneratePictureUsePromptRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.getTaskInfo.GetAITaskResponse;
@@ -286,7 +288,7 @@ public class PictureController {
     @GetMapping("/tag_category")
     public BaseResponse<PictureTagCategory> listPictureTagCategory() {
         PictureTagCategory pictureTagCategory = new PictureTagCategory();
-        List<String> tagList = Arrays.asList("热门", "搞笑", "生活", "高清", "艺术", "校园", "背景", "游戏", "创意","AI创作");
+        List<String> tagList = Arrays.asList("热门", "搞笑", "生活", "高清", "艺术", "校园", "背景", "游戏", "创意", "AI创作");
         List<String> categoryList = Arrays.asList("模版", "电商", "UI", "UX", "平面", "摄影", "插画");
         pictureTagCategory.setTagList(tagList);
         pictureTagCategory.setCategoryList(categoryList);
@@ -462,8 +464,6 @@ public class PictureController {
     }
 
 
-
-
     /**
      * AI P图 (阿里百炼云）
      */
@@ -492,7 +492,7 @@ public class PictureController {
     /**
      * AI 文生图（阿里云qwen-image-2.0）
      */
-    @PostMapping("/out_generate/create_picture")
+    @PostMapping("/out_generate/create_picture_by_word")
     public BaseResponse<GeneratePictureUsePromptTaskResponse> generatePictureUseWordTask(
             @RequestBody CreateGeneratePictureUsePromptRequest createGeneratePictureUsePromptRequest,
             HttpServletRequest request) {
@@ -506,20 +506,17 @@ public class PictureController {
     }
 
 
-
-
     /**
-     * AI 以图生图 (阿里百炼云）
+     * AI 以图生图 (阿里百炼云qwen-image-2.0-pro）
      */
-    // @PostMapping("/out_generate/create_picture_by_picture")
-    // public BaseResponse<GeneratePictureTaskResponse> generatePictureUsePictureTask(
-    //         @RequestBody CreateGeneratePictureByPictureRequest createGeneratePictureByPictureRequest,
-    //         HttpServletRequest request) {
-    //     return ResultUtils.success();
-    // }
+    @PostMapping("/out_generate/create_picture_by_picture")
+    public BaseResponse<GeneratePictureByPictureTaskResponse> generatePictureUsePictureTask(
+            @RequestBody CreatePictureGeneratePictureRequest createPictureGeneratePictureRequest,
+            @RequestPart("file") MultipartFile multipartFile) {
 
 
-
+        return null;
+    }
 
 
 }

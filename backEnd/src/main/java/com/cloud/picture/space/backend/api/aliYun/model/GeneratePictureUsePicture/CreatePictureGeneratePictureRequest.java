@@ -18,10 +18,6 @@ public class CreatePictureGeneratePictureRequest implements Serializable {
      */
     private String text;
 
-    /**
-     *  图片（Base 64）
-     */
-    private String image;
 
     private static final long serialVersionUID = -1L;
 }
