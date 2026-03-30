@@ -12,6 +12,7 @@ import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPi
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreateEditPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.EditPicture.CreatePictureEditPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.CreatePictureGeneratePictureRequest;
+import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.GeneratePictureByPictureTaskRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePicture.GeneratePictureByPictureTaskResponse;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.CreateGeneratePictureUsePromptRequest;
 import com.cloud.picture.space.backend.api.aliYun.model.GeneratePictureUsePrompt.GeneratePictureUsePromptTaskRequest;
@@ -54,7 +55,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -912,7 +915,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         GeneratePictureUsePromptTaskRequest.ContentItem contentTextItem = new GeneratePictureUsePromptTaskRequest.ContentItem();
 
         contentTextItem.setText(text);
-
+        message.setContent(Arrays.asList(contentTextItem));
         input.setMessages(Arrays.asList(message));
         taskRequest.setInput(input);
         BeanUtil.copyProperties(createGeneratePictureUsePromptRequest, taskRequest);
@@ -932,16 +935,60 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
      * @return 创建以图生图任务响应
      */
     @Override
-    public GeneratePictureByPictureTaskResponse generatePictureUsePictureTask(CreatePictureGeneratePictureRequest createPictureGeneratePictureRequest, MultipartFile multipartFile, User loginUser) {
+    public GeneratePictureByPictureTaskResponse generatePictureUsePictureTask(
+            CreatePictureGeneratePictureRequest createPictureGeneratePictureRequest,
+            MultipartFile multipartFile, User loginUser) {
+        String text = createPictureGeneratePictureRequest.getText();
         //校验参数
         ThrowUtils.throwIf(multipartFile == null, ErrorCode.PARAMS_ERROR, "请上传图片");
         ThrowUtils.throwIf(StrUtil.isBlank(createPictureGeneratePictureRequest.getText()), ErrorCode.PARAMS_ERROR, "请输入描述");
         ThrowUtils.throwIf(createPictureGeneratePictureRequest.getText().length() > 300, ErrorCode.PARAMS_ERROR, "请输入小于300个字符的描述");
         log.info("创建以图生图任务请求参数：{}", createPictureGeneratePictureRequest);
+        if (text.length() < 50){
+            text = douBaoAPI.generateExpandedPrompt(PromptExpansionEnum.EXPAND_PROMPT_USE_WORDS_TO_IMAGE, text);
+        }
+        log.info("创建以图生图任务请求参数：{}", text);
+        //图片转换成Base64
+        String imageBase64 = convertMultipartFileToBase64(multipartFile);
 
+        //构造请求参数
+        GeneratePictureByPictureTaskRequest taskRequest = new GeneratePictureByPictureTaskRequest();
+        GeneratePictureByPictureTaskRequest.Input input = new GeneratePictureByPictureTaskRequest.Input();
+        GeneratePictureByPictureTaskRequest.Message message = new GeneratePictureByPictureTaskRequest.Message();
+        GeneratePictureByPictureTaskRequest.ContentItem contentImageItem = new GeneratePictureByPictureTaskRequest.ContentItem();
+        contentImageItem.setImage(imageBase64);
+        GeneratePictureByPictureTaskRequest.ContentItem contentTextItem = new GeneratePictureByPictureTaskRequest.ContentItem();
+        contentTextItem.setText(text);
 
+        message.setContent(Arrays.asList(contentImageItem, contentTextItem));
+        input.setMessages(Arrays.asList(message));
+        taskRequest.setInput(input);
+        BeanUtil.copyProperties(createPictureGeneratePictureRequest, taskRequest);
+        log.info("创建图片P图任务请求参数：{}", taskRequest);
+        return aliYunAPI.createPictureGeneratePictureByPictureTask(taskRequest);
+    }
 
-        return null;
+    /**
+     * 将 MultipartFile 转换为 Base64 字符串
+     * @param multipartFile 图片文件
+     * @return Base64 编码的字符串
+     */
+    private String convertMultipartFileToBase64(MultipartFile multipartFile) {
+        try (InputStream inputStream = multipartFile.getInputStream();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            byte[] imageBytes = outputStream.toByteArray();
+            return Base64.getEncoder().encodeToString(imageBytes);
+        } catch (IOException e) {
+            log.error("图片转换 Base64 失败", e);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "图片转换失败");
+        }
     }
 
 }
