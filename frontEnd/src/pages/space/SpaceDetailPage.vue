@@ -7,7 +7,9 @@
             <h2>{{ space.spaceName }}</h2>
             <span class="space-tag">私有空间</span>
           </div>
-          <a-tooltip :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`">
+          <a-tooltip
+            :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
+          >
             <a-progress
               type="circle"
               :size="42"
@@ -19,7 +21,11 @@
 
         <div class="action-group">
           <div class="batch-controls">
-            <a-checkbox v-model:checked="selectAll" @change="handleSelectAll" class="select-checkbox">
+            <a-checkbox
+              v-model:checked="selectAll"
+              @change="handleSelectAll"
+              class="select-checkbox"
+            >
               全选
             </a-checkbox>
             <div class="divider-v-small"></div>
@@ -31,17 +37,15 @@
               :disabled="selectedIds.length === 0"
             >
               批量编辑
-              <span class="count-badge" v-if="selectedIds.length > 0">{{ selectedIds.length }}</span>
+              <span class="count-badge" v-if="selectedIds.length > 0">{{
+                selectedIds.length
+              }}</span>
             </a-button>
           </div>
 
           <div class="divider-v"></div>
 
-          <a-button
-            class="btn-light-primary"
-            :href="`/ai_create?spaceId=${id}`"
-            target="_blank"
-          >
+          <a-button class="btn-light-primary" :href="`/ai_create?spaceId=${id}`" target="_blank">
             <template #icon><FullscreenOutlined /></template>
             AI 绘画
           </a-button>
@@ -53,6 +57,15 @@
           >
             <template #icon><PlusOutlined /></template>
             创建图片
+          </a-button>
+          <a-button
+            type="primary"
+            class="btn-primary"
+            :href="`/space_analyze?spaceId=${id}`"
+            target="_blank"
+          >
+            <template #icon><BarChartOutlined /></template>
+            空间分析
           </a-button>
         </div>
       </div>
@@ -103,7 +116,12 @@ import PictureSearchForm from '@/components/picture/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
 import 'vue3-colorpicker/style.css'
 import PictureBathEditModal from '@/components/modal/PictureBathEditModal.vue'
-import { EditOutlined, PlusOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
+import {
+  EditOutlined,
+  PlusOutlined,
+  FullscreenOutlined,
+  BarChartOutlined,
+} from '@ant-design/icons-vue'
 
 interface Props {
   id: string | number
@@ -267,7 +285,9 @@ const doBatchEdit = () => {
 .control-panel {
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.04), 0 1px 4px -1px rgba(0, 0, 0, 0.02);
+  box-shadow:
+    0 4px 24px -4px rgba(0, 0, 0, 0.04),
+    0 1px 4px -1px rgba(0, 0, 0, 0.02);
   padding: 20px 24px;
   margin-bottom: 24px;
   border: 1px solid #f0f2f5;

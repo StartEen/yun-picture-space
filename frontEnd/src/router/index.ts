@@ -79,6 +79,11 @@ const router = createRouter({
       name: 'AI 图片创作',
       component: () => import('@/pages/picture/AddPictureAIPage.vue'),
     },
+    {
+      path: '/space_analyze',
+      name: '空间分析',
+      component: () => import('@/pages/analyze/SpaceAnalyzePage.vue'),
+    },
   ],
 })
 
