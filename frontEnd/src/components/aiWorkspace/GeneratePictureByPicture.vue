@@ -63,7 +63,9 @@
 
     <div style="margin-top: 16px">
       <a-flex gap="16" justify="flex-end">
-        <a-button type="primary" v-if="uploadedImageUrl" @click="changeHandleUploadImage">更换上传的图片</a-button>
+        <a-button type="primary" v-if="uploadedImageUrl" @click="changeHandleUploadImage"
+          >更换上传的图片</a-button
+        >
         <a-button type="primary" :loading="generatingLoading" @click="createTask">
           {{ generatingLoading ? '生成中...' : '生成图片' }}
         </a-button>
@@ -86,6 +88,7 @@ import { onUnmounted, ref } from 'vue'
 import {
   generatePictureUsePictureTaskUsingPost,
   getAliYunAiTaskUsingGet,
+  uploadPictureUsingPost,
 } from '@/api/pictureController.ts'
 import { message, type UploadProps } from 'ant-design-vue'
 
@@ -168,7 +171,7 @@ const startPolling = () => {
       //清理轮询
       clearPollingTimer()
     }
-  }, 3000)
+  }, 30000)
 }
 const clearPollingTimer = () => {
   if (pollingTimer) {
@@ -213,13 +216,11 @@ const handleUploadImage = async ({ file }: any) => {
   reader.readAsDataURL(file)
 }
 
-
 // 清除已上传的图片，恢复到可以再次上传的状态
 const changeHandleUploadImage = () => {
   uploadedImageUrl.value = undefined
   uploadedFile.value = null
 }
-
 
 /**
  * 创建任务
@@ -234,14 +235,17 @@ const createTask = async () => {
   // 设置 taskId 为一个临时值，让按钮显示加载状态
   taskId.value = 'creating'
 
-  const params: API.CreatePictureGeneratePictureRequest = {
-    text: prompt.value,
-  }
-
   try {
-    const res = await generatePictureUsePictureTaskUsingPost(params, uploadedFile.value!)
+    const res = await generatePictureUsePictureTaskUsingPost(
+      {
+        text: prompt.value,
+      },
+      {},
+      uploadedFile.value!,
+    )
 
     if (res.data.code === 0 && res.data.data) {
+      console.log('P图任务创建成功,{}', res)
       // 处理响应数据
       const output = res.data.data.output
       if (output?.choices && output.choices.length > 0) {
@@ -292,7 +296,49 @@ const createTask = async () => {
 const uploadLoading = ref<boolean>(false)
 
 // 上传图片
-const handleUpload = async () => {}
+const handleUpload = async () => {
+
+  if (!resultImageUrl.value) {
+    message.error('请先生成图片')
+    return
+  }
+  uploadLoading.value = true
+  try {
+    //从url下载图片
+    const response = await fetch(resultImageUrl.value)
+    if (!response.ok) {
+      message.error('下载图片失败')
+      return
+    }
+
+    // 2. 将响应转换为Blob
+    const blob = await response.blob()
+
+    // 3. 创建File对象
+    const fileName = `ai_edit_${Date.now()}.png`
+    const file = new File([blob], fileName, { type: blob.type })
+
+    // 4. 准备上传参数
+    const params: API.uploadPictureUsingPOSTParams = {
+      spaceId: props.spaceId,
+    }
+
+    // 开始传送图片
+    const res = await uploadPictureUsingPost(params, {}, file)
+    if (res.data.code === 0 && res.data.data) {
+      message.success('图片上传成功')
+      //将上传成功的图片信息
+      props.onSuccess?.(res.data.data)
+    } else {
+      message.error('图片上传失败：' + (res.data.message || '未知错误'))
+    }
+  } catch (error: any) {
+    console.error('上传失败', error)
+    message.error('应用结果上传失败: ' + (error?.message || '未知错误'))
+  } finally {
+    uploadLoading.value = false
+  }
+}
 </script>
 
 <style scoped>

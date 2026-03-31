@@ -247,10 +247,6 @@ declare namespace API {
     text?: string
   }
 
-  type CreatePictureGeneratePictureRequest = {
-    text?: string
-  }
-
   type DeleteRequest = {
     id?: number
   }
@@ -261,6 +257,10 @@ declare namespace API {
     output?: Output1
     requestId?: string
     usage?: Usage1
+  }
+
+  type generatePictureUsePictureTaskUsingPOSTParams = {
+    text?: string
   }
 
   type GeneratePictureUsePromptTaskResponse = {

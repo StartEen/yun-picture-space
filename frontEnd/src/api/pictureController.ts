@@ -187,6 +187,8 @@ export async function createEditPictureTaskUsingPost(
 
 /** generatePictureUsePictureTask POST /api/picture/out_generate/create_picture_by_picture */
 export async function generatePictureUsePictureTaskUsingPost(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.generatePictureUsePictureTaskUsingPOSTParams,
   body: {},
   file?: File,
   options?: { [key: string]: any }
@@ -217,6 +219,9 @@ export async function generatePictureUsePictureTaskUsingPost(
     '/api/picture/out_generate/create_picture_by_picture',
     {
       method: 'POST',
+      params: {
+        ...params,
+      },
       data: formData,
       requestType: 'form',
       ...(options || {}),
