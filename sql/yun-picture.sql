@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 27/03/2026 15:24:40
+ Date: 31/03/2026 16:06:16
 */
 
 SET NAMES utf8mb4;
@@ -54,7 +54,7 @@ CREATE TABLE `picture`  (
   INDEX `idx_userId`(`userId` ASC) USING BTREE,
   INDEX `idx_reviewStatus`(`reviewStatus` ASC) USING BTREE,
   INDEX `idx_spaceId`(`spaceId` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2033783422239535106 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '图片' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2038890165659435011 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '图片' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of picture
@@ -129,5 +129,95 @@ INSERT INTO `picture` VALUES (2033746434081902594, 'https://yun-picture-13693727
 INSERT INTO `picture` VALUES (2033746444978704386, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-17_behBqLis51Rgjxm7.webp', '坎特雷拉_9', NULL, NULL, NULL, 22866, 474, 474, 1, 'webp', 2001915226368913409, '2026-03-17 11:25:12', '2026-03-17 11:25:12', '2026-03-17 11:25:27', 1, 1, '管理员自动过审', 2001915226368913409, '2026-03-17 11:25:12', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-17_behBqLis51Rgjxm7.webp', NULL, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///public/2001915226368913409/2026-03-17_behBqLis51Rgjxm7.jpg', '0x1e2f52');
 INSERT INTO `picture` VALUES (2033746454927593474, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-17_bCAnyXua1QluEjDL.webp', '坎特雷拉_10', NULL, NULL, NULL, 23492, 474, 284, 1.67, 'webp', 2001915226368913409, '2026-03-17 11:25:14', '2026-03-17 11:25:14', '2026-03-17 11:25:26', 1, 1, '管理员自动过审', 2001915226368913409, '2026-03-17 11:25:15', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-17_bCAnyXua1QluEjDL.webp', NULL, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///public/2001915226368913409/2026-03-17_bCAnyXua1QluEjDL.jpg', '0x7b7b60');
 INSERT INTO `picture` VALUES (2033783422239535105, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-17_MWoxdmeqqFltFhGY.webp', '黑洞', NULL, '摄影', '[\"背景\"]', 1140244, 4026, 2358, 1.71, 'webp', 2001915226368913409, '2026-03-17 13:52:08', '2026-03-17 13:52:41', '2026-03-17 13:52:41', 0, 1, '管理员自动过审', 2001915226368913409, '2026-03-17 13:52:41', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-17_MWoxdmeqqFltFhGY.webp', NULL, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///public/2001915226368913409/2026-03-17_MWoxdmeqqFltFhGY.jpg', '0x000');
+INSERT INTO `picture` VALUES (2038799428762644481, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-31_pzhblyHmL30xmgSF.webp', 'ai_edit_小猫腻', '一只三花小猫咪正在阳台飘窗上晒太阳闭着眼睛仰着头，窗户打开，有只小蝴蝶只正在小猫咪的鼻尖上停留', '插画', '[\"AI创作\"]', 215318, 2048, 2048, 1, 'webp', 2001915226368913409, '2026-03-31 10:03:57', '2026-03-31 10:06:46', '2026-03-31 10:06:46', 0, 1, '管理员自动过审', 2001915226368913409, '2026-03-31 10:06:46', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-31_pzhblyHmL30xmgSF_thumbnail.png', NULL, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///public/2001915226368913409/2026-03-31_pzhblyHmL30xmgSF.png', '0x7a785c');
+INSERT INTO `picture` VALUES (2038890165659435010, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-31_1HOmZIiEHw6tL7DG.webp', 'ai_edit_1774944269271', '绿色的树枝', '摄影', '[\"AI创作\"]', 179452, 1376, 768, 1.79, 'webp', 2001915226368913409, '2026-03-31 16:04:30', '2026-03-31 16:05:09', '2026-03-31 16:05:08', 0, 1, '管理员自动过审', 2001915226368913409, '2026-03-31 16:05:09', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-31_1HOmZIiEHw6tL7DG.webp', NULL, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///public/2001915226368913409/2026-03-31_1HOmZIiEHw6tL7DG.png', '0xb49f81');
+
+-- ----------------------------
+-- Table structure for space
+-- ----------------------------
+DROP TABLE IF EXISTS `space`;
+CREATE TABLE `space`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `spaceName` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '空间名称',
+  `spaceLevel` int NULL DEFAULT 0 COMMENT '空间等级:0-普通版 1-专业版 2-旗舰版',
+  `maxSize` bigint NULL DEFAULT 0 COMMENT '空间中图片的最大总大小',
+  `maxCount` bigint NULL DEFAULT 0 COMMENT '空间中图片的最大数量',
+  `totalSize` bigint NULL DEFAULT 0 COMMENT '当前空间中图片的总大小',
+  `totalCount` bigint NULL DEFAULT 0 COMMENT '当前空间中图片的数量',
+  `userId` bigint NOT NULL COMMENT '创建用户id',
+  `createTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `editTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '编辑时间',
+  `updateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `isDelete` tinyint NOT NULL DEFAULT 0 COMMENT '是否删除',
+  `spaceType` int NOT NULL DEFAULT 0 COMMENT '空间类型：0-私有个人空间 1-团队空间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_userId`(`userId` ASC) USING BTREE,
+  INDEX `idx_spaceName`(`spaceName` ASC) USING BTREE,
+  INDEX `idx_spaceLevel`(`spaceLevel` ASC) USING BTREE,
+  INDEX `idx_spaceType`(`spaceType` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2030485422461386754 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '空间' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of space
+-- ----------------------------
+INSERT INTO `space` VALUES (2008371139942469634, '测试', 0, 104857600, 100, 1738300, 3, 2001915226368913409, '2026-01-06 10:52:48', '2026-01-06 10:52:48', '2026-03-26 11:04:19', 0, 0);
+INSERT INTO `space` VALUES (2008374503782699010, '默认私有空间', 0, 104857600, 100, 0, 0, 2008374503631704065, '2026-01-06 11:06:10', '2026-01-06 11:06:10', '2026-03-08 11:33:27', 0, 0);
+
+-- ----------------------------
+-- Table structure for space_user
+-- ----------------------------
+DROP TABLE IF EXISTS `space_user`;
+CREATE TABLE `space_user`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `spaceId` bigint NOT NULL COMMENT '空间id',
+  `userId` bigint NOT NULL COMMENT '用户id',
+  `spaceRole` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'viewer' COMMENT '空间角色：view/editor/admin',
+  `createTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_spaceId_userId`(`spaceId` ASC, `userId` ASC) USING BTREE,
+  INDEX `idx_spaceId`(`spaceId` ASC) USING BTREE,
+  INDEX `idx_userId`(`userId` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '空间用户关联' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of space_user
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for user
+-- ----------------------------
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户id',
+  `userAccount` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户账号',
+  `userPassword` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户密码',
+  `userName` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户昵称',
+  `userAvatar` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户头像',
+  `userProfile` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户简介',
+  `userRole` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'user' COMMENT '用户角色：user/admin',
+  `vipExpireTime` datetime NULL DEFAULT NULL COMMENT '会员到期时间',
+  `vipCode` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '会员码',
+  `vipNumber` bigint NULL DEFAULT NULL COMMENT '会员编号',
+  `shareCode` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '分享码',
+  `inviteUser` bigint NULL DEFAULT NULL COMMENT '邀请用户id',
+  `editTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '编辑时间',
+  `createTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `isDelete` tinyint NOT NULL DEFAULT 0 COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_userAccount`(`userAccount` ASC) USING BTREE,
+  INDEX `idx_userName`(`userName` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2026487421816496131 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of user
+-- ----------------------------
+INSERT INTO `user` VALUES (2001556182340935681, '我是老6', 'c217c89240bf69d08764ff1410616ee7', NULL, NULL, '我平时喜欢吹牛皮', 'admin', NULL, NULL, NULL, NULL, NULL, '2025-12-18 15:32:35', '2025-12-18 15:32:35', '2026-02-25 11:34:22', 0);
+INSERT INTO `user` VALUES (2001915226368913409, 'admin', 'c217c89240bf69d08764ff1410616ee7', '我是老大', '', '', 'admin', NULL, NULL, NULL, NULL, NULL, '2025-12-19 15:19:18', '2025-12-19 15:19:18', '2026-02-25 12:54:56', 0);
+INSERT INTO `user` VALUES (2003011936369504258, 'test1', 'c217c89240bf69d08764ff1410616ee7', NULL, NULL, NULL, 'user', NULL, NULL, NULL, NULL, NULL, '2025-12-22 15:57:14', '2025-12-22 15:57:14', '2025-12-22 15:57:14', 0);
+INSERT INTO `user` VALUES (2003012479758364673, 'test6', 'c217c89240bf69d08764ff1410616ee7', NULL, NULL, NULL, 'user', NULL, NULL, NULL, NULL, NULL, '2025-12-22 15:59:24', '2025-12-22 15:59:24', '2025-12-22 15:59:24', 0);
+INSERT INTO `user` VALUES (2008373936259731458, 'test', 'c217c89240bf69d08764ff1410616ee7', NULL, NULL, NULL, 'user', NULL, NULL, NULL, NULL, NULL, '2026-01-06 11:03:54', '2026-01-06 11:03:54', '2026-01-06 11:03:54', 0);
+INSERT INTO `user` VALUES (2008374503631704065, 'test2', 'c217c89240bf69d08764ff1410616ee7', NULL, NULL, NULL, 'user', NULL, NULL, NULL, NULL, NULL, '2026-01-06 11:06:10', '2026-01-06 11:06:10', '2026-01-06 11:06:10', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
