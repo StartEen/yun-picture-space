@@ -31,11 +31,11 @@
 
       <div class="action-section">
         <a-space>
-          <a-button class="action-btn" href="/space_analyze?queryPublic=1" target="_blank">
+          <a-button class="action-btn analyze-btn" href="/space_analyze?queryPublic=1" target="_blank">
             <template #icon><BarChartOutlined /></template>
             分析公共图库
           </a-button>
-          <a-button class="action-btn" href="/space_analyze?queryAll=1" target="_blank">
+          <a-button class="action-btn analyze-btn" href="/space_analyze?queryAll=1" target="_blank">
             <template #icon><BarChartOutlined /></template>
             分析全部空间
           </a-button>
@@ -341,6 +341,18 @@ const getSpaceLevelColor = (level: number) => {
 .search-btn, .create-btn, .action-btn {
   border-radius: 6px;
   font-weight: 500;
+}
+
+.analyze-btn {
+  background-color: #52c41a;
+  border-color: #52c41a;
+  color: #ffffff;
+}
+
+.analyze-btn:hover {
+  background-color: #73d13d;
+  border-color: #73d13d;
+  color: #ffffff;
 }
 
 /* ========== 表格卡片 ========== */
