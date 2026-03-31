@@ -511,7 +511,7 @@ public class PictureController {
      */
     @PostMapping("/out_generate/create_picture_by_picture")
     public BaseResponse<GeneratePictureByPictureTaskResponse> generatePictureUsePictureTask(
-            @RequestBody CreatePictureGeneratePictureRequest createPictureGeneratePictureRequest,
+            CreatePictureGeneratePictureRequest createPictureGeneratePictureRequest,
             @RequestPart("file") MultipartFile multipartFile,
             HttpServletRequest request) {
         ThrowUtils.throwIf(createPictureGeneratePictureRequest == null ||

@@ -984,7 +984,15 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             }
 
             byte[] imageBytes = outputStream.toByteArray();
-            return Base64.getEncoder().encodeToString(imageBytes);
+            String base64Data = Base64.getEncoder().encodeToString(imageBytes);
+
+            // 获取文件类型并添加 data URI scheme 前缀
+            String mimeType = multipartFile.getContentType();
+            if (mimeType == null || mimeType.isEmpty()) {
+                mimeType = "image/jpeg"; // 默认使用 jpeg
+            }
+
+            return "data:" + mimeType + ";base64," + base64Data;
         } catch (IOException e) {
             log.error("图片转换 Base64 失败", e);
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "图片转换失败");
