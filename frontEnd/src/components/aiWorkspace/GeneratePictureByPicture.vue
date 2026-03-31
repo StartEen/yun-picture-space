@@ -5,13 +5,14 @@
         <div class="section-title">上传图片</div>
         <div class="image-upload-card">
           <a-spin :spinning="uploadImageLoading" tip="正在上传图片中，请稍候...">
-            <a-upload list-type="picture-card" :show-upload-list="false" class="upload-container">
-              <template #upload-button>
-                <div>
+            <a-upload list-type="picture" :show-upload-list="false" class="upload-container">
+              <div class="upload-content">
+                <div class="upload-icon">
                   <PlusOutlined />
-                  <div class="ant-upload-text">点击上传</div>
                 </div>
-              </template>
+                <div class="upload-text">点击上传或拖拽图片到此处</div>
+                <div class="upload-hint">支持 JPG、PNG、GIF 格式，最大 6MB</div>
+              </div>
             </a-upload>
           </a-spin>
         </div>
@@ -63,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { onUnmounted, ref } from 'vue'
 import { getAliYunAiTaskUsingGet } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
@@ -171,11 +172,7 @@ onUnmounted(() => {
 const uploadLoading = ref<boolean>(false)
 
 // 上传图片
-const handleUpload = async () => {
-
-}
-
-
+const handleUpload = async () => {}
 </script>
 
 <style scoped>
@@ -265,14 +262,11 @@ const handleUpload = async () => {
   background-color: #f8fafc;
   border: 1px dashed #d9d9d9;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* 移除原本的 padding 和 display flex，让内部组件自己去撑满 */
   overflow: hidden;
   transition: all 0.3s ease;
   position: relative;
   box-sizing: border-box;
-  padding: 12px;
 }
 
 .image-upload-card:hover {
@@ -281,55 +275,103 @@ const handleUpload = async () => {
   transform: translateY(-2px);
 }
 
+/* --- 核心修改：修复 a-spin 容器不能撑满高度的问题 --- */
+.image-upload-card :deep(.ant-spin-nested-loading),
+.image-upload-card :deep(.ant-spin-container) {
+  width: 100%;
+  height: 100%;
+}
+
 /* 上传容器样式 */
 .upload-container {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block; /* 让占位显示为块级铺满 */
 }
 
-/* 上传按钮样式 */
+/* --- 核心修改：强制让 a-upload 的触发区域撑满 100% --- */
 .upload-container :deep(.ant-upload) {
   width: 100%;
   height: 100%;
-  display: flex;
+  display: flex !important; /* 覆盖 Antd 默认的 table 布局 */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   border: none;
   background: transparent;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .upload-container :deep(.ant-upload:hover) {
   background-color: rgba(24, 144, 255, 0.05);
-  border-radius: 8px;
 }
 
-/* 上传图标样式 */
-.upload-container :deep(.ant-upload-icon) {
-  font-size: 48px;
-  color: #d9d9d9;
+/* 上传内容样式 */
+.upload-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* 移除原本固定的 padding: 24px，由 Flex 自然居中 */
+  box-sizing: border-box;
   transition: all 0.3s ease;
 }
 
-.upload-container :deep(.ant-upload:hover .ant-upload-icon) {
+/* 上传图标 */
+.upload-icon {
+  /* 保持原有样式不变 */
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(24, 144, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.upload-icon :deep(.anticon) {
+  font-size: 24px;
   color: #1890ff;
+  transition: all 0.3s ease;
+}
+
+/* 上传文字 */
+.upload-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2225;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+/* 上传提示 */
+.upload-hint {
+  font-size: 12px;
+  color: #8c8c8c;
+  text-align: center;
+  transition: all 0.3s ease;
+  line-height: 1.4;
+}
+
+/* 悬停效果 */
+.upload-container :deep(.ant-upload:hover) .upload-icon {
+  background-color: rgba(24, 144, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.upload-container :deep(.ant-upload:hover) .upload-icon :deep(.anticon) {
   transform: scale(1.1);
 }
 
-/* 上传文字样式 */
-.upload-container :deep(.ant-upload-text) {
-  margin-top: 16px;
-  color: #8c8c8c;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.upload-container :deep(.ant-upload:hover .ant-upload-text) {
-  color: #1890ff;
+.upload-container :deep(.ant-upload:hover) .upload-hint {
+  color: #666666;
 }
 
 /* 图片自适应缩放，不裁切，保持比例 */
