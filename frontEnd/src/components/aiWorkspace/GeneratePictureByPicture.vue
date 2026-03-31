@@ -13,7 +13,6 @@
                   @click="handleImagePreview(uploadedImageUrl)"
                 />
               </div>
-
               <a-upload
                 v-else
                 list-type="picture"
@@ -64,6 +63,7 @@
 
     <div style="margin-top: 16px">
       <a-flex gap="16" justify="flex-end">
+        <a-button type="primary" v-if="uploadedImageUrl" @click="changeHandleUploadImage">更换上传的图片</a-button>
         <a-button type="primary" :loading="generatingLoading" @click="createTask">
           {{ generatingLoading ? '生成中...' : '生成图片' }}
         </a-button>
@@ -213,6 +213,14 @@ const handleUploadImage = async ({ file }: any) => {
   reader.readAsDataURL(file)
 }
 
+
+// 清除已上传的图片，恢复到可以再次上传的状态
+const changeHandleUploadImage = () => {
+  uploadedImageUrl.value = undefined
+  uploadedFile.value = null
+}
+
+
 /**
  * 创建任务
  */
@@ -334,7 +342,7 @@ const handleUpload = async () => {}
   display: inline-block;
   width: 4px;
   height: 16px;
-  background-color: #1890ff; /* Ant Design 默认主题蓝 */
+  background-color: #1890ff;
   border-radius: 2px;
   margin-right: 8px;
   transition: all 0.3s;
@@ -345,7 +353,8 @@ const handleUpload = async () => {}
   background-color: #40a9ff;
 }
 
-/* 图片预览卡片 */
+/* ==================== 卡片基础样式统一 ==================== */
+.image-upload-card,
 .image-preview-card {
   width: 100%;
   height: 300px;
@@ -359,72 +368,37 @@ const handleUpload = async () => {}
   transition: all 0.3s ease;
   position: relative;
   box-sizing: border-box;
-  padding: 12px;
 }
 
+.image-upload-card:hover,
 .image-preview-card:hover {
-  border-color: #1890ff;
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
-}
-
-/* 图片上传卡片 */
-.image-upload-card {
-  width: 100%;
-  height: 300px;
-  background-color: #f8fafc;
-  border: 1px dashed #d9d9d9;
-  border-radius: 8px;
-  /* 移除原本的 padding 和 display flex，让内部组件自己去撑满 */
-  overflow: hidden;
-  transition: all 0.3s ease;
-  position: relative;
-  box-sizing: border-box;
-}
-
-.image-upload-card:hover {
   border-color: #1890ff;
   box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
   transform: translateY(-2px);
 }
 
-/* --- 核心修改：修复 a-spin 容器不能撑满高度的问题 --- */
+/* ==================== 修复加载组件(a-spin)的高度 ==================== */
 .image-upload-card :deep(.ant-spin-nested-loading),
-.image-upload-card :deep(.ant-spin-container) {
+.image-upload-card :deep(.ant-spin-container),
+.image-preview-card :deep(.ant-spin-nested-loading),
+.image-preview-card :deep(.ant-spin-container) {
   width: 100%;
   height: 100%;
-}
-
-/* 新增一个顶层容器类，确保撑满整个 spin 的 100% 空间 */
-.upload-wrapper {
-  width: 100%;
-  height: 100%;
-}
-
-/* 上传内容样式：因为父级（a-upload 触发区）已经是 100% 并且居中了，
-   这里只需要纵向排列内部文字和图标即可 */
-.upload-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  transition: all 0.3s ease;
 }
 
-/* 图片预览样式：增加一点内边距（padding），让图片不要死死贴着虚线边框 */
-.image-preview {
+/* ==================== 左侧：上传容器专属内部排版 ==================== */
+.upload-wrapper {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  padding: 12px;
-  box-sizing: border-box;
 }
 
-/* ---------- 以下保持你现有的样式不变 ---------- */
-/* 比如 .upload-container 和 :deep(.ant-upload) 的设置不需要动 */
 .upload-container {
   width: 100%;
   height: 100%;
@@ -444,7 +418,13 @@ const handleUpload = async () => {}
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
-/* 上传内容样式 */
+
+.upload-container :deep(.ant-upload:hover) {
+  background-color: rgba(24, 144, 255, 0.02);
+  border-radius: 4px;
+}
+
+/* ==================== 消除割裂感：上传区域内部空状态化 ==================== */
 .upload-content {
   width: 100%;
   height: 100%;
@@ -452,51 +432,56 @@ const handleUpload = async () => {}
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* 移除原本固定的 padding: 24px，由 Flex 自然居中 */
   box-sizing: border-box;
   transition: all 0.3s ease;
 }
 
-/* 上传图标 */
 .upload-icon {
-  /* 保持原有样式不变 */
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: rgba(24, 144, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
+  background: transparent;
   transition: all 0.3s ease;
 }
 
 .upload-icon :deep(.anticon) {
-  font-size: 24px;
-  color: #1890ff;
-  transition: all 0.3s ease;
+  font-size: 48px;
+  color: #d9d9d9;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
-/* 上传文字 */
 .upload-text {
   font-size: 14px;
-  font-weight: 500;
-  color: #1f2225;
+  font-weight: normal;
+  color: #8c8c8c;
   margin-bottom: 8px;
   transition: all 0.3s ease;
-  text-align: center;
 }
 
-/* 上传提示 */
 .upload-hint {
   font-size: 12px;
-  color: #8c8c8c;
+  color: #bfbfbf;
   text-align: center;
   transition: all 0.3s ease;
   line-height: 1.4;
 }
 
-/* 图片预览样式 */
+/* 悬停交互效果 */
+.upload-container :deep(.ant-upload:hover) .upload-icon :deep(.anticon) {
+  color: #1890ff;
+  transform: scale(1.1) translateY(-4px);
+}
+
+.upload-container :deep(.ant-upload:hover) .upload-text {
+  color: #1890ff;
+}
+
+.upload-container :deep(.ant-upload:hover) .upload-hint {
+  color: #69b1ff;
+}
+
+/* ==================== 图片展示统一（左侧预览 & 右侧结果） ==================== */
 .image-preview {
   width: 100%;
   height: 100%;
@@ -506,32 +491,16 @@ const handleUpload = async () => {}
   overflow: hidden;
 }
 
-.image-preview :deep(.ant-image) {
+.image-upload-card :deep(.ant-image),
+.image-preview-card :deep(.ant-image) {
   max-width: 100%;
   max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.image-preview :deep(.ant-image-img) {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-/* 悬停效果 */
-.upload-container :deep(.ant-upload:hover) .upload-icon {
-  background-color: rgba(24, 144, 255, 0.1);
-  transform: scale(1.05);
-}
-
-.upload-container :deep(.ant-upload:hover) .upload-icon :deep(.anticon) {
-  transform: scale(1.1);
-}
-
-.upload-container :deep(.ant-upload:hover) .upload-hint {
-  color: #666666;
-}
-
-/* 图片自适应缩放，不裁切，保持比例 */
+.image-upload-card :deep(.ant-image-img),
 .image-preview-card :deep(.ant-image-img) {
   max-width: 100%;
   max-height: 100%;
@@ -542,12 +511,13 @@ const handleUpload = async () => {}
   cursor: pointer;
 }
 
+.image-upload-card :deep(.ant-image-img:hover),
 .image-preview-card :deep(.ant-image-img:hover) {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   transform: scale(1.02);
 }
 
-/* 文本域调整 */
+/* ==================== 其他通用样式 ==================== */
 .custom-textarea {
   border-radius: 8px;
   transition: all 0.3s ease;
@@ -559,14 +529,12 @@ const handleUpload = async () => {}
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
 }
 
-/* 自定义空状态样式，使文本居中 */
 .custom-empty :deep(.ant-empty-description) {
   text-align: center;
   color: #8c8c8c;
   font-size: 14px;
 }
 
-/* 按钮样式优化 */
 :deep(.ant-btn) {
   border-radius: 6px;
   transition: all 0.3s ease;
@@ -587,7 +555,6 @@ const handleUpload = async () => {}
   border-color: #40a9ff;
 }
 
-/* 加载动画样式 */
 :deep(.ant-spin) {
   height: 300px;
   display: flex;
@@ -601,7 +568,6 @@ const handleUpload = async () => {}
   margin-top: 16px;
 }
 
-/* 行和列布局调整 */
 :deep(.ant-row) {
   margin-bottom: 24px;
 }
@@ -614,13 +580,13 @@ const handleUpload = async () => {}
   box-sizing: border-box;
 }
 
-/* 响应式布局 */
 @media (max-width: 768px) {
   #generate-picture-Prompt {
     padding: 16px;
   }
 
-  .image-preview-card {
+  .image-preview-card,
+  .image-upload-card {
     height: 200px;
   }
 
