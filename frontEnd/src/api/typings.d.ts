@@ -17,9 +17,15 @@ declare namespace API {
     message?: string
   }
 
-  type BaseResponseGeneratePictureTaskResponse_ = {
+  type BaseResponseGeneratePictureByPictureTaskResponse_ = {
     code?: number
-    data?: GeneratePictureTaskResponse
+    data?: GeneratePictureByPictureTaskResponse
+    message?: string
+  }
+
+  type BaseResponseGeneratePictureUsePromptTaskResponse_ = {
+    code?: number
+    data?: GeneratePictureUsePromptTaskResponse
     message?: string
   }
 
@@ -202,7 +208,25 @@ declare namespace API {
     message?: Message
   }
 
+  type Choice1 = {
+    finishReason?: string
+    message?: Message1
+  }
+
+  type Choice2 = {
+    finishReason?: string
+    message?: Message2
+  }
+
   type Content = {
+    image?: string
+  }
+
+  type Content1 = {
+    image?: string
+  }
+
+  type Content2 = {
     image?: string
   }
 
@@ -214,8 +238,8 @@ declare namespace API {
     usage?: Usage
   }
 
-  type CreateGeneratePictureRequest = {
-    prompt?: string
+  type CreateGeneratePictureUsePromptRequest = {
+    text?: string
   }
 
   type CreatePictureEditPictureTaskRequest = {
@@ -223,26 +247,32 @@ declare namespace API {
     text?: string
   }
 
+  type CreatePictureGeneratePictureRequest = {
+    text?: string
+  }
+
   type DeleteRequest = {
     id?: number
   }
 
-  type ErrorDetail = {
+  type GeneratePictureByPictureTaskResponse = {
     code?: string
     message?: string
-  }
-
-  type GeneratePictureTaskResponse = {
-    created?: number
-    data?: ImageData[]
-    error?: ErrorDetail
-    model?: string
-    tools?: Tool[]
+    output?: Output1
+    requestId?: string
     usage?: Usage1
   }
 
+  type GeneratePictureUsePromptTaskResponse = {
+    code?: string
+    message?: string
+    output?: Output2
+    requestId?: string
+    usage?: Usage2
+  }
+
   type GetAITaskResponse = {
-    output?: Output1
+    output?: Output3
     requestId?: string
   }
 
@@ -281,13 +311,6 @@ declare namespace API {
     id?: number
   }
 
-  type ImageData = {
-    b64_json?: string
-    error?: ErrorDetail
-    size?: string
-    url?: string
-  }
-
   type ImageSearchResult = {
     fromUrl?: string
     thumbUrl?: string
@@ -314,11 +337,29 @@ declare namespace API {
     role?: string
   }
 
+  type Message1 = {
+    content?: Content1[]
+    role?: string
+  }
+
+  type Message2 = {
+    content?: Content2[]
+    role?: string
+  }
+
   type Output = {
     choices?: Choice[]
   }
 
   type Output1 = {
+    choices?: Choice1[]
+  }
+
+  type Output2 = {
+    choices?: Choice2[]
+  }
+
+  type Output3 = {
     code?: string
     endTime?: string
     message?: string
@@ -690,14 +731,6 @@ declare namespace API {
     filePath?: string
   }
 
-  type Tool = {
-    type?: string
-  }
-
-  type ToolUsage = {
-    web_search?: number
-  }
-
   type uploadPictureUsingPOSTParams = {
     fileUrl?: string
     id?: number
@@ -712,10 +745,15 @@ declare namespace API {
   }
 
   type Usage1 = {
-    generated_images?: number
-    output_tokens?: number
-    tool_usage?: ToolUsage
-    total_tokens?: number
+    height?: number
+    imageCount?: number
+    width?: number
+  }
+
+  type Usage2 = {
+    height?: number
+    imageCount?: number
+    width?: number
   }
 
   type User = {

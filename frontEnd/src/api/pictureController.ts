@@ -185,13 +185,52 @@ export async function createEditPictureTaskUsingPost(
   )
 }
 
-/** generatePictureUseWordTask POST /api/picture/out_generate/create_picture */
-export async function generatePictureUseWordTaskUsingPost(
-  body: API.CreateGeneratePictureRequest,
+/** generatePictureUsePictureTask POST /api/picture/out_generate/create_picture_by_picture */
+export async function generatePictureUsePictureTaskUsingPost(
+  body: {},
+  file?: File,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseGeneratePictureTaskResponse_>(
-    '/api/picture/out_generate/create_picture',
+  const formData = new FormData()
+
+  if (file) {
+    formData.append('file', file)
+  }
+
+  Object.keys(body).forEach((ele) => {
+    const item = (body as any)[ele]
+
+    if (item !== undefined && item !== null) {
+      if (typeof item === 'object' && !(item instanceof File)) {
+        if (item instanceof Array) {
+          item.forEach((f) => formData.append(ele, f || ''))
+        } else {
+          formData.append(ele, new Blob([JSON.stringify(item)], { type: 'application/json' }))
+        }
+      } else {
+        formData.append(ele, item)
+      }
+    }
+  })
+
+  return request<API.BaseResponseGeneratePictureByPictureTaskResponse_>(
+    '/api/picture/out_generate/create_picture_by_picture',
+    {
+      method: 'POST',
+      data: formData,
+      requestType: 'form',
+      ...(options || {}),
+    }
+  )
+}
+
+/** generatePictureUseWordTask POST /api/picture/out_generate/create_picture_by_word */
+export async function generatePictureUseWordTaskUsingPost(
+  body: API.CreateGeneratePictureUsePromptRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseGeneratePictureUsePromptTaskResponse_>(
+    '/api/picture/out_generate/create_picture_by_word',
     {
       method: 'POST',
       headers: {
