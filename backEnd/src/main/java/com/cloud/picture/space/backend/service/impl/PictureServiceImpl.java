@@ -964,7 +964,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         input.setMessages(Arrays.asList(message));
         taskRequest.setInput(input);
         BeanUtil.copyProperties(createPictureGeneratePictureRequest, taskRequest);
-        log.info("创建图片P图任务请求参数：{}", taskRequest);
+        log.info("创建图片P图任务请求参数完成");
         return aliYunAPI.createPictureGeneratePictureByPictureTask(taskRequest);
     }
 
