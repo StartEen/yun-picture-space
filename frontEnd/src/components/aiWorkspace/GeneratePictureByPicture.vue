@@ -5,15 +5,32 @@
         <div class="section-title">上传图片</div>
         <div class="image-upload-card">
           <a-spin :spinning="uploadImageLoading" tip="正在上传图片中，请稍候...">
-            <a-upload list-type="picture" :show-upload-list="false" class="upload-container">
-              <div class="upload-content">
-                <div class="upload-icon">
-                  <PlusOutlined />
-                </div>
-                <div class="upload-text">点击上传或拖拽图片到此处</div>
-                <div class="upload-hint">支持 JPG、PNG、GIF 格式，最大 6MB</div>
+            <div class="upload-wrapper">
+              <div v-if="uploadedImageUrl" class="image-preview">
+                <a-image
+                  :src="uploadedImageUrl"
+                  alt="上传图片"
+                  @click="handleImagePreview(uploadedImageUrl)"
+                />
               </div>
-            </a-upload>
+
+              <a-upload
+                v-else
+                list-type="picture"
+                :show-upload-list="false"
+                class="upload-container"
+                :custom-request="handleUploadImage"
+                :before-upload="beforeUploadImage"
+              >
+                <div class="upload-content">
+                  <div class="upload-icon">
+                    <PlusOutlined />
+                  </div>
+                  <div class="upload-text">点击上传或拖拽图片到此处</div>
+                  <div class="upload-hint">支持 JPG、PNG、GIF 格式，最大 6MB</div>
+                </div>
+              </a-upload>
+            </div>
           </a-spin>
         </div>
       </a-col>
@@ -66,8 +83,11 @@
 <script setup lang="ts">
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { onUnmounted, ref } from 'vue'
-import { getAliYunAiTaskUsingGet } from '@/api/pictureController.ts'
-import { message } from 'ant-design-vue'
+import {
+  generatePictureUsePictureTaskUsingPost,
+  getAliYunAiTaskUsingGet,
+} from '@/api/pictureController.ts'
+import { message, type UploadProps } from 'ant-design-vue'
 
 interface Props {
   picture?: API.PictureVo
@@ -100,11 +120,6 @@ const handleImagePreview = (url: string | undefined) => {
     previewVisible.value = true
   }
 }
-
-/**
- * 创建任务
- */
-const createTask = async () => {}
 
 //注册轮询定时器
 let pollingTimer: number | null = null
@@ -168,6 +183,103 @@ const clearPollingTimer = () => {
 onUnmounted(() => {
   clearPollingTimer()
 })
+
+//存储上传的图片信息
+const uploadedFile = ref<File | null>(null)
+//存储上传图片的预览URL
+const uploadedImageUrl = ref<string | undefined>()
+
+// 上传前校验图片
+const beforeUploadImage = (file: UploadProps['fileList'][number]) => {
+  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+  if (!isJpgOrPng) {
+    message.error('不支持上传该格式的图片，推荐 jpg 或 png')
+  }
+  const isLt2M = file.size / 1024 / 1024 < 10
+  if (!isLt2M) {
+    message.error('不能上传超过 10M 的图片')
+  }
+  return isJpgOrPng && isLt2M
+}
+
+// 将图片临时存储
+const handleUploadImage = async ({ file }: any) => {
+  uploadedFile.value = file
+  // 生成预览URL
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    uploadedImageUrl.value = e.target?.result as string
+  }
+  reader.readAsDataURL(file)
+}
+
+/**
+ * 创建任务
+ */
+const createTask = async () => {
+  generatingLoading.value = true
+  if (!prompt.value || prompt.value.trim() === '') {
+    message.error('请输入文字描述')
+    generatingLoading.value = false
+    return
+  }
+  // 设置 taskId 为一个临时值，让按钮显示加载状态
+  taskId.value = 'creating'
+
+  const params: API.CreatePictureGeneratePictureRequest = {
+    text: prompt.value,
+  }
+
+  try {
+    const res = await generatePictureUsePictureTaskUsingPost(params, uploadedFile.value!)
+
+    if (res.data.code === 0 && res.data.data) {
+      // 处理响应数据
+      const output = res.data.data.output
+      if (output?.choices && output.choices.length > 0) {
+        const choice = output.choices[0]
+        if (choice?.message?.content && choice.message.content.length > 0) {
+          const content = choice.message.content[0]
+          if (content?.image) {
+            //清理图片URL中的空格和反引导
+            let imageUrl = content.image.trim()
+            if (imageUrl.startsWith('`') && imageUrl.endsWith('`')) {
+              imageUrl = imageUrl.substring(1, imageUrl.length - 1).trim()
+            }
+            resultImageUrl.value = imageUrl
+            message.success('图片生成正在处理')
+            //不需要轮询，直接显示结果
+            clearPollingTimer()
+            generatingLoading.value = false
+            return
+          }
+        }
+      }
+      // 尝试获取任务ID进行轮询
+      console.log((res.data.data.output as any)?.taskId)
+      taskId.value = (res.data.data.output as any)?.taskId
+      if (taskId.value) {
+        //开启轮询
+        startPolling()
+        return
+      } else {
+        message.error('任务创建成功，但未获取到任务ID')
+        taskId.value = undefined
+        generatingLoading.value = false
+      }
+      // 恢复加载状态
+      generatingLoading.value = false
+    } else {
+      message.error('图片生成失败：' + (res.data.message || '未知错误'))
+      taskId.value = undefined
+      generatingLoading.value = false
+    }
+  } catch (error: any) {
+    console.error('图片生成失败', error)
+    message.error('图片生成失败：' + (error?.message || '未知错误'))
+    generatingLoading.value = false
+  }
+}
 
 const uploadLoading = ref<boolean>(false)
 
@@ -282,18 +394,47 @@ const handleUpload = async () => {}
   height: 100%;
 }
 
-/* 上传容器样式 */
+/* 新增一个顶层容器类，确保撑满整个 spin 的 100% 空间 */
+.upload-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+/* 上传内容样式：因为父级（a-upload 触发区）已经是 100% 并且居中了，
+   这里只需要纵向排列内部文字和图标即可 */
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+/* 图片预览样式：增加一点内边距（padding），让图片不要死死贴着虚线边框 */
+.image-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* ---------- 以下保持你现有的样式不变 ---------- */
+/* 比如 .upload-container 和 :deep(.ant-upload) 的设置不需要动 */
 .upload-container {
   width: 100%;
   height: 100%;
-  display: block; /* 让占位显示为块级铺满 */
+  display: block;
 }
 
-/* --- 核心修改：强制让 a-upload 的触发区域撑满 100% --- */
 .upload-container :deep(.ant-upload) {
   width: 100%;
   height: 100%;
-  display: flex !important; /* 覆盖 Antd 默认的 table 布局 */
+  display: flex !important;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -303,11 +444,6 @@ const handleUpload = async () => {}
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
-
-.upload-container :deep(.ant-upload:hover) {
-  background-color: rgba(24, 144, 255, 0.05);
-}
-
 /* 上传内容样式 */
 .upload-content {
   width: 100%;
@@ -358,6 +494,27 @@ const handleUpload = async () => {}
   text-align: center;
   transition: all 0.3s ease;
   line-height: 1.4;
+}
+
+/* 图片预览样式 */
+.image-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-preview :deep(.ant-image) {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.image-preview :deep(.ant-image-img) {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* 悬停效果 */
