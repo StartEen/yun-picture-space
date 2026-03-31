@@ -1,73 +1,84 @@
 <template>
   <div id="spaceDetailPage">
-    <!-- 空间信息 -->
-    <div class="space-header">
-      <h2>{{ space.spaceName }}（私有空间）</h2>
-      <div class="space-actions">
-        <a-button
-          type="primary"
-          class="create-button"
-          :href="`/add_picture?spaceId=${id}`"
-          target="_blank"
-        >
-          <template #icon>
-            <PlusOutlined />
-          </template>
-          创建图片
-        </a-button>
-        <div class="batch-actions">
-          <div class="select-all">
-            <a-checkbox v-model:checked="selectAll" @change="handleSelectAll">
-              <span>全选</span>
-            </a-checkbox>
+    <div class="control-panel">
+      <div class="panel-header">
+        <div class="space-info">
+          <div class="space-title">
+            <h2>{{ space.spaceName }}</h2>
+            <span class="space-tag">私有空间</span>
           </div>
-          <a-button
-            class="batch-edit-button"
-            :icon="h(EditOutlined)"
-            @click="doBatchEdit"
-            :disabled="selectedIds.length === 0"
-          >
-            批量编辑
-            <span class="selected-count" v-if="selectedIds.length > 0"
-              >({{ selectedIds.length }})</span
+          <a-tooltip :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`">
+            <a-progress
+              type="circle"
+              :size="42"
+              :stroke-width="7"
+              :percent="Number(((space.totalSize * 100) / space.maxSize).toFixed(1))"
+            />
+          </a-tooltip>
+        </div>
+
+        <div class="action-group">
+          <div class="batch-controls">
+            <a-checkbox v-model:checked="selectAll" @change="handleSelectAll" class="select-checkbox">
+              全选
+            </a-checkbox>
+            <div class="divider-v-small"></div>
+            <a-button
+              type="text"
+              class="btn-batch-edit"
+              :icon="h(EditOutlined)"
+              @click="doBatchEdit"
+              :disabled="selectedIds.length === 0"
             >
+              批量编辑
+              <span class="count-badge" v-if="selectedIds.length > 0">{{ selectedIds.length }}</span>
+            </a-button>
+          </div>
+
+          <div class="divider-v"></div>
+
+          <a-button
+            class="btn-light-primary"
+            :href="`/ai_create?spaceId=${id}`"
+            target="_blank"
+          >
+            <template #icon><FullscreenOutlined /></template>
+            AI 绘画
+          </a-button>
+          <a-button
+            type="primary"
+            class="btn-primary"
+            :href="`/add_picture?spaceId=${id}`"
+            target="_blank"
+          >
+            <template #icon><PlusOutlined /></template>
+            创建图片
           </a-button>
         </div>
-        <a-tooltip
-          :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
-        >
-          <a-progress
-            type="circle"
-            :size="42"
-            :percent="((space.totalSize * 100) / space.maxSize).toFixed(1)"
-          />
-        </a-tooltip>
       </div>
-    </div>
-    <div style="margin-bottom: 16px" />
 
-    <!-- 搜索区域 -->
-    <div class="search-container">
-      <!-- 搜索表单 -->
-      <PictureSearchForm :onSearch="onSearch" />
-      <!-- 按颜色搜索 -->
-      <div class="color-search">
-        <span>按颜色搜索:</span>
-        <color-picker format="hex" @pureColorChange="onColorChange" />
+      <div class="panel-search">
+        <div class="search-form-wrapper">
+          <PictureSearchForm :onSearch="onSearch" />
+        </div>
+        <div class="filter-color">
+          <span class="filter-label">颜色筛选:</span>
+          <color-picker format="hex" @pureColorChange="onColorChange" />
+        </div>
       </div>
     </div>
 
-    <div style="margin-bottom: 16px" />
-    <!-- 图片列表 -->
-    <PictureList
-      :dataList="dataList"
-      :loading="loading"
-      :showOp="true"
-      :onReload="fetchData"
-      :selectable="true"
-      :selectedIds="selectedIds"
-      @selectChange="handleSelectChange"
-    />
+    <div class="list-container">
+      <PictureList
+        :dataList="dataList"
+        :loading="loading"
+        :showOp="true"
+        :onReload="fetchData"
+        :selectable="true"
+        :selectedIds="selectedIds"
+        @selectChange="handleSelectChange"
+      />
+    </div>
   </div>
 
   <PictureBathEditModal
@@ -92,7 +103,7 @@ import PictureSearchForm from '@/components/picture/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
 import 'vue3-colorpicker/style.css'
 import PictureBathEditModal from '@/components/modal/PictureBathEditModal.vue'
-import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, PlusOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 
 interface Props {
   id: string | number
@@ -249,226 +260,207 @@ const doBatchEdit = () => {
 #spaceDetailPage {
   max-width: 1450px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 24px;
 }
 
-#spaceDetailPage .space-header {
+/* 统一控制面板 */
+.control-panel {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.04), 0 1px 4px -1px rgba(0, 0, 0, 0.02);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  border: 1px solid #f0f2f5;
+}
+
+/* 头部区域 */
+.panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding: 20px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease;
 }
 
-#spaceDetailPage .space-header:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-#spaceDetailPage .space-header h2 {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-  color: #333333;
-}
-
-#spaceDetailPage .space-actions {
+/* 左侧标题与信息 */
+.space-info {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-#spaceDetailPage .batch-actions {
+.space-title {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  background: #fafafa;
-  border-radius: 8px;
-  border: 1px solid #e8e8e8;
-  transition: all 0.3s ease;
 }
 
-#spaceDetailPage .batch-actions:hover {
-  background: #f0f0f0;
-  border-color: #d9d9d9;
-}
-
-#spaceDetailPage .batch-actions :deep(.ant-checkbox) {
-  font-size: 14px;
-  color: #666666;
-  font-weight: 500;
-}
-
-/* 创建图片按钮 */
-#spaceDetailPage .space-actions :deep(.create-button) {
-  border-radius: 8px;
-  padding: 10px 24px;
-  min-width: 140px;
+.space-title h2 {
+  font-size: 20px;
   font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
-  border: none;
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
+  color: #1d2129;
+  margin: 0;
+  line-height: 1.2;
 }
 
-#spaceDetailPage .space-actions :deep(.create-button:hover) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.4);
-  background: linear-gradient(135deg, #40a9ff 0%, #69c0ff 100%);
-}
-
-/* 批量编辑按钮 */
-#spaceDetailPage .space-actions :deep(.batch-edit-button) {
-  border-radius: 8px;
-  padding: 8px 20px;
-  min-width: 120px;
-  font-weight: 500;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  border: 1px solid #d9d9d9;
-  background: #ffffff;
-  color: #333333;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-/* 按钮内部图标和文字对齐 */
-#spaceDetailPage .space-actions :deep(.ant-btn > span) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-#spaceDetailPage .space-actions :deep(.ant-btn-icon) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 搜索容器 */
-#spaceDetailPage .search-container {
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 20px;
-  margin-bottom: 24px;
-  transition: box-shadow 0.3s ease;
-}
-
-#spaceDetailPage .search-container:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-/* 颜色搜索 */
-#spaceDetailPage .color-search {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
-}
-
-#spaceDetailPage .color-search span {
-  font-size: 14px;
-  font-weight: 500;
-  color: #666666;
-}
-
-/* 搜索表单样式 */
-
-#spaceDetailPage .space-actions :deep(.batch-edit-button:hover:not(:disabled)) {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-color: #1890ff;
-  color: #1890ff;
-}
-
-#spaceDetailPage .space-actions :deep(.batch-edit-button:disabled) {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-  border-color: #d9d9d9;
-  color: #bfbfbf;
-}
-
-/* 选中数量显示 */
-#spaceDetailPage .space-actions :deep(.selected-count) {
-  margin-left: 4px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #1890ff;
-  background: rgba(24, 144, 255, 0.1);
-  padding: 2px 6px;
-  border-radius: 10px;
-}
-
-/* 全选复选框 */
-#spaceDetailPage .space-actions :deep(.select-all) {
-  display: flex;
-  align-items: center;
-}
-
-#spaceDetailPage .space-actions :deep(.select-all .ant-checkbox) {
-  font-size: 14px;
-  color: #666666;
+.space-tag {
+  background: #e8f3ff;
+  color: #1677ff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 500;
 }
 
-#spaceDetailPage
-  .space-actions
-  :deep(.select-all .ant-checkbox-input:checked + .ant-checkbox-inner) {
-  background-color: #1890ff;
-  border-color: #1890ff;
-}
-
-#spaceDetailPage .space-actions :deep(.ant-tooltip) {
-  font-size: 12px;
-}
-
-#spaceDetailPage .space-actions :deep(.ant-progress-circle) {
+/* 环形进度条微调：增大且支持悬浮动画 */
+:deep(.ant-progress-circle) {
+  cursor: help;
   transition: transform 0.3s ease;
 }
-
-#spaceDetailPage .space-actions :deep(.ant-progress-circle:hover) {
+:deep(.ant-progress-circle:hover) {
   transform: scale(1.05);
 }
 
-#spaceDetailPage .pagination-container {
+/* 右侧操作组合 */
+.action-group {
   display: flex;
-  justify-content: center;
-  margin-top: 24px;
-  padding: 16px 0;
+  align-items: center;
+  gap: 12px;
 }
 
-#spaceDetailPage .pagination-container :deep(.ant-pagination) {
+/* 分割线 */
+.divider-v {
+  width: 1px;
+  height: 24px;
+  background-color: #e5e6eb;
+  margin: 0 4px;
+}
+.divider-v-small {
+  width: 1px;
+  height: 14px;
+  background-color: #dcdfe6;
+}
+
+/* 批量操作控件（类 Mac 分段控件风格） */
+.batch-controls {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  background: #f2f3f5;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 6px;
+  transition: background 0.3s;
+}
+.batch-controls:hover {
+  background: #e5e6eb;
 }
 
-#spaceDetailPage .pagination-container :deep(.ant-pagination-item) {
-  border-radius: 4px;
+.select-checkbox {
+  margin: 0;
+  padding: 4px 10px;
+  color: #4e5969;
+  font-weight: 500;
 }
 
-#spaceDetailPage .pagination-container :deep(.ant-pagination-item-active) {
-  background-color: #1890ff;
-  border-color: #1890ff;
+/* 批量编辑按钮 - 加入对齐属性 */
+.btn-batch-edit {
+  border-radius: 6px !important;
+  height: 30px !important;
+  padding: 0 12px !important;
+  color: #4e5969 !important;
+  font-weight: 500;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.btn-batch-edit:hover:not(:disabled) {
+  background: #ffffff !important;
+  color: #1677ff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.btn-batch-edit:disabled {
+  color: #c9cdd4 !important;
+  background: transparent !important;
 }
 
-#spaceDetailPage .pagination-container :deep(.ant-pagination-item-active a) {
+/* 数量角标 */
+.count-badge {
+  background: #1677ff;
   color: #fff;
+  font-size: 12px;
+  padding: 0 6px;
+  border-radius: 10px;
+  margin-left: 6px;
+  line-height: 18px;
+  display: inline-block;
+}
+
+/* 核心操作按钮 - 增加 inline-flex 实现绝对上下居中 */
+.btn-light-primary {
+  background: #e8f3ff !important;
+  color: #1677ff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  height: 38px !important;
+  font-weight: 500;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px;
+}
+.btn-light-primary:hover {
+  background: #d4e8ff !important;
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  border-radius: 8px !important;
+  height: 38px !important;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(22, 119, 255, 0.2) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 119, 255, 0.3) !important;
+}
+
+/* 搜索与过滤区域：取消 flex 强制排列，让 SearchForm 原生展开 */
+.panel-search {
+  display: block; /* 恢复为 block 防止挤压内部栅格 */
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed #e5e6eb;
+}
+
+.search-form-wrapper {
+  width: 100%;
+}
+
+/* 颜色筛选器：调整为独立的块，放在搜索组件下方 */
+.filter-color {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #f7f8fa;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #f0f2f5;
+  margin-top: 16px; /* 距离上方表单的间距 */
+}
+.filter-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #4e5969;
+}
+
+/* 全局分页器样式覆盖 */
+:deep(.ant-pagination-item) {
+  border-radius: 6px;
+}
+:deep(.ant-pagination-item-active) {
+  font-weight: 600;
 }
 </style>
