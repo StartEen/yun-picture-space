@@ -1,5 +1,5 @@
 <template>
-  <div id="generate-picture-Prompt">
+  <div id="generate-picture-prompt">
     <a-row :gutter="24">
       <a-col :span="24">
         <div class="section-title">最终生成结果</div>
@@ -262,7 +262,7 @@ const handleUpload = async () => {
 </script>
 
 <style scoped>
-#generate-picture-Prompt {
+#generate-picture-prompt {
   padding: 24px;
   background-color: #ffffff;
   border-radius: 12px;
@@ -274,7 +274,7 @@ const handleUpload = async () => {
   animation: fadeInUp 0.6s ease-out;
 }
 
-#generate-picture-Prompt:hover {
+#generate-picture-prompt:hover {
   transform: translateY(-2px);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.08),
@@ -339,7 +339,6 @@ const handleUpload = async () => {
 .image-preview-card:hover {
   border-color: #1890ff;
   box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
-  transform: translateY(-2px);
 }
 
 /* 图片自适应缩放，不裁切，保持比例 */

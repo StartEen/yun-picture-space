@@ -357,7 +357,6 @@ const handleUpload = async () => {
 .result-preview-card:hover {
   border-color: #1890ff;
   box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
-  transform: translateY(-2px);
 }
 
 /* 图片预览卡片统一高度 */

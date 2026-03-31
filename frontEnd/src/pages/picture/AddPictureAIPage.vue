@@ -1,8 +1,6 @@
 <template>
   <div id="addPictureAIPage">
-    <h2 style="margin-bottom: 16px">
-      AI 图片生成
-    </h2>
+    <h2 style="margin-bottom: 16px">AI 图片生成</h2>
 
     <a-typography-paragraph v-if="spaceId" type="secondary">
       保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
@@ -13,8 +11,7 @@
         <GeneratePictureByPrompt :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
       <a-tab-pane key="url" tab="图生图（千问qwen-image-2.0-pro）" force-render>
-<!--        <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />-->
-
+        <GeneratePictureByPicture :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
     </a-tabs>
 
@@ -22,11 +19,7 @@
       <a-button class="edit-btn" :icon="h(EditOutlined)" @click="doEditPicture">
         裁剪与编辑图片
       </a-button>
-      <a-button
-        class="edit-btn ai-edit-btn"
-        :icon="h(FullscreenOutlined)"
-        @click="doImageAIEdit"
-      >
+      <a-button class="edit-btn ai-edit-btn" :icon="h(FullscreenOutlined)" @click="doImageAIEdit">
         AI 一键P图
       </a-button>
       <ImageCropper
@@ -108,7 +101,8 @@ import UrlPictureUpload from '@/components/picture/UrlPictureUpload.vue'
 import ImageCropper from '@/components/picture/ImageCropper.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 import ImageAiEdit from '@/components/aiWorkspace/ImageAIEdit.vue'
-import GeneratePictureByPrompt from "@/components/aiWorkspace/GeneratePictureByPrompt.vue";
+import GeneratePictureByPrompt from '@/components/aiWorkspace/GeneratePictureByPrompt.vue'
+import GeneratePictureByPicture from '@/components/aiWorkspace/GeneratePictureByPicture.vue'
 
 const picture = ref<API.PictureVo>()
 const pictureForm = reactive<API.PictureEditRequest>({})
