@@ -124,7 +124,7 @@ public class GeneratePictureUsePromptTaskRequest implements Serializable {
          * 图像总像素需在 512*512 至 2048*2048 之间
          * 默认总像素数接近 1024*1024
          */
-        private String size = "1080*1920";
+        private String size = "1280*720";
     }
 
 

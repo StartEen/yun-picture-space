@@ -9,12 +9,12 @@
     </a-typography-paragraph>
 
     <a-tabs v-model:activeKey="uploadType">
-      <a-tab-pane key="file" tab="文生图（火山引擎）">
-<!--        <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />-->
+      <a-tab-pane key="file" tab="文生图（千问qwen-image-2.0）">
         <GeneratePictureByPrompt :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
-      <a-tab-pane key="url" tab="图生图（千问引擎）" force-render>
+      <a-tab-pane key="url" tab="图生图（千问qwen-image-2.0-pro）" force-render>
 <!--        <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />-->
+
       </a-tab-pane>
     </a-tabs>
 

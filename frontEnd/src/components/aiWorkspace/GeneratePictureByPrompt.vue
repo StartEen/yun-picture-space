@@ -217,7 +217,48 @@ onUnmounted(() => {
 const uploadLoading = ref<boolean>(false)
 
 // 上传图片
-const handleUpload = async () => {}
+const handleUpload = async () => {
+  if (!resultImageUrl.value) {
+    message.error('请先生成图片')
+    return
+  }
+  uploadLoading.value = true
+  try {
+    //从url下载图片
+    const response = await fetch(resultImageUrl.value)
+    if (!response.ok) {
+      message.error('下载图片失败')
+      return
+    }
+
+    // 2. 将响应转换为Blob
+    const blob = await response.blob()
+
+    // 3. 创建File对象
+    const fileName = `ai_edit_${Date.now()}.png`
+    const file = new File([blob], fileName, { type: blob.type })
+
+    // 4. 准备上传参数
+    const params: API.uploadPictureUsingPOSTParams = {
+      spaceId: props.spaceId,
+    }
+
+    // 开始传送图片
+    const res = await uploadPictureUsingPost(params, {}, file)
+    if (res.data.code === 0 && res.data.data){
+      message.success('图片上传成功')
+      //将上传成功的图片信息
+      props.onSuccess?.(res.data.data)
+    }else {
+      message.error('图片上传失败：' + (res.data.message || '未知错误'))
+    }
+  } catch (error: any) {
+    console.error('上传失败', error)
+    message.error('应用结果上传失败: ' + (error?.message || '未知错误'))
+  } finally {
+    uploadLoading.value = false
+  }
+}
 </script>
 
 <style scoped>
