@@ -1,37 +1,43 @@
 <template>
   <div id="spaceAnalyzePage">
-    <h2>
-      空间图库分析 -
-      <span v-if="queryAll">全部空间</span>
-      <span v-else-if="queryPublic">公共图库</span>
-      <span v-else>
-        <a :href="`/space/${spaceId}`" target="_blank">空间 id：{{ spaceId }}</a>
-      </span>
-    </h2>
-    <div style="margin-bottom: 16px" />
-    <a-row :gutter="[16, 16]">
-      <!-- 空间使用分析 -->
+    <div class="page-header">
+      <h2 class="page-title">
+        空间图库分析
+        <span class="page-subtitle">
+          <template v-if="queryAll"> / 全部空间</template>
+          <template v-else-if="queryPublic"> / 公共图库</template>
+          <template v-else>
+            <a :href="`/space/${spaceId}`" target="_blank" class="space-link">
+              (空间 ID: {{ spaceId }})
+            </a>
+          </template>
+        </span>
+      </h2>
+      <div class="page-desc">全面掌握空间的使用状况、图片分布与用户行为数据。</div>
+    </div>
+
+    <a-row :gutter="[24, 24]">
       <a-col :xs="24" :md="12">
         <SpaceUsageAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
       </a-col>
-      <!-- 空间分类分析 -->
+
       <a-col :xs="24" :md="12">
         <SpaceCategoryAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
       </a-col>
-      <!-- 标签分析 -->
+
       <a-col :xs="24" :md="12">
         <SpaceTagAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
       </a-col>
-      <!-- 图片大小分段分析 -->
+
       <a-col :xs="24" :md="12">
         <SpaceSizeAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
       </a-col>
-      <!-- 用户上传行为分析 -->
-      <a-col :xs="24" :md="12">
+
+      <a-col :xs="24" :md="24">
         <SpaceUserAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
       </a-col>
-      <!-- 空间使用排行分析 -->
-      <a-col :xs="24" :md="12">
+
+      <a-col :xs="24" :md="24">
         <SpaceRankAnalyze
           v-if="isAdmin"
           :spaceId="spaceId"
@@ -81,6 +87,47 @@ const queryPublic = computed(() => {
 
 <style scoped>
 #spaceAnalyzePage {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+/* 页面头部样式优化 */
+.page-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0; /* 添加一条淡雅的分割线分隔内容区 */
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f1f1f;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: baseline;
+  letter-spacing: 0.5px;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: #595959;
+  font-weight: normal;
+  margin-left: 8px;
+}
+
+.space-link {
+  color: #1890ff;
+  text-decoration: none;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.space-link:hover {
+  color: #40a9ff;
+  text-decoration: underline;
+}
+
+.page-desc {
+  color: #8c8c8c;
+  font-size: 14px;
 }
 </style>
