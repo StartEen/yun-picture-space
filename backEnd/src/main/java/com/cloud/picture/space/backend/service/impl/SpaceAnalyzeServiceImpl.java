@@ -285,7 +285,7 @@ public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
                 queryWrapper.select("YEARWEEK(createTime) as period", "count(*) as count");
                 break;
             case "month":
-                queryWrapper.select("DATE_FORMAT(createTime, %m-%d') as period", "count(*) as count");
+                queryWrapper.select("DATE_FORMAT(createTime, '%Y-%m-%d') as period", "count(*) as count");
                 break;
             case "year":
                 queryWrapper.select("YEAR(createTime) as period", "count(*) as count");
