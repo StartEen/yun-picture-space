@@ -20,7 +20,8 @@
   "dependencies": {
     "ant-design-vue": "^4.2.6",
     "axios": "^1.13.2",
-    "echarts": "^6.0.0",
+    "echarts": "^5.4.3",
+    "echarts-wordcloud": "^2.1.0",
     "file-saver": "^2.0.5",
     "lodash-es": "^4.17.23",
     "pinia": "^3.0.4",
