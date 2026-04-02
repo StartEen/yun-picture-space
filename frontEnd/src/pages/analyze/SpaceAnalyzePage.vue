@@ -9,16 +9,50 @@
       </span>
     </h2>
     <div style="margin-bottom: 16px" />
-
-
-
+    <a-row :gutter="[16, 16]">
+      <!-- 空间使用分析 -->
+      <a-col :xs="24" :md="12">
+        <SpaceUsageAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
+      </a-col>
+      <!-- 空间分类分析 -->
+      <a-col :xs="24" :md="12">
+        <SpaceCategoryAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
+      </a-col>
+      <!-- 标签分析 -->
+      <a-col :xs="24" :md="12">
+        <SpaceTagAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
+      </a-col>
+      <!-- 图片大小分段分析 -->
+      <a-col :xs="24" :md="12">
+        <SpaceSizeAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
+      </a-col>
+      <!-- 用户上传行为分析 -->
+      <a-col :xs="24" :md="12">
+        <SpaceUserAnalyze :spaceId="spaceId" :queryAll="queryAll" :queryPublic="queryPublic" />
+      </a-col>
+      <!-- 空间使用排行分析 -->
+      <a-col :xs="24" :md="12">
+        <SpaceRankAnalyze
+          v-if="isAdmin"
+          :spaceId="spaceId"
+          :queryAll="queryAll"
+          :queryPublic="queryPublic"
+        />
+      </a-col>
+    </a-row>
   </div>
 </template>
 
 <script setup lang="ts">
-import {useRoute} from "vue-router";
-import {computed} from "vue";
-import {useLoginUserStore} from "@/stores/useLoginUserStore.ts";
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import SpaceUsageAnalyze from '@/components/analyze/SpaceUsageAnalyze.vue'
+import SpaceCategoryAnalyze from '@/components/analyze/SpaceCategoryAnalyze.vue'
+import SpaceTagAnalyze from '@/components/analyze/SpaceTagAnalyze.vue'
+import SpaceSizeAnalyze from '@/components/analyze/SpaceSizeAnalyze.vue'
+import SpaceUserAnalyze from '@/components/analyze/SpaceUserAnalyze.vue'
+import SpaceRankAnalyze from '@/components/analyze/SpaceRankAnalyze.vue'
 
 const route = useRoute()
 
@@ -43,8 +77,6 @@ const queryAll = computed(() => {
 const queryPublic = computed(() => {
   return !!route.query?.queryPublic
 })
-
-
 </script>
 
 <style scoped>
