@@ -26,7 +26,7 @@
     </a-tabs>
 
     <div class="tag-bar">
-      <span style="margin-right: 8px">标签：</span>
+
       <a-space :size="[0, 8]" wrap>
         <a-checkable-tag
           v-for="(tag, index) in tagList"
@@ -205,21 +205,63 @@ onMounted(() => {
 
 #homePage .tag-bar {
   margin-bottom: 24px;
-  padding: 12px 16px;
-  background: #fafafa;
-  border-radius: 8px;
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+#homePage .tag-bar:hover {
+  border-color: #d0e0ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+#homePage .tag-bar span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+  margin-right: 12px;
+  white-space: nowrap;
+}
+
+#homePage .tag-bar :deep(.ant-space) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 #homePage .tag-bar :deep(.ant-checkable-tag) {
-  padding: 4px 12px;
-  border-radius: 16px;
+  padding: 6px 16px;
+  border-radius: 20px;
   font-size: 13px;
-  transition: all 0.2s ease;
+  font-weight: 400;
+  color: #495057;
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+#homePage .tag-bar :deep(.ant-checkable-tag:hover) {
+  border-color: #1890ff;
+  color: #1890ff;
+  background: #f0f7ff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(24, 144, 255, 0.1);
 }
 
 #homePage .tag-bar :deep(.ant-checkable-tag-checked) {
   background: #1890ff;
   color: #fff;
+  border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+#homePage .tag-bar :deep(.ant-checkable-tag-checked:hover) {
+  background: #4096ff;
+  border-color: #4096ff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
 }
 
 #homePage .loading-more {

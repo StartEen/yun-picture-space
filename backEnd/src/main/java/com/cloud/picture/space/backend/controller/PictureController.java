@@ -289,12 +289,11 @@ public class PictureController {
     public BaseResponse<PictureTagCategory> listPictureTagCategory() {
         PictureTagCategory pictureTagCategory = new PictureTagCategory();
         List<String> tagList = Arrays.asList(
-                "天空", "海洋", "森林", "山峰", "湖泊", "植物", "花卉",
-                "星空", "日出/日落", "雪景", "肖像", "团队",
-                "家庭", "情侣", "职场", "笑容", "猫", "狗",
-                "野生动物", "宠物", "美食",  "汽车", "书籍", "服饰",
-                "城市", "街道", "夜景", "室内",  "快乐",
-                "宁静", "浪漫", "悲伤", "复古", "极简", "插画"
+                "AI","天空", "海洋", "森林", "山峰", "湖泊", "植物", "花卉", "星空", "日出/日落",
+                "雪景", "男人", "女人", "儿童", "老人", "肖像", "团队", "家庭", "情侣", "职场",
+                "笑容", "猫", "狗", "鸟类", "野生动物", "宠物", "美食", "饮品", "水果", "手机",
+                "电脑", "汽车", "服饰", "城市", "建筑", "街道", "夜景", "室内", "地标",
+                "快乐", "宁静", "浪漫", "悲伤", "复古", "极简", "商务", "插画"
         );
         List<String> categoryList = Arrays.asList("自然与景观", "人物与生活", "城市与建筑", "科技与商业", "美食与饮品", "动物与宠物", "艺术与抽象", "交通与出行", "工业与制造");
         pictureTagCategory.setTagList(tagList);
