@@ -4,15 +4,15 @@ import request from '@/request'
 
 /** addSpaceUser POST /api/spaceUser/add */
 export async function addSpaceUserUsingPost(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.addSpaceUserUsingPOSTParams,
+  body: API.SpaceUserAddRequest,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponseLong_>('/api/spaceUser/add', {
     method: 'POST',
-    params: {
-      ...params,
+    headers: {
+      'Content-Type': 'application/json',
     },
+    data: body,
     ...(options || {}),
   })
 }

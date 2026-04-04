@@ -1,10 +1,4 @@
 declare namespace API {
-  type addSpaceUserUsingPOSTParams = {
-    spaceId?: number
-    spaceRole?: string
-    userId?: number
-  }
-
   type BaseResponseBoolean_ = {
     code?: number
     data?: boolean
@@ -664,6 +658,12 @@ declare namespace API {
     spaceId?: number
     spaceRole?: string
     updateTime?: string
+    userId?: number
+  }
+
+  type SpaceUserAddRequest = {
+    spaceId?: number
+    spaceRole?: string
     userId?: number
   }
 
