@@ -1,7 +1,8 @@
 <template>
   <div id="addSpacePage">
     <!-- 页面头部 -->
-    <h2>{{ route.query?.id ? '修改空间' : '创建空间' }}</h2>
+    <h2>{{ route.query?.id ? '修改' : '创建' }} {{ SPACE_TYPE_MAP[spaceType] }}
+    </h2>
 
     <!-- 空间信息表单 -->
     <div class="form-section">
@@ -74,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   addSpaceUsingPost,
@@ -83,10 +84,18 @@ import {
   updateSpaceUsingPost,
 } from '@/api/spaceController.ts'
 import { useRoute, useRouter } from 'vue-router'
-import { SPACE_LEVEL_ENUM, SPACE_LEVEL_OPTIONS } from '@/constants/space.ts'
+import { SPACE_LEVEL_ENUM, SPACE_LEVEL_OPTIONS, SPACE_TYPE_ENUM } from '@/constants/space.ts'
 import { formatSize } from '@/utils'
 
 const space = ref<API.SpaceVo>()
+
+// 空间类型文本映射
+const SPACE_TYPE_MAP: Record<number, string> = {
+  0: '私有空间',
+  1: '团队空间',
+}
+
+
 const spaceForm = reactive<API.SpaceAddRequest | API.SpaceEditRequest>({
   spaceName: '我的私有空间',
   spaceLevel: SPACE_LEVEL_ENUM.COMMON,
@@ -94,6 +103,15 @@ const spaceForm = reactive<API.SpaceAddRequest | API.SpaceEditRequest>({
 const loading = ref(false)
 
 const spaceLevelList = ref<API.SpaceLevel[]>([])
+
+// 空间类别，默认为私有空间
+const spaceType = computed(() => {
+  if (route.query?.type) {
+    return Number(route.query.type)
+  } else {
+    return SPACE_TYPE_ENUM.PRIVATE
+  }
+})
 
 // 获取空间级别
 const fetchSpaceLevelList = async () => {
@@ -134,6 +152,7 @@ const handleSubmit = async (values: any) => {
     // 创建
     res = await addSpaceUsingPost({
       ...spaceForm,
+      spaceType: spaceType.value,
     })
   }
   // 操作成功
