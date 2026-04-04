@@ -23,6 +23,7 @@ import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
+import com.cloud.picture.space.backend.manager.auth.StpKit;
 import com.cloud.picture.space.backend.manager.auth.annotation.SaSpaceCheckPermission;
 import com.cloud.picture.space.backend.manager.auth.SpaceUserAuthManager;
 import com.cloud.picture.space.backend.manager.auth.model.SpaceUserPermissionConstant;
@@ -198,12 +199,12 @@ public class PictureController {
         Space space = null;
         Long spaceId = picture.getSpaceId();
         if (spaceId != null) {
-            // boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
-            // ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH_ERROR);
-            // space = spaceService.getById(spaceId);
-            // ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR,"空间不存在");
-            User loginUser = userService.getLoginUser(request);
-            pictureService.checkPictureAuth(loginUser, picture);
+            boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
+            ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH_ERROR);
+            space = spaceService.getById(spaceId);
+            ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR,"空间不存在");
+            // User loginUser = userService.getLoginUser(request);
+            // pictureService.checkPictureAuth(loginUser, picture);
         }
 
         // 获取权限列表
@@ -252,14 +253,14 @@ public class PictureController {
             pictureQueryRequest.setNullSpaceId(true);
         } else {
             // 私有空间
-            // boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
-            // ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH_ERROR);
-            User loginUser = userService.getLoginUser(request);
-            Space space = spaceService.getById(spaceId);
-            ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
-            if (!loginUser.getId().equals(space.getUserId())) {
-                throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间权限");
-            }
+            boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
+            ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH_ERROR);
+            // User loginUser = userService.getLoginUser(request);
+            // Space space = spaceService.getById(spaceId);
+            // ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
+            // if (!loginUser.getId().equals(space.getUserId())) {
+            //     throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间权限");
+            // }
         }
 
         Page<Picture> picturePage = pictureService.page(new Page<>(current, size), pictureService.getQueryWrapper(pictureQueryRequest));
@@ -474,6 +475,7 @@ public class PictureController {
      * AI P图 (阿里百炼云）
      */
     @PostMapping("/out_Edit/create_task")
+    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_EDIT)
     public BaseResponse<CreateEditPictureTaskResponse> createEditPictureTask(
             @RequestBody CreatePictureEditPictureTaskRequest createPictureEditPictureTaskRequest,
             HttpServletRequest request) {

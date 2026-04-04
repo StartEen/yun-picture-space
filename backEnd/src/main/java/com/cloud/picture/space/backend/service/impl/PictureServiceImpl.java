@@ -572,7 +572,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
 
         // 校验权限
-        checkPictureAuth(loginUser, oldPicture);
+        // checkPictureAuth(loginUser, oldPicture);
 
         // 开启事务
 
@@ -639,7 +639,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
 
         // 设置权限
-        checkPictureAuth(loginUser, oldPicture);
+        // checkPictureAuth(loginUser, oldPicture);
         // 补充审核参数
         this.fillReviewParams(picture, loginUser);
         boolean result = this.updateById(picture);
@@ -859,7 +859,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
                 () -> new BusinessException(ErrorCode.PARAMS_ERROR, "图片id不能为空")
         );
         // 校验权限
-        checkPictureAuth(loginUser, picture);
+        // checkPictureAuth(loginUser, picture);
         // 构造请求参数
         CreateEditPictureTaskRequest taskRequest = new CreateEditPictureTaskRequest();
         CreateEditPictureTaskRequest.Input input = new CreateEditPictureTaskRequest.Input();
