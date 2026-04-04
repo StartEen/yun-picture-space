@@ -112,19 +112,20 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
      */
     @Override
     public long addSpace(SpaceAddRequest spaceAddRequest, User loginUser) {
+
+        // 设置默认值
+        if (StrUtil.isBlank(spaceAddRequest.getSpaceName())) {
+            spaceAddRequest.setSpaceName("默认空间");
+        }
+        if (spaceAddRequest.getSpaceLevel() == null) {
+            spaceAddRequest.setSpaceLevel(SpaceLevelEnum.COMMON.getValue());
+        }
+        if (spaceAddRequest.getSpaceType() == null) {
+            spaceAddRequest.setSpaceType(SpaceTypeEnum.PRIVATE.getValue());
+        }
         // 实体类转化
         Space space = new Space();
         BeanUtils.copyProperties(spaceAddRequest, space);
-        // 设置默认值
-        if (StrUtil.isBlank(spaceAddRequest.getSpaceName())) {
-            space.setSpaceName("默认空间");
-        }
-        if (spaceAddRequest.getSpaceLevel() == null) {
-            space.setSpaceLevel(SpaceLevelEnum.COMMON.getValue());
-        }
-        if (spaceAddRequest.getSpaceType() == null) {
-            space.setSpaceType(SpaceTypeEnum.PRIVATE.getValue());
-        }
         // 填充数据
         this.fillSpaceBySpaceLevel(space);
         // 数据校验

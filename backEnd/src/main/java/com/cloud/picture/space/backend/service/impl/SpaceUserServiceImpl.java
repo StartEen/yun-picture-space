@@ -53,6 +53,7 @@ public class SpaceUserServiceImpl extends ServiceImpl<SpaceUserMapper, SpaceUser
      */
     @Override
     public void validSpaceUser(SpaceUser spaceUser, boolean add) {
+        ThrowUtils.throwIf(spaceUser == null, ErrorCode.PARAMS_ERROR);
         // 创建时，空间ID和用户ID必填
         Long spaceId = spaceUser.getSpaceId();
         Long userId = spaceUser.getUserId();
@@ -62,7 +63,15 @@ public class SpaceUserServiceImpl extends ServiceImpl<SpaceUserMapper, SpaceUser
             ThrowUtils.throwIf(user == null, ErrorCode.NOT_FOUND_ERROR, "用户不存在");
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
+
+            // 校验是否已经添加该成员
+            QueryWrapper<SpaceUser> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("spaceId", spaceId).eq("userId", userId);
+            SpaceUser existSpaceUser = this.getOne(queryWrapper);
+            ThrowUtils.throwIf(existSpaceUser != null, ErrorCode.PARAMS_ERROR, "该用户已是空间成员");
         }
+
+
 
         // 校验空间角色
         String spaceRole = spaceUser.getSpaceRole();
