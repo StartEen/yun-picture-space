@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 /**
  * @Author: StartEnd
  * @CreateTime: 2026-01-20  14:11
- * @Description: TODO Sa-Token权限验证工具类(Kit模式)
+ * @Description: TODO Sa-Token权限验证工具类(Kit模式)，空间账号体系
  * <p>
  * 使用Kit模式，实现多账套授权；
  * 1. StpLogic 门面类，管理项目中的所有StpLogic账号体系

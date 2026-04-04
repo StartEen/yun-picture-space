@@ -1,4 +1,4 @@
-package com.cloud.picture.space.backend.config;
+package com.cloud.picture.space.backend.manager.auth.annotation;
 
 
 import cn.dev33.satoken.interceptor.SaInterceptor;

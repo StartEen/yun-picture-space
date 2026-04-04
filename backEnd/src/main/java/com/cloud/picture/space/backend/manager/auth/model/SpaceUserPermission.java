@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * @Author: StartEnd
  * @CreateTime: 2026-01-20  13:13
- * @Description: TODO
+ * @Description: TODO 空间成员权限
  */
 
 @Data

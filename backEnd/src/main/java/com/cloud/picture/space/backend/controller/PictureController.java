@@ -23,7 +23,7 @@ import com.cloud.picture.space.backend.common.ResultUtils;
 import com.cloud.picture.space.backend.exception.BusinessException;
 import com.cloud.picture.space.backend.exception.ErrorCode;
 import com.cloud.picture.space.backend.exception.ThrowUtils;
-import com.cloud.picture.space.backend.manager.auth.SaSpaceCheckPermission;
+import com.cloud.picture.space.backend.manager.auth.annotation.SaSpaceCheckPermission;
 import com.cloud.picture.space.backend.manager.auth.SpaceUserAuthManager;
 import com.cloud.picture.space.backend.manager.auth.model.SpaceUserPermissionConstant;
 import com.cloud.picture.space.backend.model.dto.picture.*;

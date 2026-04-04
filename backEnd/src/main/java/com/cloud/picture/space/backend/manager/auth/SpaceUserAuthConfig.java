@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @Author: StartEnd
  * @CreateTime: 2026-01-20  13:11
- * @Description: TODO
+ * @Description: TODO 用于接收用户权限配置信息的值
  */
 @Data
 public class SpaceUserAuthConfig implements Serializable {

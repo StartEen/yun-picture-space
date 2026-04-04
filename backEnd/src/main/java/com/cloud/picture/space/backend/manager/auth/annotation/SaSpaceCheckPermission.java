@@ -1,10 +1,10 @@
-package com.cloud.picture.space.backend.manager.auth;
+package com.cloud.picture.space.backend.manager.auth.annotation;
 
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaMode;
 import cn.hutool.core.annotation.AliasFor;
-import org.apache.ibatis.type.Alias;
+import com.cloud.picture.space.backend.manager.auth.StpKit;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
