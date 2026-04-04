@@ -32,7 +32,7 @@ const fixedMenuItems = [
   },
   {
     key: '/add_space?type=' + SPACE_TYPE_ENUM.TEAM,
-    label: '团队空间',
+    label: '创建团队',
     icon: () => h(TeamOutlined),
   },
 ]
