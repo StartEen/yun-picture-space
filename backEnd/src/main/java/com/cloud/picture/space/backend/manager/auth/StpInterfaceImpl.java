@@ -137,7 +137,7 @@ public class StpInterfaceImpl implements StpInterface {
         if (space == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到相关空间信息");
         }
-        // 根据Space类型判断权限
+        // 根据 Space 类型判断权限
         if (space.getSpaceType() == SpaceTypeEnum.PRIVATE.getValue()) {
             // 私有空间仅本人或管理员可操作
             if (space.getUserId().equals(userId) || userService.isAdmin(loginUser)) {
@@ -146,7 +146,7 @@ public class StpInterfaceImpl implements StpInterface {
                 return new ArrayList<>();
             }
         } else {
-            // 团队空间，查询SpaceUser并获取角色和权限
+            // 团队空间，查询 SpaceUser 并获取角色和权限
             spaceUser = spaceUserService.lambdaQuery()
                     .eq(SpaceUser::getSpaceId, spaceId)
                     .eq(SpaceUser::getUserId, userId)

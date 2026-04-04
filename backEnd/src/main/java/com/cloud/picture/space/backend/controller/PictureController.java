@@ -252,8 +252,15 @@ public class PictureController {
             pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
             pictureQueryRequest.setNullSpaceId(true);
         } else {
-            // 私有空间
+
+            if (!StpKit.SPACE.isLogin()){
+                log.info("未登录");
+            }
             boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
+            log.info("权限检查结果：hasPermission={}", hasPermission);
+            log.info("用户权限列表：{}", StpKit.SPACE.getPermissionList());
+            log.info("=== 权限检查结束 ===");
+
             ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH_ERROR);
             // User loginUser = userService.getLoginUser(request);
             // Space space = spaceService.getById(spaceId);

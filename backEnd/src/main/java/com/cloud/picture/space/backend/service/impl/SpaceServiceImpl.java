@@ -175,7 +175,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
                         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建团队空间成员记录失败");
                     }
 
-                    // 创建分表
+                    // 创建分表（使用分库分表的时候公共空间便一定不能为0）
                     // dynamicShardingManager.createSpacePictureTable(space);
 
                     return space.getId();

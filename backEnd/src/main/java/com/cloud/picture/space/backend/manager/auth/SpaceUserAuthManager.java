@@ -49,7 +49,7 @@ public class SpaceUserAuthManager {
      * @return 权限列表
      */
     public List<String> getPermissionsByRole(String spaceUserRole) {
-        if (StrUtil.isNotBlank(spaceUserRole)) {
+        if (StrUtil.isBlank(spaceUserRole)) {
             return new ArrayList<>();
         }
         SpaceUserRole role = SPACE_USER_AUTH_CONFIG.getRoles().stream()
