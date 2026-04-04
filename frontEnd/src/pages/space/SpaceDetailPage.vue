@@ -67,6 +67,15 @@
             <template #icon><BarChartOutlined /></template>
             空间分析
           </a-button>
+          <a-button
+            type="primary"
+            class="btn-primary"
+            :href="`/space_user/manage/${id}`"
+            target="_blank"
+          >
+            <template #icon><TeamOutlined /></template>
+            成员管理
+          </a-button>
         </div>
       </div>
 
@@ -103,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, onMounted, reactive, ref, computed } from 'vue'
+import { h, onMounted, reactive, ref, computed, watch } from 'vue'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
 import {
@@ -121,6 +130,7 @@ import {
   PlusOutlined,
   FullscreenOutlined,
   BarChartOutlined,
+  TeamOutlined,
 } from '@ant-design/icons-vue'
 
 interface Props {
@@ -184,6 +194,17 @@ const fetchData = async () => {
   }
   loading.value = false
 }
+
+// 监听路由参数变化，重新加载数据
+watch(
+  () => props.id,
+  (newId) => {
+    if (newId) {
+      fetchSpaceDetail()
+      fetchData()
+    }
+  },
+)
 
 // 页面加载时获取数据，请求一次
 onMounted(() => {

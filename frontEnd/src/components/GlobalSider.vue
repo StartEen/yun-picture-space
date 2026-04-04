@@ -46,7 +46,13 @@ router.afterEach((to, from, failure) => {
 })
 
 const doMenuClick = ({ key }: { key: string }) => {
-  router.push(key)
+  try {
+    router.push(key)
+    console.log('路由跳转成功')
+  } catch (error) {
+    console.error('路由跳转失败:', error)
+    message.error('跳转失败：' + error)
+  }
 }
 
 const loginUserStore = useLoginUserStore()
@@ -64,6 +70,7 @@ const menuItems = computed(() => {
     return {
       key: '/space/' + spaceUser.spaceId,
       label: space?.spaceName,
+      icon: () => h(TeamOutlined),
     }
   })
   const teamSpaceMenuGroup = {
