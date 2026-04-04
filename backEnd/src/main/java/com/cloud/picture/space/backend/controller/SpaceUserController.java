@@ -41,9 +41,6 @@ import java.util.List;
 public class SpaceUserController {
 
     @Resource
-    private SpaceService spaceService;
-
-    @Resource
     private UserService userService;
 
     @Resource
