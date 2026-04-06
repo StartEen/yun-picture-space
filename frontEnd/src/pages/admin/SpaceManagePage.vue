@@ -31,7 +31,11 @@
 
       <div class="action-section">
         <a-space>
-          <a-button class="action-btn analyze-btn" href="/space_analyze?queryPublic=1" target="_blank">
+          <a-button
+            class="action-btn analyze-btn"
+            href="/space_analyze?queryPublic=1"
+            target="_blank"
+          >
             <template #icon><BarChartOutlined /></template>
             分析公共图库
           </a-button>
@@ -64,12 +68,20 @@
             </a-tag>
           </template>
 
+          <template v-else-if="column.dataIndex === 'spaceType'">
+            <a-tag :color="getSpaceTypeColor(record.spaceType)" class="type-tag">
+              {{ SPACE_TYPE_MAP[record.spaceType ?? 0]}}
+            </a-tag>
+          </template>
+
           <template v-if="column.dataIndex === 'spaceUseInfo'">
             <div class="usage-container">
               <div class="usage-item">
                 <div class="usage-label">
                   <span>容量</span>
-                  <span class="usage-text">{{ formatSize(record.totalSize) }} / {{ formatSize(record.maxSize) }}</span>
+                  <span class="usage-text"
+                    >{{ formatSize(record.totalSize) }} / {{ formatSize(record.maxSize) }}</span
+                  >
                 </div>
                 <a-progress
                   :percent="calcPercent(record.totalSize, record.maxSize)"
@@ -94,12 +106,19 @@
           </template>
 
           <template v-if="column.dataIndex === 'createTime' || column.dataIndex === 'editTime'">
-            <span class="time-text">{{ dayjs(record[column.dataIndex]).format('YYYY-MM-DD HH:mm:ss') }}</span>
+            <span class="time-text">{{
+              dayjs(record[column.dataIndex]).format('YYYY-MM-DD HH:mm:ss')
+            }}</span>
           </template>
 
           <template v-else-if="column.key === 'action'">
             <div class="table-action-wrapper">
-              <a-button type="link" :href="`/add_space?id=${record.id}`" target="_blank" class="table-action-btn">
+              <a-button
+                type="link"
+                :href="`/add_space?id=${record.id}`"
+                target="_blank"
+                class="table-action-btn"
+              >
                 编辑
               </a-button>
               <a-popconfirm
@@ -108,9 +127,7 @@
                 cancel-text="取消"
                 @confirm="doDelete(record.id)"
               >
-                <a-button type="link" danger class="table-action-btn">
-                  删除
-                </a-button>
+                <a-button type="link" danger class="table-action-btn"> 删除 </a-button>
               </a-popconfirm>
             </div>
           </template>
@@ -124,13 +141,9 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
-import {
-  SearchOutlined,
-  PlusOutlined,
-  BarChartOutlined,
-} from '@ant-design/icons-vue'
+import { SearchOutlined, PlusOutlined, BarChartOutlined } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
-import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS } from '@/constants/space.ts'
+import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS, SPACE_TYPE_MAP } from '@/constants/space.ts'
 import { formatSize } from '@/utils'
 
 const columns = [
@@ -148,6 +161,12 @@ const columns = [
   {
     title: '空间级别',
     dataIndex: 'spaceLevel',
+    width: 120,
+    align: 'center',
+  },
+  {
+    title: '空间类别',
+    dataIndex: 'spaceType',
     width: 120,
     align: 'center',
   },
@@ -266,12 +285,20 @@ const getStrokeColor = (percent: number) => {
 // 获取空间级别颜色 (已更新为高亮颜色)
 const getSpaceLevelColor = (level: number) => {
   const colors: Record<number, string> = {
-    0: 'cyan',    // 0 通常是普通空间，使用青色打破沉闷
-    1: 'blue',    // 1 使用蓝色
-    2: 'purple',  // 2 使用紫色
-    3: 'gold',    // 3 使用金色
+    0: 'cyan', // 0 通常是普通空间，使用青色打破沉闷
+    1: 'blue', // 1 使用蓝色
+    2: 'green', // 2 使用紫色
+    3: 'orange', // 3 使用金色
   }
   return colors[level] || 'default'
+}
+//获取空间类别颜色
+const getSpaceTypeColor = (type: number) => {
+  const colors: Record<number, string> = {
+    0: 'purple', // 0 通常是普通空间，使用青色打破沉闷
+    1: 'gold', // 1 使用蓝色
+  }
+  return colors[type] || 'default'
 }
 </script>
 
@@ -338,7 +365,9 @@ const getSpaceLevelColor = (level: number) => {
   width: 220px;
 }
 
-.search-btn, .create-btn, .action-btn {
+.search-btn,
+.create-btn,
+.action-btn {
   border-radius: 6px;
   font-weight: 500;
 }
