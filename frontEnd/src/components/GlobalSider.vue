@@ -18,6 +18,10 @@ import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { SPACE_TYPE_ENUM } from '@/constants/space.ts'
 import {listMyTeamSpaceUsingPost} from "@/api/spaceUserController.ts";
 import {message} from "ant-design-vue";
+import {findCreateSpaceUsingGet} from "@/api/spaceController.ts";
+
+//判断的当前账号是否创建团队空间
+const isCreatedTeam = ref<boolean>(false)
 
 const fixedMenuItems = [
   {
@@ -92,6 +96,15 @@ const fetchTeamSpaceList = async () => {
   }
 }
 
+const isCreatedTeamSpace = async ()=>{
+  const res = await findCreateSpaceUsingGet({
+    spaceType: SPACE_TYPE_ENUM.TEAM
+  })
+  if (res.data.code === 0 && res.data.data) {
+    isCreatedTeam.value = true
+  }
+}
+
 
 /**
  * 监听变量，改变时触发数据的重新加载
@@ -100,6 +113,7 @@ watchEffect(() => {
   // 登录才加载
   if (loginUserStore.loginUser.id) {
     fetchTeamSpaceList()
+    isCreatedTeamSpace()
   }
 })
 </script>
