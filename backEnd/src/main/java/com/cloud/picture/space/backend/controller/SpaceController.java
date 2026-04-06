@@ -1,6 +1,7 @@
 package com.cloud.picture.space.backend.controller;
 
 
+import cn.hutool.core.util.ObjUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.picture.space.backend.annotation.AuthCheck;
 import com.cloud.picture.space.backend.common.BaseResponse;
@@ -210,6 +211,19 @@ public class SpaceController {
         ThrowUtils.throwIf(pageSize > 20, ErrorCode.PARAMS_ERROR);
         Page<Space> spacePage = spaceService.page(new Page<>(current, pageSize), spaceService.getQueryWrapper(spaceQueryRequest));
         return ResultUtils.success(spaceService.getSpaceVOPage(spacePage, request));
+    }
+
+    /**
+     * 查询当前登录账号是否创建空间
+     */
+    @GetMapping("/findCreateCount")
+    public BaseResponse<Boolean> findCreateSpace(long spaceType, HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        Space one = spaceService.lambdaQuery()
+                .eq(Space::getUserId, loginUser.getId())
+                .eq(Space::getSpaceType, spaceType).one();
+        boolean notEmpty = ObjUtil.isNotEmpty(one);
+        return ResultUtils.success(notEmpty);
     }
 
 

@@ -245,6 +245,11 @@ declare namespace API {
     id?: number
   }
 
+  type findCreateSpaceUsingGETParams = {
+    /** spaceType */
+    spaceType?: number
+  }
+
   type GeneratePictureByPictureTaskResponse = {
     code?: string
     message?: string
