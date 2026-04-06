@@ -140,7 +140,8 @@ import {
 import { useRouter } from 'vue-router'
 import { downloadImage, formatSize, toHexColor } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import ShareModal from "@/components/modal/ShareModal.vue";
+import ShareModal from '@/components/modal/ShareModal.vue'
+import { SPACE_PERMISSION_ENUM } from '@/constants/space.ts'
 
 interface Props {
   id: string | number
@@ -150,6 +151,17 @@ const props = defineProps<Props>()
 const picture = ref<API.PictureVo>({})
 const loading = ref(true)
 const fullImageVisible = ref(false)
+
+// 通用权限检查函数
+function createPermissionChecker(permission: string) {
+  return computed(() => {
+    return (picture.value.permissionList ?? []).includes(permission)
+  })
+}
+
+// 定义权限检查
+const canEdit = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+const canDelete = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
 
 // 获取图片详情
 const fetchPictureDetail = async () => {
@@ -177,18 +189,18 @@ onMounted(() => {
 //编写权限逻辑：删除和编辑
 const loginUserStore = useLoginUserStore()
 
-// 判断是否有编辑权限
-const canEdit = computed(() => {
-  const loginUser = loginUserStore.loginUser
-  if (!loginUser.id) {
-    return false
-  }
-  //仅本人或管理员可编辑
-  const user = picture.value.user || {}
-  return loginUser.id === user.id || loginUser.userRole === 'admin'
-})
-//将编辑的权限值赋值给删除权限的值
-const canDelete = canEdit
+// // 判断是否有编辑权限
+// const canEdit = computed(() => {
+//   const loginUser = loginUserStore.loginUser
+//   if (!loginUser.id) {
+//     return false
+//   }
+//   //仅本人或管理员可编辑
+//   const user = picture.value.user || {}
+//   return loginUser.id === user.id || loginUser.userRole === 'admin'
+// })
+// //将编辑的权限值赋值给删除权限的值
+// const canDelete = canEdit
 
 const router = useRouter()
 // 编辑
@@ -260,8 +272,6 @@ const doShare = () => {
     shareModalRef.value.openModal()
   }
 }
-
-
 </script>
 
 <style scoped>

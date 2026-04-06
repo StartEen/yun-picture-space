@@ -31,6 +31,7 @@
             <div class="divider-v-small"></div>
             <a-button
               type="text"
+              v-if="canEditPicture"
               class="btn-batch-edit"
               :icon="h(EditOutlined)"
               @click="doBatchEdit"
@@ -52,6 +53,7 @@
           <a-button
             type="primary"
             class="btn-primary"
+            v-if="canUploadPicture"
             :href="`/add_picture?spaceId=${id}`"
             target="_blank"
           >
@@ -61,6 +63,7 @@
           <a-button
             type="primary"
             class="btn-primary"
+            v-if="canManageSpaceUser"
             :href="`/space_analyze?spaceId=${id}`"
             target="_blank"
           >
@@ -70,6 +73,7 @@
           <a-button
             type="primary"
             class="btn-primary"
+            v-if="canManageSpaceUser"
             :href="`/space_user/manage/${id}`"
             target="_blank"
           >
@@ -99,6 +103,8 @@
         :selectable="true"
         :selectedIds="selectedIds"
         @selectChange="handleSelectChange"
+        :canEdit = " canEditPicture"
+        :canDelete="canDeletePicture"
       />
     </div>
   </div>
@@ -132,6 +138,7 @@ import {
   BarChartOutlined,
   TeamOutlined,
 } from '@ant-design/icons-vue'
+import { SPACE_PERMISSION_ENUM } from '@/constants/space.ts'
 
 interface Props {
   id: string | number
@@ -139,6 +146,19 @@ interface Props {
 
 const props = defineProps<Props>()
 const space = ref<API.SpaceVo>({})
+
+// 通用权限检查函数
+function createPermissionChecker(permission: string) {
+  return computed(() => {
+    return (space.value.permissionList ?? []).includes(permission)
+  })
+}
+
+// 定义权限检查
+const canManageSpaceUser = createPermissionChecker(SPACE_PERMISSION_ENUM.SPACE_USER_MANAGE)
+const canUploadPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_UPLOAD)
+const canEditPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+const canDeletePicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
 
 // -------- 获取空间详情 --------
 const fetchSpaceDetail = async () => {

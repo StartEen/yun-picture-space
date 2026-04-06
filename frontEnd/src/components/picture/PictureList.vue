@@ -44,11 +44,11 @@
                     <SearchOutlined />
                     以图搜图
                   </a-space>
-                  <a-space @click="(e) => doEdit(picture, e)">
+                  <a-space v-if="canEdit" @click="(e) => doEdit(picture, e)">
                     <EditOutlined />
                     编辑
                   </a-space>
-                  <a-space @click="(e) => doDelete(picture, e)">
+                  <a-space v-if="canDelete" @click="(e) => doDelete(picture, e)">
                     <DeleteOutlined />
                     删除
                   </a-space>
@@ -84,6 +84,8 @@ interface Props {
   selectable?: boolean
   selectedIds?: number[]
   onSelectChange?: (selectedIds: number[]) => void
+  canEdit?: boolean
+  canDelete?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -92,6 +94,8 @@ const props = withDefaults(defineProps<Props>(), {
   showOp: false,
   selectable: false,
   selectedIds: () => [],
+  canEdit: false,
+  canDelete: false,
 })
 
 const emit = defineEmits<{
