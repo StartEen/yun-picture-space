@@ -5,7 +5,9 @@
         <div class="space-info">
           <div class="space-title">
             <h2>{{ space.spaceName }}</h2>
-            <span class="space-tag">私有空间</span>
+            <span class="space-tag" :class="'space-tag-' + space.spaceType">
+              {{ SPACE_TYPE_MAP[space.spaceType ?? 0] }}
+            </span>
           </div>
           <a-tooltip
             :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
@@ -138,8 +140,7 @@ import {
   BarChartOutlined,
   TeamOutlined,
 } from '@ant-design/icons-vue'
-import { SPACE_PERMISSION_ENUM } from '@/constants/space.ts'
-
+import { SPACE_PERMISSION_ENUM, SPACE_TYPE_MAP } from '@/constants/space.ts'
 interface Props {
   id: string | number
 }
@@ -370,6 +371,17 @@ const doBatchEdit = () => {
   font-size: 13px;
   font-weight: 500;
 }
+
+.space-tag-0 {
+  background: #e8f3ff;
+  color: #1677ff;
+}
+
+.space-tag-1 {
+  background: #f0f5ff;
+  color: #597ef7;
+}
+
 
 /* 环形进度条微调：增大且支持悬浮动画 */
 :deep(.ant-progress-circle) {
