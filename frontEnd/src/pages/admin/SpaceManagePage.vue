@@ -20,6 +20,16 @@
               class="custom-select"
             />
           </a-form-item>
+          <a-form-item label="空间类别" name="spaceType">
+            <a-select
+              v-model:value="searchParams.spaceType"
+              placeholder="请选择空间类别"
+              :options="SPACE_TYPE_OPTIONS"
+              allow-clear
+              class="custom-select"
+            />
+          </a-form-item>
+
           <a-form-item>
             <a-button type="primary" html-type="submit" class="search-btn">
               <template #icon><SearchOutlined /></template>
@@ -70,7 +80,7 @@
 
           <template v-else-if="column.dataIndex === 'spaceType'">
             <a-tag :color="getSpaceTypeColor(record.spaceType)" class="type-tag">
-              {{ SPACE_TYPE_MAP[record.spaceType ?? 0]}}
+              {{ SPACE_TYPE_MAP[record.spaceType ?? 0] }}
             </a-tag>
           </template>
 
@@ -143,7 +153,12 @@ import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceContr
 import { message } from 'ant-design-vue'
 import { SearchOutlined, PlusOutlined, BarChartOutlined } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
-import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS, SPACE_TYPE_MAP } from '@/constants/space.ts'
+import {
+  SPACE_LEVEL_MAP,
+  SPACE_LEVEL_OPTIONS,
+  SPACE_TYPE_MAP,
+  SPACE_TYPE_OPTIONS,
+} from '@/constants/space.ts'
 import { formatSize } from '@/utils'
 
 const columns = [
