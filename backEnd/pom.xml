@@ -153,6 +153,14 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
+        <!--高性能无锁队列-->
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
+
         <!--阿里巴巴AI SDK-->
         <dependency>
             <groupId>com.alibaba</groupId>
