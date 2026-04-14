@@ -4,6 +4,7 @@ package com.cloud.picture.space.backend.manager.webSocket;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.json.JSONUtil;
+import com.cloud.picture.space.backend.manager.webSocket.disruptor.PictureEditEventProducer;
 import com.cloud.picture.space.backend.manager.webSocket.model.PictureEditActionEnum;
 import com.cloud.picture.space.backend.manager.webSocket.model.PictureEditMessageTypeEnum;
 import com.cloud.picture.space.backend.manager.webSocket.model.PictureEditRequestMessage;
@@ -39,6 +40,11 @@ public class PictureEditHandler extends TextWebSocketHandler {
 
     @Resource
     private UserService userService;
+
+
+    @Resource
+    private PictureEditEventProducer pictureEditEventProducer;
+
 
 
     /**
@@ -124,32 +130,35 @@ public class PictureEditHandler extends TextWebSocketHandler {
 
         // 将消息解析为PictureEditMessage
         PictureEditRequestMessage pictureEditRequestMessage = JSONUtil.toBean(message.getPayload(), PictureEditRequestMessage.class);
-        String type = pictureEditRequestMessage.getType();
-        PictureEditMessageTypeEnum pictureEditMessageTypeEnum = PictureEditMessageTypeEnum.valueOf(type);
 
         // 从Session属性中获取公共参数
         Map<String, Object> attributes = session.getAttributes();
         User user = (User) attributes.get("user");
         Long pictureId = (Long) attributes.get("pictureId");
 
-        // 调用对应的消息处理方法
-        switch (pictureEditMessageTypeEnum) {
-            case ENTER_EDIT:
-                handleEnterEditMessage(pictureEditRequestMessage, session, user, pictureId);
-                break;
-            case EDIT_ACTION:
-                handleEditMessage(pictureEditRequestMessage, session, user, pictureId);
-                break;
-            case EXIT_EDIT:
-                handleExitEditMessage(pictureEditRequestMessage, session, user, pictureId);
-                break;
-            default:
-                PictureEditResponseMessage pictureEditResponseMessage = new PictureEditResponseMessage();
-                pictureEditResponseMessage.setType(PictureEditMessageTypeEnum.ERROR.getValue());
-                pictureEditResponseMessage.setMessage("消息类型错误");
-                pictureEditResponseMessage.setUser(userService.getUserVo(user));
-                session.sendMessage(new TextMessage(JSONUtil.toJsonStr(pictureEditResponseMessage)));
-        }
+        //使用Disruptor异步处理信息
+        pictureEditEventProducer.publishEvent(pictureEditRequestMessage, session, user, pictureId);
+
+        // // 调用对应的消息处理方法
+        // String type = pictureEditRequestMessage.getType();
+        // PictureEditMessageTypeEnum pictureEditMessageTypeEnum = PictureEditMessageTypeEnum.valueOf(type);
+        // switch (pictureEditMessageTypeEnum) {
+        //     case ENTER_EDIT:
+        //         handleEnterEditMessage(pictureEditRequestMessage, session, user, pictureId);
+        //         break;
+        //     case EDIT_ACTION:
+        //         handleEditMessage(pictureEditRequestMessage, session, user, pictureId);
+        //         break;
+        //     case EXIT_EDIT:
+        //         handleExitEditMessage(pictureEditRequestMessage, session, user, pictureId);
+        //         break;
+        //     default:
+        //         PictureEditResponseMessage pictureEditResponseMessage = new PictureEditResponseMessage();
+        //         pictureEditResponseMessage.setType(PictureEditMessageTypeEnum.ERROR.getValue());
+        //         pictureEditResponseMessage.setMessage("消息类型错误");
+        //         pictureEditResponseMessage.setUser(userService.getUserVo(user));
+        //         session.sendMessage(new TextMessage(JSONUtil.toJsonStr(pictureEditResponseMessage)));
+        // }
     }
 
     /**
