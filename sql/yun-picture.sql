@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 02/04/2026 18:58:04
+ Date: 16/04/2026 17:14:26
 */
 
 SET NAMES utf8mb4;
@@ -54,7 +54,7 @@ CREATE TABLE `picture`  (
   INDEX `idx_userId`(`userId` ASC) USING BTREE,
   INDEX `idx_reviewStatus`(`reviewStatus` ASC) USING BTREE,
   INDEX `idx_spaceId`(`spaceId` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2038890165659435011 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '图片' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2041077600451526658 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '图片' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of picture
@@ -131,6 +131,8 @@ INSERT INTO `picture` VALUES (2033746454927593474, 'https://yun-picture-13693727
 INSERT INTO `picture` VALUES (2033783422239535105, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-17_MWoxdmeqqFltFhGY.webp', '黑洞', NULL, '摄影', '[\"背景\"]', 1140244, 4026, 2358, 1.71, 'webp', 2001915226368913409, '2026-03-17 13:52:08', '2026-03-17 13:52:41', '2026-03-17 13:52:41', 0, 1, '管理员自动过审', 2001915226368913409, '2026-03-17 13:52:41', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-17_MWoxdmeqqFltFhGY.webp', NULL, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///public/2001915226368913409/2026-03-17_MWoxdmeqqFltFhGY.jpg', '0x000');
 INSERT INTO `picture` VALUES (2038799428762644481, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-31_pzhblyHmL30xmgSF.webp', 'ai_edit_小猫腻', '一只三花小猫咪正在阳台飘窗上晒太阳闭着眼睛仰着头，窗户打开，有只小蝴蝶只正在小猫咪的鼻尖上停留', '插画', '[\"AI创作\"]', 215318, 2048, 2048, 1, 'webp', 2001915226368913409, '2026-03-31 10:03:57', '2026-03-31 10:06:46', '2026-03-31 10:06:46', 0, 1, '管理员自动过审', 2001915226368913409, '2026-03-31 10:06:46', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-31_pzhblyHmL30xmgSF_thumbnail.png', NULL, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///public/2001915226368913409/2026-03-31_pzhblyHmL30xmgSF.png', '0x7a785c');
 INSERT INTO `picture` VALUES (2038890165659435010, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-31_1HOmZIiEHw6tL7DG.webp', 'ai_edit_1774944269271', '绿色的树枝', '自然与景观', '[\"植物\"]', 179452, 1376, 768, 1.79, 'webp', 2001915226368913409, '2026-03-31 16:04:30', '2026-04-02 14:31:58', '2026-04-02 14:31:58', 0, 1, '管理员自动过审', 2001915226368913409, '2026-04-02 14:31:58', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-03-31_1HOmZIiEHw6tL7DG.webp', NULL, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///public/2001915226368913409/2026-03-31_1HOmZIiEHw6tL7DG.png', '0xb49f81');
+INSERT INTO `picture` VALUES (2040274072418082817, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-04-04_DyT1PIVKuVkzzEmd.webp', '表情包_1', NULL, NULL, NULL, 10402, 474, 475, 1, 'webp', 2001915226368913409, '2026-04-04 11:43:39', '2026-04-04 11:43:39', '2026-04-04 11:43:39', 0, 1, '管理员自动过审', 2001915226368913409, '2026-04-04 11:43:40', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/public/2001915226368913409/2026-04-04_DyT1PIVKuVkzzEmd.webp', NULL, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///public/2001915226368913409/2026-04-04_DyT1PIVKuVkzzEmd.jpg', '0x656954');
+INSERT INTO `picture` VALUES (2041077600451526657, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/space/2040270952950620162/2026-04-06_NPo123w99qbZ1Tzn.webp', '草3440x1440曲面壁纸_彼岸图网', NULL, '自然与景观', '[\"植物\"]', 2167930, 3440, 1440, 2.39, 'webp', 2001915226368913409, '2026-04-06 16:56:35', '2026-04-06 16:56:48', '2026-04-06 16:56:48', 0, 1, '管理员自动过审', 2001915226368913409, '2026-04-06 16:56:48', 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com/space/2040270952950620162/2026-04-06_NPo123w99qbZ1Tzn_thumbnail.jpg', 2040270952950620162, 'https://yun-picture-1369372725.cos.ap-nanjing.myqcloud.com///space/2040270952950620162/2026-04-06_NPo123w99qbZ1Tzn.jpg', '0x3f5c23');
 
 -- ----------------------------
 -- Table structure for space
@@ -155,13 +157,16 @@ CREATE TABLE `space`  (
   INDEX `idx_spaceName`(`spaceName` ASC) USING BTREE,
   INDEX `idx_spaceLevel`(`spaceLevel` ASC) USING BTREE,
   INDEX `idx_spaceType`(`spaceType` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2030485422461386754 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '空间' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2041099324182192131 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '空间' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of space
 -- ----------------------------
 INSERT INTO `space` VALUES (2008371139942469634, '测试', 0, 104857600, 100, 1738300, 3, 2001915226368913409, '2026-01-06 10:52:48', '2026-01-06 10:52:48', '2026-03-26 11:04:19', 0, 0);
 INSERT INTO `space` VALUES (2008374503782699010, '默认私有空间', 0, 104857600, 100, 0, 0, 2008374503631704065, '2026-01-06 11:06:10', '2026-01-06 11:06:10', '2026-03-08 11:33:27', 0, 0);
+INSERT INTO `space` VALUES (2040270952950620162, '创建一个团队空间', 0, 104857600, 100, 2167930, 1, 2001915226368913409, '2026-04-04 11:31:16', '2026-04-04 11:31:16', '2026-04-06 16:56:36', 0, 1);
+INSERT INTO `space` VALUES (2040339168909492225, '我的私有空间2', 0, 104857600, 100, 0, 0, 2003012479758364673, '2026-04-04 16:02:20', '2026-04-04 16:02:20', '2026-04-06 18:21:36', 0, 0);
+INSERT INTO `space` VALUES (2041099324182192130, '普创团', 0, 104857600, 100, 0, 0, 2003012479758364673, '2026-04-06 18:22:55', '2026-04-06 18:22:55', '2026-04-06 18:32:45', 1, 1);
 
 -- ----------------------------
 -- Table structure for space_user
@@ -178,11 +183,15 @@ CREATE TABLE `space_user`  (
   UNIQUE INDEX `uk_spaceId_userId`(`spaceId` ASC, `userId` ASC) USING BTREE,
   INDEX `idx_spaceId`(`spaceId` ASC) USING BTREE,
   INDEX `idx_userId`(`userId` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '空间用户关联' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '空间用户关联' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of space_user
 -- ----------------------------
+INSERT INTO `space_user` VALUES (1, 2040270952950620162, 2001915226368913409, 'admin', '2026-04-04 11:31:16', '2026-04-06 17:08:36');
+INSERT INTO `space_user` VALUES (3, 2041099324182192130, 2003012479758364673, 'admin', '2026-04-06 18:22:55', '2026-04-06 18:22:55');
+INSERT INTO `space_user` VALUES (4, 2041099324182192130, 2001915226368913409, 'viewer', '2026-04-06 18:23:50', '2026-04-06 18:23:50');
+INSERT INTO `space_user` VALUES (5, 2040270952950620162, 2003012479758364673, 'editor', '2026-04-16 17:03:33', '2026-04-16 17:03:35');
 
 -- ----------------------------
 -- Table structure for user
