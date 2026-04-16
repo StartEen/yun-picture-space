@@ -3,7 +3,7 @@
     class="image-cropper-modal"
     v-model:visible="visible"
     title="裁剪与编辑图片"
-    width="800px"
+    width="950px"
     :footer="false"
     destroyOnClose
     @cancel="closeModal"
@@ -39,26 +39,32 @@
       </div>
 
       <div class="cropper-actions">
+        <a-space size="middle" v-if="isTeamSpace" style="margin-right: 20px">
+          <a-button v-if="editingUser" disabled>{{ editingUser.userName }} 正在编辑</a-button>
+          <a-button v-if="canEnterEdit" type="primary" ghost @click="enterEdit">进入编辑</a-button>
+          <a-button v-if="canExitEdit" danger ghost @click="exitEdit">退出编辑</a-button>
+        </a-space>
         <a-space size="middle">
-          <a-button @click="rotateLeft">
+          <a-button @click="rotateLeft" :disabled="!canEdit">
             <template #icon><RotateLeftOutlined /></template>
             向左旋转
           </a-button>
-          <a-button @click="rotateRight">
+          <a-button @click="rotateRight" :disabled="!canEdit">
             <template #icon><RotateRightOutlined /></template>
             向右旋转
           </a-button>
-          <a-button @click="changeScale(1)">
+          <a-button @click="changeScale(1)" :disabled="!canEdit">
             <template #icon><ZoomInOutlined /></template>
             放大
           </a-button>
-          <a-button @click="changeScale(-1)">
+          <a-button @click="changeScale(-1)" :disabled="!canEdit">
             <template #icon><ZoomOutOutlined /></template>
             缩小
           </a-button>
           <a-button
             type="primary"
             :loading="loading"
+            :disabled="!canEdit"
             @click="handleConfirm"
             class="confirm-btn"
           >
@@ -72,23 +78,28 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed, watchEffect, onUnmounted } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   RotateLeftOutlined,
   RotateRightOutlined,
   ZoomInOutlined,
   ZoomOutOutlined,
-  CheckOutlined
+  CheckOutlined,
 } from '@ant-design/icons-vue'
 import 'vue-cropper/dist/index.css'
 import { VueCropper } from 'vue-cropper'
 import { uploadPictureUsingPost } from '@/api/pictureController.ts'
+import { SPACE_TYPE_ENUM } from '@/constants/space.ts'
+import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import PictureEditWebSocket from '@/utils/pictureEditWebSocket.ts'
+import { PICTURE_EDIT_ACTION_ENUM, PICTURE_EDIT_MESSAGE_TYPE_ENUM } from '@/constants/picture.ts'
 
 interface Props {
   imageUrl?: string
   picture?: API.PictureVo
   spaceId?: number
+  space?: API.SpaceVo
   onSuccess?: (newPicture: API.PictureVo) => void
 }
 
@@ -108,7 +119,7 @@ watch(
   () => props.imageUrl,
   (newVal) => {
     imageUrl.value = newVal
-  }
+  },
 )
 
 // 监听比例变化
@@ -120,7 +131,7 @@ watch(
       '4:3': [4, 3],
       '16:9': [16, 9],
       '3:4': [3, 4],
-      '9:16': [9, 16]
+      '9:16': [9, 16],
     }
     currentAspectRatio.value = ratioMap[newVal] || [1, 1]
 
@@ -134,7 +145,7 @@ watch(
       cropperRef.value.goAutoCrop()
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // 图片加载成功，动态调整容器高度
@@ -153,9 +164,22 @@ const onImgLoad = (data: any) => {
 }
 
 // 控件操作
-const changeScale = (num: number) => cropperRef.value?.changeScale(num)
-const rotateLeft = () => cropperRef.value?.rotateLeft()
-const rotateRight = () => cropperRef.value?.rotateRight()
+const changeScale = (num: number) => {
+  cropperRef.value?.changeScale(num)
+  if (num > 0) {
+    editAction(PICTURE_EDIT_ACTION_ENUM.ZOOM_IN)
+  } else {
+    editAction(PICTURE_EDIT_ACTION_ENUM.ZOOM_OUT)
+  }
+}
+const rotateLeft = () => {
+  cropperRef.value?.rotateLeft()
+  editAction(PICTURE_EDIT_ACTION_ENUM.ROTATE_LEFT)
+}
+const rotateRight = () => {
+  cropperRef.value?.rotateRight()
+  editAction(PICTURE_EDIT_ACTION_ENUM.ROTATE_RIGHT)
+}
 
 // 确认裁切
 const handleConfirm = () => {
@@ -201,12 +225,149 @@ const openModal = () => {
 }
 const closeModal = () => {
   visible.value = false
+
+  //断开链接
+  if (webSocket) {
+    webSocket.disconnect()
+  }
+  editingUser.value = undefined
 }
 
 // 暴露函数给父组件
 defineExpose({
   openModal,
 })
+
+/*---------实时编辑-----------*/
+
+// 判断当前空间是否是团队空间
+const isTeamSpace = computed(() => {
+  return props.space?.spaceType === SPACE_TYPE_ENUM.TEAM
+})
+
+const loginUserStore = useLoginUserStore()
+const loginUser = loginUserStore.loginUser
+
+// 正在编辑的用户
+const editingUser = ref<API.UserVo>()
+// 当前用户是否可进入编辑
+const canEnterEdit = computed(() => {
+  return !editingUser.value
+})
+// 正在编辑的用户是本人，可退出编辑
+const canExitEdit = computed(() => {
+  return editingUser.value?.id === loginUser.id
+})
+// 可以点击编辑图片的操作按钮
+const canEdit = computed(() => {
+  // 不是团队空间，默认就可以编辑
+  if (!isTeamSpace.value) {
+    return true
+  }
+  // 团队空间，只有编辑者才能协同编辑
+  return editingUser.value?.id === loginUser.id
+})
+
+let webSocket: PictureEditWebSocket | null
+
+//初始化WebSocket链接，绑定事件
+const initWebSocket = () => {
+  const pictureId = props.picture?.id
+  if (!pictureId || !visible.value) {
+    return
+  }
+  //防止之前的链接未释放
+  if (webSocket) {
+    webSocket.disconnect()
+  }
+
+  //创建WebSocket实例
+  webSocket = new PictureEditWebSocket(pictureId)
+
+  //建立WebSocket连接
+  webSocket.connect()
+
+  //监听通知消息
+  webSocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.INFO, (msg) => {
+    console.log('收到通知消息：', msg)
+    message.info(msg.message)
+  })
+
+  //监听进入编辑状态消息
+  webSocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT, (msg) => {
+    console.log('收到进入编辑状态消息：', msg)
+    message.info(msg.message)
+    editingUser.value = msg.user
+  })
+
+  //监听编辑操作消息
+  webSocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION, (msg) => {
+    console.log('收到编辑操作消息：', msg)
+    message.info(msg.message)
+    switch (msg.editAction) {
+      case PICTURE_EDIT_ACTION_ENUM.ROTATE_LEFT:
+        cropperRef.value.rotateLeft()
+        break
+      case PICTURE_EDIT_ACTION_ENUM.ROTATE_RIGHT:
+        cropperRef.value.rotateRight()
+        break
+      case PICTURE_EDIT_ACTION_ENUM.ZOOM_IN:
+        cropperRef.value.changeScale(1)
+        break
+      case PICTURE_EDIT_ACTION_ENUM.ZOOM_OUT:
+        cropperRef.value.changeScale(-1)
+        break
+    }
+  })
+  //监听退出编辑状态消息
+  webSocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT, (msg) => {
+    console.log('收到退出编辑状态消息：', msg)
+    message.info(msg.message)
+    editingUser.value = undefined
+  })
+}
+watchEffect(() => {
+  initWebSocket()
+})
+
+onUnmounted(() => {
+  //断开链接
+  if (webSocket) {
+    webSocket.disconnect()
+  }
+  editingUser.value = undefined
+})
+
+// 进入编辑状态
+const enterEdit = () => {
+  if (webSocket) {
+    // 发送进入编辑状态的请求
+    webSocket.sendMessage({
+      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT,
+    })
+  }
+}
+
+// 退出编辑状态
+const exitEdit = () => {
+  if (webSocket) {
+    // 发送退出编辑状态的请求
+    webSocket.sendMessage({
+      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT,
+    })
+  }
+}
+
+// 编辑图片操作
+const editAction = (action: string) => {
+  if (webSocket) {
+    // 发送编辑操作的请求
+    webSocket.sendMessage({
+      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION,
+      editAction: action,
+    })
+  }
+}
 </script>
 
 <style scoped>
@@ -245,7 +406,11 @@ defineExpose({
     linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
     linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
   background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
 }
 
 /* 覆盖 vue-cropper 默认背景，让网格透出来 */

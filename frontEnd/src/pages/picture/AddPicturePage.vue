@@ -21,11 +21,7 @@
       <a-button class="edit-btn" :icon="h(EditOutlined)" @click="doEditPicture">
         裁剪与编辑图片
       </a-button>
-      <a-button
-        class="edit-btn ai-edit-btn"
-        :icon="h(FullscreenOutlined)"
-        @click="doImagePainting"
-      >
+      <a-button class="edit-btn ai-edit-btn" :icon="h(FullscreenOutlined)" @click="doImagePainting">
         AI 一键P图
       </a-button>
       <ImageCropper
@@ -33,6 +29,7 @@
         :imageUrl="picture?.url"
         :picture="picture"
         :spaceId="spaceId"
+        :space="space"
         :onSuccess="onCropSuccess"
       />
       <ImageAiEdit
@@ -95,7 +92,7 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/picture/PictureUpload.vue'
-import { computed, onMounted, reactive, ref, h } from 'vue'
+import { computed, onMounted, reactive, ref, h, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   editPictureUsingPost,
@@ -107,6 +104,7 @@ import UrlPictureUpload from '@/components/picture/UrlPictureUpload.vue'
 import ImageCropper from '@/components/picture/ImageCropper.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 import ImageAiEdit from '@/components/aiWorkspace/ImageAIEdit.vue'
+import {getSpaceVoByIdUsingGet} from "@/api/spaceController.ts";
 
 const picture = ref<API.PictureVo>()
 const pictureForm = reactive<API.PictureEditRequest>({})
@@ -231,6 +229,26 @@ const doImagePainting = () => {
 const onImageOutPaintingSuccess = (newPicture: API.PictureVo) => {
   picture.value = newPicture
 }
+
+// 获取空间信息
+const space = ref<API.SpaceVo>()
+
+// 获取空间信息
+const fetchSpace = async () => {
+  // 获取数据
+  if (spaceId.value) {
+    const res = await getSpaceVoByIdUsingGet({
+      id: spaceId.value,
+    })
+    if (res.data.code === 0 && res.data.data) {
+      space.value = res.data.data
+    }
+  }
+}
+
+watchEffect(() => {
+  fetchSpace()
+})
 </script>
 
 <style scoped>

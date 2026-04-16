@@ -57,7 +57,7 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
 
             // 获取请求参数
             String pictureId = servletRequest.getParameter("pictureId");
-            if (StrUtil.isNotBlank(pictureId)) {
+            if (StrUtil.isBlank(pictureId)) {
                 log.info("缺少图片参数，拒绝握手");
                 return false;
             }
